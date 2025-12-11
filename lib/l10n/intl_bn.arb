@@ -1,0 +1,684 @@
+{
+  "@@locale": "bn",
+  "skip": "এড়িয়ে যান",
+  "@skip": {},
+
+  "welcomeTitle": "Ready Ride এ স্বাগতম",
+  "@welcomeTitle": {},
+
+  "rideYourWay": "আপনার যাত্রা, আপনার মতো",
+  "@rideYourWay": {},
+
+  "safetyPriority": "আপনার নিরাপত্তা, আমাদের অগ্রাধিকার",
+  "@safetyPriority": {},
+
+  "smartRideSavings": "স্মার্ট রাইড, স্মার্ট সাশ্রয়।",
+  "@smartRideSavings": {},
+
+  "welcomeSubtitle": "আপনার আঙুলের ছোঁয়ায় সহজ রাইড। যেকোনো সময়, যেকোনো জায়গায় দ্রুত, নির্ভরযোগ্য এবং নিরাপদ যাত্রার অভিজ্ঞতা নিন।",
+  "@welcomeSubtitle": {},
+
+  "letsGo": "চলুন শুরু করি",
+  "@letsGo": {},
+
+  "proceedNext": "পরবর্তী ধাপে যান",
+  "@proceedNext": {},
+
+  "getStarted": "শুরু করুন",
+  "@getStarted": {},
+
+  "safeSecure": "নিরাপদ ও সুরক্ষিত রাইড",
+  "@safeSecure": {},
+
+  "rideFeatures": "রিয়েল-টাইম ট্র্যাকিং, যাচাইকৃত ড্রাইভার এবং নিরাপদ পেমেন্ট নিশ্চিত করে নিশ্চিন্ত রাইড অভিজ্ঞতা।",
+  "@rideFeatures": {},
+
+  "affordableConvenient": "সাশ্রয়ী ও সুবিধাজনক",
+  "@affordableConvenient": {},
+
+  "rideBookingEase": "প্রতিযোগিতামূলক ভাড়া, একাধিক রাইড অপশন এবং শুধু একটি ট্যাপে নির্বিঘ্ন বুকিং উপভোগ করুন।",
+  "@rideBookingEase": {},
+
+  "helloText": "হ্যালো...",
+  "@helloText": {},
+
+  "welcomeBack": "ফিরে আসার জন্য স্বাগতম!",
+  "@welcomeBack": {},
+
+  "enterPhoneDes": "আপনার রাইড চালিয়ে যেতে এবং আপডেট থাকতে আপনার ফোন নম্বর লিখুন।",
+  "@enterPhoneDes": {},
+
+  "phoneNo": "ফোন নম্বর",
+  "@phoneNo": {},
+
+  "loginSignup": "লগইন / সাইন আপ",
+  "@loginSignup": {},
+
+  "enterPhoneNumber": "ফোন নম্বর লিখুন",
+  "@enterPhoneNumber": {},
+
+  "phoneMinLengthError": "ফোন নম্বরে অন্তত ৬টি সংখ্যা থাকতে হবে",
+  "@phoneMinLengthError": {},
+
+  "otp_enter_title": "আপনার ওটিপি লিখুন",
+  "@otp_enter_title": {},
+
+  "otp_sent_message": "আমরা আপনার ফোন নম্বরে একটি ওটিপি পাঠিয়েছি",
+  "@otp_sent_message": {},
+
+  "otp_input_hint": "ওটিপি লিখুন",
+  "@otp_input_hint": {},
+
+  "otp_resend": "পুনরায় পাঠান",
+  "@otp_resend": {},
+
+  "otp_resend_timer": "00:{secondsRemaining} সেকেন্ডে কোড পুনরায় পাঠান",
+  "@otp_resend_timer": {
+    "placeholders": {
+      "secondsRemaining": {}
+    }
+  },
+
+  "otp_save_button": "সংরক্ষণ করুন",
+  "@otp_save_button": {},
+
+  "otp_title_short": "ওটিপি",
+  "@otp_title_short": {},
+
+  "password_label": "পাসওয়ার্ড",
+  "@password_label": {},
+
+  "password_hint": "একটি শক্তিশালী পাসওয়ার্ড সেট করুন",
+  "@password_hint": {},
+
+  "password_requirements": "{length} অক্ষরের একটি পাসওয়ার্ড ব্যবহার করুন।",
+  "@password_requirements": {
+    "placeholders": {
+      "length": {}
+    }
+  },
+
+  "confirm_password": "পাসওয়ার্ড নিশ্চিত করুন",
+  "@confirm_password": {},
+
+  "password_mismatch": "পাসওয়ার্ড মিলছে না।",
+  "@password_mismatch": {},
+
+  "field_required": "এই ঘরটি অবশ্যই পূরণ করতে হবে",
+  "@field_required": {},
+
+  "min_length_error": "অন্তত {length} অক্ষরের হতে হবে",
+  "@min_length_error": {
+    "placeholders": {
+      "length": {}
+    }
+  },
+
+  "profile_info_title": "প্রোফাইল তথ্য",
+  "@profile_info_title": {},
+
+  "profile_info_subtitle": "প্রোফাইল তথ্য যুক্ত করুন",
+  "@profile_info_subtitle": {},
+
+  "profile_info_description": "আপনার প্রোফাইল সম্পূর্ণ করতে এবং অভিজ্ঞতা উন্নত করতে আপনার তথ্য লিখুন।",
+  "@profile_info_description": {},
+
+  "name_label": "নাম",
+  "@name_label": {},
+
+  "email_label": "ইমেইল",
+  "@email_label": {},
+
+  "gender_label": "লিঙ্গ",
+  "@gender_label": {},
+
+  "gender_male": "পুরুষ",
+  "@gender_male": {},
+
+  "gender_female": "নারী",
+  "@gender_female": {},
+
+  "gender_other": "অন্যান্য",
+  "@gender_other": {},
+
+  "gender_select": "লিঙ্গ নির্বাচন করুন",
+  "@gender_select": {},
+
+  "fetching_address": "ঠিকানা আনা হচ্ছে...",
+  "@fetching_address": {},
+
+  "search_destination": "গন্তব্য অনুসন্ধান",
+  "@search_destination": {},
+
+  "services": "সেবা",
+  "@services": {},
+
+  "please_wait": "অনুগ্রহ করে অপেক্ষা করুন...",
+  "@please_wait": {},
+
+  "home": "হোম",
+  "@home": {},
+
+  "wallet": "ওয়ালেট",
+  "@wallet": {},
+
+  "activity": "কার্যক্রম",
+  "@activity": {},
+
+  "account": "অ্যাকাউন্ট",
+  "@account": {},
+
+  "no_wallet_data_available": "কোনও ওয়ালেট তথ্য পাওয়া যায়নি",
+  "@no_wallet_data_available": {},
+
+  "wallet_balance": "ওয়ালেট ব্যালেন্স",
+  "@wallet_balance": {},
+
+  "payment_gateway": "পেমেন্ট গেটওয়ে",
+  "@payment_gateway": {},
+
+  "add_new": "নতুন যোগ করুন",
+  "@add_new": {},
+
+  "no_cards_yet": "এখনও কোনও কার্ড নেই!",
+  "@no_cards_yet": {},
+
+  "today": "আজ",
+  "@today": {},
+
+  "complete_ride": "রাইড সম্পন্ন করুন",
+  "@complete_ride": {},
+
+  "cancel_ride": "রাইড বাতিল করুন",
+  "@cancel_ride": {},
+
+  "no_rides_yet": "এখনও কোনও রাইড নেই।",
+  "@no_rides_yet": {},
+
+  "error_with_msg": "ত্রুটি: {msg}",
+  "@error_with_msg": {
+    "placeholders": {
+      "msg": {}
+    }
+  },
+
+  "my_profile": "আমার প্রোফাইল",
+  "@my_profile": {},
+
+  "change_password": "পাসওয়ার্ড পরিবর্তন করুন",
+  "@change_password": {},
+
+  "terms_conditions": "শর্তাবলী",
+  "@terms_conditions": {},
+
+  "privacy_policy": "প্রাইভেসি পলিসি",
+  "@privacy_policy": {},
+
+  "log_out": "লগ আউট",
+  "@log_out": {},
+
+  "delete_account": "অ্যাকাউন্ট মুছে ফেলুন",
+  "@delete_account": {},
+
+  "language": "ভাষা",
+  "@language": {},
+
+  "are_you_sure_msg": "আপনি কি নিশ্চিত আপনি অ্যাপ থেকে {msg} করতে চান?",
+  "@are_you_sure_msg": {
+    "placeholders": {
+      "msg": {}
+    }
+  },
+
+  "see_you_next_ride": "পরবর্তী রাইডের জন্য আবার আপনাকে দেখতে চাই!",
+  "@see_you_next_ride": {},
+
+  "exit": "প্রস্থান",
+  "@exit": {},
+
+  "cancel": "বাতিল করুন",
+  "@cancel": {},
+
+  "location_permission_needed": "লোকেশন অনুমতি প্রয়োজন",
+  "@location_permission_needed": {},
+
+  "location_permission_msg": "এই ফিচারটি ব্যবহারের জন্য লোকেশন অ্যাক্সেস চালু করুন।",
+  "@location_permission_msg": {},
+
+  "grant_permission": "অনুমতি দিন",
+  "@grant_permission": {},
+
+  "find_you_faster": "চলুন আপনাকে দ্রুত খুঁজে নেই!",
+  "@find_you_faster": {},
+
+  "find_you_faster_msg": "লোকেশন চালু করুন যাতে কাছাকাছি ড্রাইভারের সাথে সহজে ম্যাচ করা যায়।",
+  "@find_you_faster_msg": {},
+
+  "skip_for_now": "এখনই বাদ দিন",
+  "@skip_for_now": {},
+
+  "allow": "অনুমতি দিন",
+  "@allow": {},
+
+  "select_pickup_location": "পিকআপ লোকেশন নির্বাচন করুন",
+  "@select_pickup_location": {},
+
+  "confirm": "নিশ্চিত করুন",
+  "@confirm": {},
+
+  "pickup": "পিকআপ",
+  "@pickup": {},
+
+  "stop_point": "স্টপ পয়েন্ট",
+  "@stop_point": {},
+
+  "destination": "গন্তব্য",
+  "@destination": {},
+
+  "enter_pickup_point": "পিকআপ পয়েন্ট লিখুন",
+  "@enter_pickup_point": {},
+
+  "enter_stop_point": "স্টপ পয়েন্ট লিখুন",
+  "@enter_stop_point": {},
+
+  "enter_destination": "গন্তব্য লিখুন",
+  "@enter_destination": {},
+
+  "choose_ride_title": "আপনার জন্য উপযুক্ত রাইডটি বেছে নিন",
+  "@choose_ride_title": {},
+
+  "ride_preferences": "রাইড পছন্দ",
+  "@ride_preferences": {},
+
+  "no_service_available": "কোনো পরিষেবা পাওয়া যায়নি",
+  "@no_service_available": {},
+
+  "apply": "প্রয়োগ করুন",
+  "@apply": {},
+
+  "ride_preferences_description": "আপনার প্রয়োজন অনুযায়ী রাইডের ধরন বেছে নিন।",
+  "@ride_preferences_description": {},
+
+  "initializing": "আরম্ভ হচ্ছে...",
+  "@initializing": {},
+
+  "select_service": "একটি পরিষেবা নির্বাচন করুন!",
+  "@select_service": {},
+
+  "start_ride": "রাইড শুরু করুন",
+  "@start_ride": {},
+
+  "add_coupon_code": "কুপন কোড যোগ করুন",
+  "@add_coupon_code": {},
+
+  "coupon_description": "আপনার রাইডে ছাড় পেতে একটি বৈধ কুপন কোড দিন।",
+  "@coupon_description": {},
+
+  "enter_coupon_code": "কুপন কোড লিখুন",
+  "@enter_coupon_code": {},
+
+  "ride_requested": "রাইড অনুরোধ করা হয়েছে",
+  "@ride_requested": {},
+
+  "searching_for_driver": "অনলাইনে ড্রাইভার খোঁজা হচ্ছে..",
+  "@searching_for_driver": {},
+
+  "wait_message": "অনুগ্রহ করে অপেক্ষা করুন যতক্ষণ না আমরা আপনাকে নিকটতম উপলব্ধ ড্রাইভারের সাথে সংযুক্ত করব।",
+  "@wait_message": {},
+
+  "type_a_message": "একটি বার্তা লিখুন",
+  "@type_a_message": {},
+
+  "cancel_title": "আপনি রাইড বাতিল করছেন কেন জানান",
+  "@cancel_title": {},
+
+  "cancel_subtitle": "আপনার রাইড বাতিলের কারণ জানান।",
+  "@cancel_subtitle": {},
+
+  "reason_driver_late": "ড্রাইভার দেরি করছে।",
+  "@reason_driver_late": {},
+
+  "reason_wrong_location": "ভুল পিকআপ লোকেশন।",
+  "@reason_wrong_location": {},
+
+  "reason_mismatch_info": "ড্রাইভার/গাড়ির তথ্য মিলছে না।",
+  "@reason_mismatch_info": {},
+
+  "reason_changed_mind": "ভাবনা পরিবর্তন করেছি।",
+  "@reason_changed_mind": {},
+
+  "reason_other": "অন্যান্য",
+  "@reason_other": {},
+
+  "go_back_to_ride": "রাইডে ফিরে যান",
+  "@go_back_to_ride": {},
+
+  "cancel_the_ride": "রাইড বাতিল করুন",
+  "@cancel_the_ride": {},
+
+  "trips": "ট্রিপসমূহ",
+  "@trips": {},
+
+  "ride_on_the_way": "আপনার রাইড আসছে",
+  "@ride_on_the_way": {},
+
+  "driver_heading_to_you": "ড্রাইভার আপনার লোকেশনের দিকে আসছেন। অনুগ্রহ করে প্রস্তুত থাকুন।",
+  "@driver_heading_to_you": {},
+
+  "ride_ready": "আপনার রাইড প্রস্তুত!",
+  "@ride_ready": {},
+
+  "driver_arrived": "ড্রাইভার পিকআপ লোকেশনে পৌঁছে গেছেন। এখনই যান।",
+  "@driver_arrived": {},
+
+  "inside_car": "আপনি গাড়িতে আছেন। আরামে বসুন।",
+  "@inside_car": {},
+
+  "ride_started": "আপনার রাইড শুরু হয়েছে",
+  "@ride_started": {},
+
+  "ride_in_progress": "আরামে বসে থাকুন। ড্রাইভার আপনাকে গন্তব্যে নিয়ে যাচ্ছেন।",
+  "@ride_in_progress": {},
+
+  "estimated_time": "আনুমানিক সময়",
+  "@estimated_time": {},
+
+  "ride_complete": "আপনার রাইড সম্পন্ন হয়েছে",
+  "@ride_complete": {},
+
+  "ride_feedback_prompt": "আশা করি রাইডটি মসৃণ হয়েছে। অনুগ্রহ করে পেমেন্ট সম্পন্ন করুন এবং রেটিং দিন।",
+  "@ride_feedback_prompt": {},
+
+  "confirm_pay": "পেমেন্ট নিশ্চিত করুন",
+  "@confirm_pay": {},
+
+  "select_payment_method": "পেমেন্ট পদ্ধতি নির্বাচন করুন",
+  "@select_payment_method": {},
+
+  "payment_completed": "ধন্যবাদ! পেমেন্ট সম্পন্ন হয়েছে",
+  "@payment_completed": {},
+
+  "payment_confirmation": "{method} মাধ্যমে পেমেন্ট হয়েছে। আশা করি রাইডটি ভালো হয়েছে! দয়া করে রেটিং দিতে ভুলবেন না।",
+  "@payment_confirmation": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+
+  "share_experience": "আপনার অভিজ্ঞতা শেয়ার করুন!",
+  "@share_experience": {},
+
+  "enter_experience": "আপনার অভিজ্ঞতা লিখুন!",
+  "@enter_experience": {},
+
+  "submit": "জমা দিন",
+  "@submit": {},
+
+  "service_charge": "পরিষেবা চার্জ",
+  "@service_charge": {},
+
+  "discount": "ডিসকাউন্ট",
+  "@discount": {},
+
+  "total_amount": "মোট পরিমাণ",
+  "@total_amount": {},
+
+  "please_select_payment_type": "অনুগ্রহ করে পেমেন্ট টাইপ নির্বাচন করুন",
+  "@please_select_payment_type": {},
+
+  "drag_map_adjust_location": "অবস্থান সমন্বয়ের জন্য মানচিত্র টেনে আনুন",
+  "@drag_map_adjust_location": {},
+
+  "confirm_destination": "গন্তব্য নিশ্চিত করুন",
+  "@confirm_destination": {},
+
+  "confirm_pickup": "পিকআপ নিশ্চিত করুন",
+  "@confirm_pickup": {},
+
+  "no_address_found": "কোন ঠিকানা পাওয়া যায়নি",
+  "@no_address_found": {},
+
+  "full_name": "পুরো নাম",
+  "@full_name": {},
+
+  "mobile_number": "মোবাইল নম্বর",
+  "@mobile_number": {},
+
+  "email": "ইমেইল",
+  "@email": {},
+
+  "gender": "লিঙ্গ",
+  "@gender": {},
+
+  "gender_required": "লিঙ্গ প্রয়োজন",
+  "@gender_required": {},
+
+  "save": "সংরক্ষণ করুন",
+  "@save": {},
+
+  "current_password": "বর্তমান পাসওয়ার্ড",
+  "@current_password": {},
+  "new_password": "নতুন পাসওয়ার্ড",
+  "@new_password": {},
+  "confirm_new_password": "নতুন পাসওয়ার্ড নিশ্চিত করুন",
+  "@confirm_new_password": {},
+  "all_rights_reserved": "{msg} সর্বস্বত্ব সংরক্ষিত।",
+  "@all_rights_reserved": {
+    "placeholders": {
+      "msg": {}
+    }
+  },
+  "close": "বন্ধ করুন",
+  "@close": {},
+  "delete_account_confirmation": "আপনি কি নিশ্চিত যে আপনার অ্যাকাউন্ট মুছে ফেলতে চান?",
+  "@delete_account_confirmation": {},
+  "delete_account_warning": "এই কাজটি স্থায়ী এবং পূর্বাবস্থায় ফেরানো যাবে না।",
+  "@delete_account_warning": {},
+  "delete": "মুছে ফেলুন",
+  "@delete": {},
+
+  "login_with_your_password": "আপনার পাসওয়ার্ড দিয়ে লগইন করুন",
+  "@login_with_your_password": {},
+
+  "use_your_password_here": "এখানে আপনার পাসওয়ার্ড ব্যবহার করুন",
+  "@use_your_password_here": {},
+
+  "use_otp_instead": "তার পরিবর্তে ওটিপি ব্যবহার করুন",
+  "@use_otp_instead": {},
+
+  "either_phone_number_is_null_or_password_is_empty": "ফোন নম্বর খালি বা পাসওয়ার্ড ফাঁকা",
+  "@either_phone_number_is_null_or_password_is_empty": {},
+
+  "add_balance_to_your_wallet": "আপনার ওয়ালেটে ব্যালেন্স যোগ করুন",
+  "@add_balance_to_your_wallet": {},
+
+  "top_up_your_wallet_securely_and_enjoy_seamless_payments": "নিরাপদে আপনার ওয়ালেট পূরণ করুন এবং নির্বিঘ্নে পেমেন্ট উপভোগ করুন।",
+  "@top_up_your_wallet_securely_and_enjoy_seamless_payments": {},
+
+  "no_payment_methods_available": "কোন পেমেন্ট পদ্ধতি পাওয়া যায়নি",
+  "@no_payment_methods_available": {},
+
+  "select_card_type": "কার্ডের ধরন নির্বাচন করুন",
+  "@select_card_type": {},
+
+  "enter_amount": "পরিমাণ লিখুন",
+  "@enter_amount": {},
+
+  "enter_a_valid_amount": "একটি সঠিক পরিমাণ লিখুন",
+  "@enter_a_valid_amount": {},
+
+  "add_wallet": "ওয়ালেট যোগ করুন",
+  "@add_wallet": {},
+
+  "form_is_not_valid": "ফর্মটি বৈধ নয়",
+  "@form_is_not_valid": {},
+
+  "add_payment_gateway": "পেমেন্ট গেটওয়ে যোগ করুন",
+  "@add_payment_gateway": {},
+
+  "cardholder_name": "কার্ডধারীর নাম",
+  "@cardholder_name": {},
+
+  "enter_cardholder_name": "নাম লিখুন",
+  "@enter_cardholder_name": {},
+
+  "card_number": "কার্ড নম্বর",
+  "@card_number": {},
+
+  "enter_valid_card_number": "সঠিক কার্ড নম্বর লিখুন",
+  "@enter_valid_card_number": {},
+
+  "exp_date": "মেয়াদ শেষের তারিখ",
+  "@exp_date": {},
+
+  "pick_a_date": "একটি তারিখ নির্বাচন করুন",
+  "@pick_a_date": {},
+
+  "cvv": "CVV",
+  "@cvv": {},
+
+  "enter_3_digit_cvv": "৩ সংখ্যার CVV লিখুন",
+  "@enter_3_digit_cvv": {},
+
+  "country": "দেশ",
+  "@country": {},
+
+  "select_a_country": "একটি দেশ নির্বাচন করুন",
+  "@select_a_country": {},
+
+  "connection_timeout_with_api_server": "API সার্ভারের সাথে সংযোগের সময় শেষ হয়েছে",
+  "@connection_timeout_with_api_server": {},
+
+  "receive_timeout_with_api_server": "API সার্ভার থেকে ডেটা গ্রহণের সময় শেষ হয়েছে",
+  "@receive_timeout_with_api_server": {},
+
+  "send_timeout_with_api_server": "API সার্ভারে ডেটা পাঠানোর সময় শেষ হয়েছে",
+  "@send_timeout_with_api_server": {},
+
+  "bad_certificate_with_api_server": "API সার্ভারের সাথে খারাপ সার্টিফিকেট",
+  "@bad_certificate_with_api_server": {},
+
+  "received_invalid_response_from_server": "সার্ভার থেকে অবৈধ উত্তর পাওয়া গেছে।",
+  "@received_invalid_response_from_server": {},
+
+  "request_to_api_server_was_cancelled": "API সার্ভারে অনুরোধ বাতিল হয়েছে",
+  "@request_to_api_server_was_cancelled": {},
+
+  "connection_error_with_api_server": "API সার্ভারের সাথে সংযোগ ত্রুটি",
+  "@connection_error_with_api_server": {},
+
+  "no_internet_connection_please_check": "ইন্টারনেট সংযোগ নেই। অনুগ্রহ করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।",
+  "@no_internet_connection_please_check": {},
+
+  "unexpected_error_occurred": "একটি অপ্রত্যাশিত ত্রুটি ঘটেছে",
+  "@unexpected_error_occurred": {},
+
+  "unexpected_response_format": "অপ্রত্যাশিত রেসপন্স ফরম্যাট",
+  "@unexpected_response_format": {},
+
+  "bad_request": "ত্রুটিপূর্ণ অনুরোধ",
+  "@bad_request": {},
+
+  "unauthorized_access_please_login_again": "অননুমোদিত প্রবেশ। দয়া করে আবার লগইন করুন।",
+  "@unauthorized_access_please_login_again": {},
+
+  "forbidden_access_please_login_again": "নিষিদ্ধ প্রবেশ। দয়া করে আবার লগইন করুন।",
+  "@forbidden_access_please_login_again": {},
+
+  "validation_error": "ভ্যালিডেশন ত্রুটি",
+  "@validation_error": {},
+
+  "internal_server_error": "সার্ভার অভ্যন্তরীণ ত্রুটি",
+  "@internal_server_error": {},
+
+  "something_went_wrong": "কিছু ভুল হয়েছে",
+  "@something_went_wrong": {},
+
+  "no_internet_connection": "ইন্টারনেট সংযোগ নেই।",
+  "@no_internet_connection": {},
+
+  "request_timed_out_please_try_again": "অনুরোধের সময় শেষ হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।",
+  "@request_timed_out_please_try_again": {},
+
+  "something_went_wrong_exclamation": "কিছু ভুল হয়েছে!",
+  "@something_went_wrong_exclamation": {},
+
+  "resource_not_found": "সম্পদ পাওয়া যায়নি।",
+  "@resource_not_found": {},
+
+  "unexpected_application_crash": "অপ্রত্যাশিত অ্যাপ ক্র্যাশ",
+  "@unexpected_application_crash": {},
+
+  "app_encountered_unexpected_error": "অ্যাপটি একটি অপ্রত্যাশিত ত্রুটির সম্মুখীন হয়েছে এবং বন্ধ করতে হয়েছে। এটি হতে পারে ডিভাইসের মেমোরি কম থাকা, অ্যাপের বাগ, বা ক্ষতিগ্রস্ত ফাইলের কারণে। সমস্যা চলতে থাকলে অ্যাপটি রিস্টার্ট করুন অথবা পুনরায় ইনস্টল করুন।",
+  "@app_encountered_unexpected_error": {},
+
+  "contact_support": "সাপোর্টের সাথে যোগাযোগ করুন",
+  "@contact_support": {},
+
+  "theme": "থিম",
+  "@theme": {},
+  "select_profile_image": "প্রোফাইল ছবি নির্বাচন করুন",
+  "@select_profile_image": {},
+  "upload_image": "ছবি আপলোড করুন",
+  "@upload_image": {},
+  "or_select_avatar": "অথবা নিচের তালিকা থেকে একটি অবতার নির্বাচন করুন:",
+  "@or_select_avatar": {},
+
+  "reportIssue": "সমস্যা জানান",
+  "@reportIssue": {},
+  "rideDetails": "যাত্রার বিস্তারিত",
+  "@rideDetails": {},
+  "textCopied": "টেক্সট কপি হয়েছে",
+  "@textCopied": {},
+  "reportIssueTitle": "কোনো সমস্যা হয়েছে? সমস্যা রিপোর্ট করুন",
+  "@reportIssueTitle": {},
+  "reportIssueSubtitle": "আমাদের জানান কী হয়েছে। আমরা দ্রুত সমাধান করব।",
+  "@reportIssueSubtitle": {},
+  "reportType": "রিপোর্টের ধরন",
+  "@reportType": {},
+  "selectReportType": "রিপোর্টের ধরন নির্বাচন করুন",
+  "@selectReportType": {},
+  "details": "বিস্তারিত",
+  "@details": {},
+  "writeIssueDetails": "সমস্যার বিস্তারিত লিখুন",
+  "@writeIssueDetails": {},
+  "insertAllData": "অনুগ্রহ করে সব তথ্য প্রদান করুন",
+  "@insertAllData": {},
+  "issueSubmitted": "আপনার সমস্যা সফলভাবে জমা হয়েছে",
+  "@issueSubmitted": {},
+  "thanksForReporting": "সমস্যা জানানোর জন্য ধন্যবাদ। আমাদের টিম দ্রুত আপনার সাথে যোগাযোগ করবে।",
+  "@thanksForReporting": {},
+
+  "downloadReceipt": "রসিদ ডাউনলোড করুন",
+  "@downloadReceipt": {},
+
+  "status": "অবস্থা",
+  "@status": {},
+
+  "paymentMethod": "পেমেন্ট পদ্ধতি",
+  "@paymentMethod": {},
+
+  "rideCharge": "যাত্রার চার্জ",
+  "@rideCharge": {},
+
+  "requestEntityTooLarge": "অনুরোধকৃত এককটি খুব বড়",
+  "@requestEntityTooLarge": {},
+
+  "login": "লগইন",
+  "@login": {},
+
+  "yourAccountAlreadyActive": "আপনার অ্যাকাউন্ট ইতিমধ্যেই অন্য ডিভাইসে সক্রিয় আছে। এখানে ব্যবহার করতে চাইলে অন্য ডিভাইস থেকে লগআউট হয়ে যাবে।",
+  "@yourAccountAlreadyActive": {},
+
+  "loggingInSomewhereElse": "অন্য কোথাও লগইন করা হচ্ছে",
+  "@loggingInSomewhereElse": {},
+
+  "stayOnThisDevice": "এই ডিভাইসে থাকুন",
+  "@stayOnThisDevice": {},
+
+  "view_details": "বিস্তারিত দেখুন",
+  "@view_details": {}
+
+}

@@ -1,0 +1,703 @@
+{
+  "@@locale": "te",
+  "skip": "దాటవేయి",
+  "@skip": {},
+
+  "welcomeTitle": "రెడీ రైడ్‌కు స్వాగతం",
+  "@welcomeTitle": {},
+
+  "rideYourWay": "మీ రైడ్, మీ మార్గం",
+  "@rideYourWay": {},
+
+  "safetyPriority": "మీ భద్రత, మా ప్రాధాన్యత",
+  "@safetyPriority": {},
+
+  "smartRideSavings": "స్మార్ట్ రైడ్‌లు, స్మార్ట్ పొదుపులు.",
+  "@smartRideSavings": {},
+
+  "welcomeSubtitle": "మీ వేళ్ల చివర్లలో సులభమైన రైడ్‌లు. ఎప్పుడైనా, ఎక్కడైనా వేగవంతమైన, నమ్మకమైన మరియు సురక్షితమైన రవాణాను అనుభవించండి.",
+  "@welcomeSubtitle": {},
+
+  "letsGo": "వెళ్దాం",
+  "@letsGo": {},
+
+  "proceedNext": "తర్వాత కొనసాగించు",
+  "@proceedNext": {},
+
+  "getStarted": "ప్రారంభించండి",
+  "@getStarted": {},
+
+  "safeSecure": "సురక్షిత మరియు సురక్షితమైన రైడ్‌లు",
+  "@safeSecure": {},
+
+  "rideFeatures": "రియల్-టైమ్ ట్రాకింగ్, ధృవీకరించబడిన డ్రైవర్‌లు మరియు సురక్షిత చెల్లింపులు చింత లేని రైడ్ అనుభవాన్ని నిర్ధారిస్తాయి.",
+  "@rideFeatures": {},
+
+  "affordableConvenient": "అధిక ధర మరియు సౌకర్యవంతమైన",
+  "@affordableConvenient": {},
+
+  "rideBookingEase": "పోటీ ధరలు, బహుళ రైడ్ ఎంపికలు మరియు కేవలం ఒక టాప్‌తో నిరాటంకమైన బుకింగ్‌ను ఆస్వాదించండి.",
+  "@rideBookingEase": {},
+
+  "helloText": "హలో...",
+  "@helloText": {},
+
+  "welcomeBack": "మళ్లీ స్వాగతం!",
+  "@welcomeBack": {},
+
+  "enterPhoneDes": "మీ రైడ్‌ను కొనసాగించడానికి మరియు నవీకరించబడటానికి మీ ఫోన్ నంబర్‌ను నమోదు చేయండి.",
+  "@enterPhoneDes": {},
+
+  "phoneNo": "ఫోన్ నంబర్",
+  "@phoneNo": {},
+
+  "loginSignup": "లాగిన్ / సైన్ అప్",
+  "@loginSignup": {},
+
+  "enterPhoneNumber": "ఫోన్ నంబర్ నమోదు చేయండి",
+  "@enterPhoneNumber": {},
+
+  "phoneMinLengthError": "ఫోన్ నంబర్ కనీసం 6 అంకెలు ఉండాలి",
+  "@phoneMinLengthError": {},
+
+  "otp_enter_title": "మీ OTP నమోదు చేయండి",
+  "@otp_enter_title": {},
+
+  "otp_sent_message": "మేము మీ ఫోన్ నంబర్‌కు OTP కోడ్ పంపాము",
+  "@otp_sent_message": {},
+
+  "otp_input_hint": "మీ OTP వ్రాయండి",
+  "@otp_input_hint": {},
+
+  "otp_resend": "మళ్లీ పంపండి",
+  "@otp_resend": {},
+
+  "otp_resend_timer": "00:{secondsRemaining}లో కోడ్‌ను మళ్లీ పంపండి",
+  "@otp_resend_timer": {
+    "placeholders": {
+      "secondsRemaining": {}
+    }
+  },
+
+  "otp_save_button": "సేవ్ చేయండి",
+  "@otp_save_button": {},
+
+  "otp_title_short": "OTP",
+  "@otp_title_short": {},
+
+  "password_label": "పాస్‌వర్డ్",
+  "@password_label": {},
+
+  "password_hint": "బలమైన పాస్‌వర్డ్ సెట్ చేయండి",
+  "@password_hint": {},
+
+  "password_requirements": "కనీసం {length} అక్షరాలను ఉపయోగించండి",
+  "@password_requirements": {
+    "placeholders": {
+      "length": {}
+    }
+  },
+
+  "confirm_password": "పాస్‌వర్డ్ నిర్ధారించండి",
+  "@confirm_password": {},
+
+  "password_mismatch": "పాస్‌వర్డ్‌లు సరిపోలవు.",
+  "@password_mismatch": {},
+
+  "field_required": "ఈ ఫీల్డ్ అవసరం",
+  "@field_required": {},
+
+  "min_length_error": "కనీసం {length} అక్షరాలు ఉండాలి",
+  "@min_length_error": {
+    "placeholders": {
+      "length": {}
+    }
+  },
+
+  "profile_info_title": "ప్రొఫైల్ సమాచారం",
+  "@profile_info_title": {},
+
+  "profile_info_subtitle": "ప్రొఫైల్ సమాచారం జోడించండి",
+  "@profile_info_subtitle": {},
+
+  "profile_info_description": "మీ ప్రొఫైల్‌ను పూర్తి చేయడానికి మరియు మీ అనుభవాన్ని మెరుగుపరచడానికి మీ వివరాలను నమోదు చేయండి.",
+  "@profile_info_description": {},
+
+  "name_label": "పేరు",
+  "@name_label": {},
+
+  "email_label": "ఇమెయిల్",
+  "@email_label": {},
+
+  "gender_label": "లింగం",
+  "@gender_label": {},
+
+  "gender_male": "పురుషుడు",
+  "@gender_male": {},
+
+  "gender_female": "స్త్రీ",
+  "@gender_female": {},
+
+  "gender_other": "ఇతర",
+  "@gender_other": {},
+
+  "gender_select": "లింగం ఎంచుకోండి",
+  "@gender_select": {},
+
+  "fetching_address": "చిరునామా పొందుతోంది...",
+  "@fetching_address": {},
+
+  "search_destination": "గమ్యస్థానం శోధించండి",
+  "@search_destination": {},
+
+  "services": "సేవలు",
+  "@services": {},
+
+  "please_wait": "దయచేసి వేచి ఉండండి...",
+  "@please_wait": {},
+
+  "home": "హోమ్",
+  "@home": {},
+
+  "wallet": "వాలెట్",
+  "@wallet": {},
+
+  "activity": "కార్యాచరణ",
+  "@activity": {},
+
+  "account": "ఖాతా",
+  "@account": {},
+
+  "no_wallet_data_available": "వాలెట్ డేటా అందుబాటులో లేదు",
+  "@no_wallet_data_available": {},
+
+  "wallet_balance": "వాలెట్ బ్యాలెన్స్",
+  "@wallet_balance": {},
+
+  "payment_gateway": "చెల్లింపు గేట్‌వే",
+  "@payment_gateway": {},
+
+  "add_new": "కొత్తది జోడించండి",
+  "@add_new": {},
+
+  "no_cards_yet": "ఇంకా కార్డ్‌లు లేవు!",
+  "@no_cards_yet": {},
+
+  "today": "ఈరోజు",
+  "@today": {},
+
+  "complete_ride": "రైడ్ పూర్తి చేయండి",
+  "@complete_ride": {},
+
+  "cancel_ride": "రైడ్ రద్దు చేయండి",
+  "@cancel_ride": {},
+
+  "no_rides_yet": "ఇంకా రైడ్‌లు లేవు.",
+  "@no_rides_yet": {},
+
+  "error_with_msg": "దోషం: {msg}",
+  "@error_with_msg": {
+    "placeholders": {
+      "msg": {}
+    }
+  },
+
+  "my_profile": "నా ప్రొఫైల్",
+  "@my_profile": {},
+
+  "change_password": "పాస్‌వర్డ్ మార్చండి",
+  "@change_password": {},
+
+  "terms_conditions": "నిబంధనలు & షరతులు",
+  "@terms_conditions": {},
+
+  "privacy_policy": "గోప్యతా విధానం",
+  "@privacy_policy": {},
+
+  "log_out": "లాగ్ అవుట్",
+  "@log_out": {},
+
+  "delete_account": "ఖాతాను తొలగించండి",
+  "@delete_account": {},
+
+  "language": "భాష",
+  "@language": {},
+
+  "are_you_sure_msg": "మీరు ఖచ్చితంగా {msg} అని అనుకుంటున్నారా",
+  "@are_you_sure_msg": {
+    "placeholders": {
+      "msg": {}
+    }
+  },
+
+  "see_you_next_ride": "మీ తదుపరి రైడ్ కోసం త్వరలో మిమ్మల్ని మళ్లీ చూడాలని ఆశిస్తున్నాము!",
+  "@see_you_next_ride": {},
+
+  "exit": "నిష్క్రమించు",
+  "@exit": {},
+
+  "cancel": "రద్దు చేయండి",
+  "@cancel": {},
+
+  "location_permission_needed": "స్థాన అనుమతి అవసరం",
+  "@location_permission_needed": {},
+
+  "location_permission_msg": "దయచేసి ఈ ఫీచర్‌ను ఉపయోగించడానికి స్థాన ప్రాప్యతను ప్రారంభించండి.",
+  "@location_permission_msg": {},
+
+  "grant_permission": "అనుమతి ఇవ్వండి",
+  "@grant_permission": {},
+
+  "find_you_faster": "మిమ్మల్ని వేగంగా కనుగొనండి!",
+  "@find_you_faster": {},
+
+  "find_you_faster_msg": "సమీపంలోని డ్రైవర్‌లతో వేగంగా మరియు సులభంగా మ్యాచ్ కావడానికి స్థాన ప్రాప్యతను ప్రారంభించండి.",
+  "@find_you_faster_msg": {},
+
+  "skip_for_now": "ఇప్పుడు దాటవేయి",
+  "@skip_for_now": {},
+
+  "allow": "అనుమతించు",
+  "@allow": {},
+
+  "select_pickup_location": "పికప్ స్థానాన్ని ఎంచుకోండి",
+  "@select_pickup_location": {},
+
+  "confirm": "నిర్ధారించండి",
+  "@confirm": {},
+
+  "pickup": "పికప్",
+  "@pickup": {},
+
+  "stop_point": "ఆపే స్థానం",
+  "@stop_point": {},
+
+  "destination": "గమ్యస్థానం",
+  "@destination": {},
+
+  "enter_pickup_point": "పికప్ పాయింట్ నమోదు చేయండి",
+  "@enter_pickup_point": {},
+
+  "enter_stop_point": "ఆపే స్థానం నమోదు చేయండి",
+  "@enter_stop_point": {},
+
+  "enter_destination": "గమ్యస్థానం నమోదు చేయండి",
+  "@enter_destination": {},
+
+  "choose_ride_title": "మీకు సరిపోయే రైడ్‌ను ఎంచుకోండి",
+  "@choose_ride_title": {},
+
+  "ride_preferences": "రైడ్ ప్రాధాన్యతలు",
+  "@ride_preferences": {},
+
+  "no_service_available": "సేవ అందుబాటులో లేదు",
+  "@no_service_available": {},
+
+  "apply": "వర్తింపజేయండి",
+  "@apply": {},
+
+  "ride_preferences_description": "మీ అవసరాలకు సరిపోయే రైడ్ రకాన్ని ఎంచుకోండి.",
+  "@ride_preferences_description": {},
+
+  "initializing": "ప్రారంభిస్తోంది...",
+  "@initializing": {},
+
+  "select_service": "సేవను ఎంచుకోండి!",
+  "@select_service": {},
+
+  "start_ride": "రైడ్ ప్రారంభించండి",
+  "@start_ride": {},
+
+  "add_coupon_code": "కూపన్ కోడ్ జోడించండి",
+  "@add_coupon_code": {},
+
+  "coupon_description": "మీ రైడ్‌కు తగ్గింపులను వర్తింపజేయడానికి చెల్లుబాటు అయ్యే కూపన్ కోడ్‌ను నమోదు చేయండి.",
+  "@coupon_description": {},
+
+  "enter_coupon_code": "కూపన్ కోడ్ నమోదు చేయండి",
+  "@enter_coupon_code": {},
+
+  "ride_requested": "రైడ్ అభ్యర్థించబడింది",
+  "@ride_requested": {},
+
+  "searching_for_driver": "ఆన్‌లైన్ డ్రైవర్‌ను శోధిస్తోంది..",
+  "@searching_for_driver": {},
+
+  "wait_message": "దయచేసి మేము మిమ్మల్ని సమీపంలోని అందుబాటులో ఉన్న డ్రైవర్‌తో కనెక్ట్ చేస్తున్నప్పుడు వేచి ఉండండి.",
+  "@wait_message": {},
+
+  "type_a_message": "సందేశం టైప్ చేయండి",
+  "@type_a_message": {},
+
+  "cancel_title": "మీరు రైడ్‌ను ఎందుకు రద్దు చేస్తున్నారో మాకు చెప్పండి",
+  "@cancel_title": {},
+
+  "cancel_subtitle": "మీ రైడ్‌ను రద్దు చేయడానికి కారణం మాకు తెలియజేయండి.",
+  "@cancel_subtitle": {},
+
+  "reason_driver_late": "డ్రైవర్ చాలా సమయం తీసుకుంటున్నాడు.",
+  "@reason_driver_late": {},
+
+  "reason_wrong_location": "తప్పు పికప్ స్థానం.",
+  "@reason_wrong_location": {},
+
+  "reason_mismatch_info": "డ్రైవర్/వాహన సమాచారం సరిపోలలేదు.",
+  "@reason_mismatch_info": {},
+
+  "reason_changed_mind": "నా మనసు మార్చుకున్నాను.",
+  "@reason_changed_mind": {},
+
+  "reason_other": "ఇతర",
+  "@reason_other": {},
+
+  "go_back_to_ride": "రైడ్‌కు తిరిగి వెళ్ళండి",
+  "@go_back_to_ride": {},
+
+  "cancel_the_ride": "రైడ్‌ను రద్దు చేయండి",
+  "@cancel_the_ride": {},
+
+  "trips": "ప్రయాణాలు",
+  "@trips": {},
+
+  "ride_on_the_way": "మీ రైడ్ మార్గంలో ఉంది",
+  "@ride_on_the_way": {},
+
+  "driver_heading_to_you": "మీ డ్రైవర్ మీ స్థానానికి వెళ్తున్నాడు. దయచేసి సిద్ధంగా ఉండండి.",
+  "@driver_heading_to_you": {},
+
+  "ride_ready": "మీ రైడ్ సిద్ధంగా ఉంది!",
+  "@ride_ready": {},
+
+  "driver_arrived": "మీ డ్రైవర్ పికప్ స్థానానికి వచ్చారు. దయచేసి ఇప్పుడు వెళ్ళండి.",
+  "@driver_arrived": {},
+
+  "inside_car": "మీరు కారులో ఉన్నారు. సౌకర్యంగా కూర్చోండి",
+  "@inside_car": {},
+
+  "ride_started": "మీ రైడ్ ప్రారంభమైంది",
+  "@ride_started": {},
+
+  "ride_in_progress": "వెనక్కి కూర్చొని విశ్రాంతి తీసుకోండి. మీ డ్రైవర్ మిమ్మల్ని మీ గమ్యస్థానానికి తీసుకువెళ్తున్నాడు.",
+  "@ride_in_progress": {},
+
+  "estimated_time": "అంచనా సమయం",
+  "@estimated_time": {},
+
+  "ride_complete": "మీ రైడ్ పూర్తయింది",
+  "@ride_complete": {},
+
+  "ride_feedback_prompt": "మీకు సున్నితమైన రైడ్ ఉందని మేము ఆశిస్తున్నాము. దయచేసి మీ చెల్లింపును పూర్తి చేయండి మరియు మీ అనుభవాన్ని రేట్ చేయండి.",
+  "@ride_feedback_prompt": {},
+
+  "confirm_pay": "చెల్లింపును నిర్ధారించండి",
+  "@confirm_pay": {},
+
+  "select_payment_method": "చెల్లింపు పద్ధతిని ఎంచుకోండి",
+  "@select_payment_method": {},
+
+  "payment_completed": "ధన్యవాదాలు! చెల్లింపు పూర్తయింది",
+  "@payment_completed": {},
+
+  "payment_confirmation": "{method} ద్వారా చెల్లించబడింది. మీకు గొప్ప రైడ్ ఉందని మేము ఆశిస్తున్నాము! రేటింగ్ ఇవ్వడం మర్చిపోవద్దు.",
+  "@payment_confirmation": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+
+  "share_experience": "మీ అనుభవాన్ని భాగస్వామ్యం చేయండి!",
+  "@share_experience": {},
+
+  "enter_experience": "మీ అనుభవాన్ని నమోదు చేయండి!",
+  "@enter_experience": {},
+
+  "submit": "సమర్పించండి",
+  "@submit": {},
+
+  "service_charge": "సేవ ఛార్జ్",
+  "@service_charge": {},
+
+  "discount": "తగ్గింపు",
+  "@discount": {},
+
+  "total_amount": "మొత్తం మొత్తం",
+  "@total_amount": {},
+
+  "please_select_payment_type": "దయచేసి చెల్లింపు రకాన్ని ఎంచుకోండి",
+  "@please_select_payment_type": {},
+
+  "drag_map_adjust_location": "స్థానాన్ని సర్దుబాటు చేయడానికి మ్యాప్‌ను లాగండి",
+  "@drag_map_adjust_location": {},
+
+  "confirm_destination": "గమ్యస్థానాన్ని నిర్ధారించండి",
+  "@confirm_destination": {},
+
+  "confirm_pickup": "పికప్‌ను నిర్ధారించండి",
+  "@confirm_pickup": {},
+
+  "no_address_found": "చిరునామా కనుగొనబడలేదు",
+  "@no_address_found": {},
+
+  "full_name": "పూర్తి పేరు",
+  "@full_name": {},
+
+  "mobile_number": "మొబైల్ నంబర్",
+  "@mobile_number": {},
+
+  "email": "ఇమెయిల్",
+  "@email": {},
+
+  "gender": "లింగం",
+  "@gender": {},
+
+  "gender_required": "లింగం అవసరం",
+  "@gender_required": {},
+
+  "save": "సేవ్ చేయండి",
+  "@save": {},
+
+  "current_password": "ప్రస్తుత పాస్‌వర్డ్",
+  "@current_password": {},
+  "new_password": "కొత్త పాస్‌వర్డ్",
+  "@new_password": {},
+  "confirm_new_password": "కొత్త పాస్‌వర్డ్‌ను నిర్ధారించండి",
+  "@confirm_new_password": {},
+  "all_rights_reserved": "{msg} అన్ని హక్కులు రిజర్వ్ చేయబడ్డాయి.",
+  "@all_rights_reserved": {
+    "placeholders": {
+      "msg": {}
+    }
+  },
+  "close": "మూసివేయి",
+  "@close": {},
+  "delete_account_confirmation": "మీరు ఖచ్చితంగా మీ ఖాతాను తొలగించాలనుకుంటున్నారా?",
+  "@delete_account_confirmation": {},
+  "delete_account_warning": "ఈ చర్య శాశ్వతమైనది మరియు రద్దు చేయలేము.",
+  "@delete_account_warning": {},
+  "delete": "తొలగించు",
+  "@delete": {},
+
+  "login_with_your_password": "మీ పాస్‌వర్డ్‌తో లాగిన్ చేయండి",
+  "@login_with_your_password": {},
+
+  "use_your_password_here": "మీ పాస్‌వర్డ్‌ను ఇక్కడ ఉపయోగించండి",
+  "@use_your_password_here": {},
+
+  "use_otp_instead": "బదులుగా OTP ఉపయోగించండి",
+  "@use_otp_instead": {},
+
+  "either_phone_number_is_null_or_password_is_empty": "ఫోన్ నంబర్ శూన్యం లేదా పాస్‌వర్డ్ ఖాళీగా ఉంది",
+  "@either_phone_number_is_null_or_password_is_empty": {},
+
+  "add_balance_to_your_wallet": "మీ వాలెట్‌కు బ్యాలెన్స్ జోడించండి",
+  "@add_balance_to_your_wallet": {},
+
+  "top_up_your_wallet_securely_and_enjoy_seamless_payments": "మీ వాలెట్‌ను సురక్షితంగా టాప్ అప్ చేయండి మరియు నిరాటంకమైన చెల్లింపులను ఆస్వాదించండి.",
+  "@top_up_your_wallet_securely_and_enjoy_seamless_payments": {},
+
+  "no_payment_methods_available": "చెల్లింపు పద్ధతులు అందుబాటులో లేవు",
+  "@no_payment_methods_available": {},
+
+  "select_card_type": "కార్డ్ రకాన్ని ఎంచుకోండి",
+  "@select_card_type": {},
+
+  "enter_amount": "మొత్తం నమోదు చేయండి",
+  "@enter_amount": {},
+
+  "enter_a_valid_amount": "చెల్లుబాటు అయ్యే మొత్తాన్ని నమోదు చేయండి",
+  "@enter_a_valid_amount": {},
+
+  "add_wallet": "వాలెట్ జోడించండి",
+  "@add_wallet": {},
+
+  "form_is_not_valid": "ఫారమ్ చెల్లుబాటు కాదు",
+  "@form_is_not_valid": {},
+
+  "add_payment_gateway": "చెల్లింపు గేట్‌వే జోడించండి",
+  "@add_payment_gateway": {},
+
+  "cardholder_name": "కార్డ్ హోల్డర్ పేరు",
+  "@cardholder_name": {},
+
+  "enter_cardholder_name": "పేరు నమోదు చేయండి",
+  "@enter_cardholder_name": {},
+
+  "card_number": "కార్డ్ నంబర్",
+  "@card_number": {},
+
+  "write": "{msg} వ్రాయండి",
+  "@write": {
+    "placeholders": {
+      "msg": {}
+    }
+  },
+
+  "enter_valid_card_number": "చెల్లుబాటు అయ్యే కార్డ్ నంబర్‌ను నమోదు చేయండి",
+  "@enter_valid_card_number": {},
+
+  "exp_date": "గడువు తేదీ",
+  "@exp_date": {},
+
+  "pick_a_date": "తేదీ ఎంచుకోండి",
+  "@pick_a_date": {},
+
+  "cvv": "CVV",
+  "@cvv": {},
+
+  "enter_3_digit_cvv": "3 అంకెల CVV నమోదు చేయండి",
+  "@enter_3_digit_cvv": {},
+
+  "country": "దేశం",
+  "@country": {},
+
+  "select_a_country": "దేశాన్ని ఎంచుకోండి",
+  "@select_a_country": {},
+
+  "connection_timeout_with_api_server": "API సర్వర్‌తో కనెక్షన్ టైమౌట్",
+  "@connection_timeout_with_api_server": {},
+
+  "receive_timeout_with_api_server": "API సర్వర్‌తో రిసీవ్ టైమౌట్",
+  "@receive_timeout_with_api_server": {},
+
+  "send_timeout_with_api_server": "API సర్వర్‌కు పంపే టైమౌట్",
+  "@send_timeout_with_api_server": {},
+
+  "bad_certificate_with_api_server": "API సర్వర్‌తో చెడు సర్టిఫికేట్",
+  "@bad_certificate_with_api_server": {},
+
+  "received_invalid_response_from_server": "సర్వర్‌నుండి చెల్లని ప్రతిస్పందనను స్వీకరించారు.",
+  "@received_invalid_response_from_server": {},
+
+  "request_to_api_server_was_cancelled": "API సర్వర్‌కు అభ్యర్థన రద్దు చేయబడింది",
+  "@request_to_api_server_was_cancelled": {},
+
+  "connection_error_with_api_server": "API సర్వర్‌తో కనెక్షన్ దోషం",
+  "@connection_error_with_api_server": {},
+
+  "no_internet_connection_please_check": "ఇంటర్నెట్ కనెక్షన్ లేదు. దయచేసి మీ ఇంటర్నెట్ కనెక్షన్‌ను తనిఖీ చేయండి.",
+  "@no_internet_connection_please_check": {},
+
+  "unexpected_error_occurred": "ఊహించని దోషం సంభవించింది",
+  "@unexpected_error_occurred": {},
+
+  "unexpected_response_format": "ఊహించని ప్రతిస్పందన ఫార్మాట్",
+  "@unexpected_response_format": {},
+
+  "bad_request": "చెడు అభ్యర్థన",
+  "@bad_request": {},
+
+  "unauthorized_access_please_login_again": "అనధికార ప్రాప్యత. దయచేసి మళ్లీ లాగిన్ చేయండి.",
+  "@unauthorized_access_please_login_again": {},
+
+  "forbidden_access_please_login_again": "నిషేధించబడిన ప్రాప్యత. దయచేసి మళ్లీ లాగిన్ చేయండి.",
+  "@forbidden_access_please_login_again": {},
+
+  "validation_error": "వాలిడేషన్ దోషం",
+  "@validation_error": {},
+
+  "internal_server_error": "అంతర్గత సర్వర్ దోషం",
+  "@internal_server_error": {},
+
+  "something_went_wrong": "ఏదో తప్పు జరిగింది",
+  "@something_went_wrong": {},
+
+  "no_internet_connection": "ఇంటర్నెట్ కనెక్షన్ లేదు.",
+  "@no_internet_connection": {},
+
+  "request_timed_out_please_try_again": "అభ్యర్థన సమయం ముగిసింది. దయచేసి మళ్లీ ప్రయత్నించండి.",
+  "@request_timed_out_please_try_again": {},
+
+  "something_went_wrong_exclamation": "ఏదో తప్పు జరిగింది!",
+  "@something_went_wrong_exclamation": {},
+
+  "resource_not_found": "వనరు కనుగొనబడలేదు.",
+  "@resource_not_found": {},
+
+  "unexpected_application_crash": "ఊహించని అప్లికేషన్ క్రాష్",
+  "@unexpected_application_crash": {},
+
+  "app_encountered_unexpected_error": "అప్లికేషన్ ఊహించని దోషాన్ని ఎదుర్కొంది మరియు మూసివేయవలసి వచ్చింది. ఇది అసమర్థమైన పరికర మెమరీ, అప్లికేషన్‌లోని బగ్ లేదా దెబ్బతిన్న ఫైల్ వలన కావచ్చు. సమస్య కొనసాగితే దయచేసి అప్లికేషన్‌ను పునఃప్రారంభించండి లేదా మళ్లీ ఇన్‌స్టాల్ చేయండి.",
+  "@app_encountered_unexpected_error": {},
+
+  "contact_support": "సపోర్ట్‌ను సంప్రదించండి",
+  "@contact_support": {},
+  "theme": "థీమ్",
+  "@theme": {},
+  "select_profile_image": "ప్రొఫైల్ చిత్రాన్ని ఎంచుకోండి",
+  "@select_profile_image": {},
+  "upload_image": "చిత్రాన్ని అప్‌లోడ్ చేయండి",
+  "@upload_image": {},
+  "or_select_avatar": "లేదా క్రింది జాబితా నుండి అవతారాన్ని ఎంచుకోండి:",
+  "@or_select_avatar": {},
+  "reportIssue": "సమస్యను నివేదించండి",
+  "@reportIssue": {},
+
+  "rideDetails": "రైడ్ వివరాలు",
+  "@rideDetails": {},
+
+  "textCopied": "టెక్స్ట్ కాపీ చేయబడింది",
+  "@textCopied": {},
+
+  "reportIssueTitle": "ఏదైనా తప్పు జరిగిందా? సమస్యను నివేదించండి",
+  "@reportIssueTitle": {},
+
+  "reportIssueSubtitle": "ఏమి తప్పు జరిగిందో మాకు చెప్పండి. మేము వెంటనే దానిని పరిశీలిస్తాము.",
+  "@reportIssueSubtitle": {},
+
+  "reportType": "నివేదిక రకం",
+  "@reportType": {},
+
+  "selectReportType": "నివేదిక రకాన్ని ఎంచుకోండి",
+  "@selectReportType": {},
+
+  "details": "వివరాలు",
+  "@details": {},
+
+  "writeIssueDetails": "సమస్య వివరాలను వ్రాయండి",
+  "@writeIssueDetails": {},
+
+  "insertAllData": "దయచేసి అన్ని డేటాను చేర్చండి",
+  "@insertAllData": {},
+
+  "issueSubmitted": "మీ సమస్య విజయవంతంగా సమర్పించబడింది",
+  "@issueSubmitted": {},
+
+  "thanksForReporting": "నివేదించినందుకు ధన్యవాదాలు. మా బృందం మీ సమస్యను సమీక్షిస్తుంది మరియు త్వరలో మీకు తిరిగి సమాధానం ఇస్తుంది.",
+  "@thanksForReporting": {},
+
+  "downloadReceipt": "రసీదును డౌన్‌లోడ్ చేయండి",
+  "@downloadReceipt": {},
+
+  "status": "స్థితి",
+  "@status": {},
+
+  "paymentMethod": "చెల్లింపు పద్ధతి",
+  "@paymentMethod": {},
+
+  "rideCharge": "రైడ్ ఛార్జ్",
+  "@rideCharge": {},
+
+  "requestEntityTooLarge": "అభ్యర్థన ఎంటిటీ చాలా పెద్దది",
+  "@requestEntityTooLarge": {},
+
+  "login": "లాగిన్",
+  "@login": {},
+
+  "yourAccountAlreadyActive": "మీ ఖాతా ఇతర పరికరంలో ఇప్పటికే సక్రియంగా ఉంది. ఇక్కడ ఉపయోగించడానికి, ఇతర పరికరం లాగ్ అవుట్ అవుతుంది.",
+  "@yourAccountAlreadyActive": {},
+
+  "loggingInSomewhereElse": "మరెక్కడో లాగిన్ అవుతోంది",
+  "@loggingInSomewhereElse": {},
+
+  "stayOnThisDevice": "ఈ పరికరంపై ఉండండి",
+  "@stayOnThisDevice": {},
+
+  "view_details": "వివరాలను వీక్షించండి",
+  "@view_details": {}
+
+}
+
+
+

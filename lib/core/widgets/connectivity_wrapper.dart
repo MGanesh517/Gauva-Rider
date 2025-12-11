@@ -1,0 +1,55 @@
+import 'package:flutter/material.dart';
+
+import '../../data/services/navigation_service.dart';
+import '../routes/app_routes.dart';
+import '../utils/connectivity_monitor.dart';
+import '../utils/helpers.dart';
+
+class GlobalConnectivityWrapper extends StatefulWidget {
+  final Widget child;
+  const GlobalConnectivityWrapper({super.key, required this.child});
+
+  @override
+  State<GlobalConnectivityWrapper> createState() => _GlobalConnectivityWrapperState();
+}
+
+class _GlobalConnectivityWrapperState extends State<GlobalConnectivityWrapper> {
+  final ConnectivityMonitor _monitor = ConnectivityMonitor();
+  bool isConnected = true;
+  bool _isOnNoInternetPage = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _monitor.onStatusChange.listen((connected) {
+      if (!connected && !_isOnNoInternetPage) {
+        _isOnNoInternetPage = true;
+        showNotification(message: 'No Internet! Please connect to internet',);
+        Future.delayed(const Duration(microseconds: 300)).then((_){
+          NavigationService.pushNamedAndRemoveUntil(AppRoutes.noInternet);
+        });
+
+      } else if (connected && _isOnNoInternetPage) {
+        _isOnNoInternetPage = false;
+        showNotification(message: 'Your Internet connection restored', isSuccess: true);
+        Future.delayed(const Duration(microseconds: 300)).then((_){
+          Navigator.of(NavigationService.navigatorKey.currentContext!).pushNamedAndRemoveUntil(
+              AppRoutes.splash,
+                  (route)=> false,
+          );
+        });
+
+      }
+      isConnected = connected;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+
+  @override
+  void dispose() {
+    _monitor.dispose();
+    super.dispose();
+  }
+}

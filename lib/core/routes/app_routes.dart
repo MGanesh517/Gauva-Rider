@@ -1,0 +1,32 @@
+class AppRoutes {
+  static const String splash = '/';
+  static const String onboarding = '/onboarding';
+  static const String login = '/login';
+  static const String signup = '/signup';
+  static const String verifyOtp = '/verify-otp';
+  static const String setPassword = '/set-password';
+  static const String loginWithPasswordPage = '/login-with-password-page';
+  static const String changePassword = '/change-password';
+  static const String setProfile = '/set-profile';
+  static const String dashboard = '/dashboard-page';
+  static const String waypointPage = '/waypoint-page';
+  static const String bookingPage = '/booking-page';
+  static const String chatPage = '/chat-page';
+  static const String profileInfoPage = '/profile-info-page';
+  static const String walletsPage = '/wallets-page';
+  static const String searchDestinationPage = '/search-destination-page';
+  static const String rideHistory = '/ride-history';
+  static const String rideHistoryDetail = '/ride-history-detail';
+  static const String paymentPage = '/payment-page';
+  static const String about = '/about';
+  static const String logout = '/logout';
+  static const String paymentMethodsPage = '/payment-methods';
+  static const String reportIssue = '/report-issue';
+  static const String addPaymentGateway = '/add-payment-gateway';
+  static const String razorpayPayment = '/razorpay-payment';
+  static const String noInternet = '/no-internet';
+  static const String brokenPage = '/broken-page';
+  static const String sharePoolingSelection = '/share_pooling_selection';
+  static const String sharePoolingSearch = '/share_pooling_search';
+  static const String privateBooking = '/private_booking';
+}

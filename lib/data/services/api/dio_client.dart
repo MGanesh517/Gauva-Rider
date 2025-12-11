@@ -1,0 +1,31 @@
+import 'package:dio/dio.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
+import '../../../core/config/environment.dart';
+import 'dio_interceptors.dart';
+
+class DioClient {
+  final Dio dio;
+
+  DioClient({String? baseUrl})
+      : dio = Dio(
+    BaseOptions(
+      sendTimeout: const Duration(seconds: 20),
+      receiveTimeout: const Duration(seconds: 20),
+      connectTimeout: const Duration(seconds: 20),
+      baseUrl: baseUrl ?? Environment.apiUrl,
+      contentType: 'application/json',
+      headers: {
+        'Accept': '*/*', // Match curl command
+        'Content-Type': 'application/json',
+      },
+    ),
+  ) {
+    dio.interceptors.add(DioInterceptors());
+    dio.interceptors.add(InterceptorsWrapper());
+    dio.interceptors.add(PrettyDioLogger(
+      requestHeader: true,
+      requestBody: true,
+      compact: false,
+    ));
+  }
+}

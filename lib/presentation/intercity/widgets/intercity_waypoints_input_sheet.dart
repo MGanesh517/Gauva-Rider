@@ -1,0 +1,355 @@
+import 'dart:async';
+import 'package:collection/collection.dart';
+import 'package:dotted_line/dotted_line.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:gauva_userapp/core/utils/change_status_bar.dart';
+import 'package:gauva_userapp/core/utils/exit_app_dialogue.dart';
+import 'package:gauva_userapp/core/widgets/is_ios.dart';
+import 'package:gauva_userapp/generated/l10n.dart';
+import '../../../core/extensions/extensions.dart';
+import '../../../core/utils/color_palette.dart';
+import '../../../core/widgets/buttons/app_back_button.dart';
+import '../../../core/widgets/icon_destination.dart';
+import '../../../core/widgets/location_text_field.dart';
+import '../../../data/models/waypoint.dart';
+import '../../../data/services/navigation_service.dart';
+import '../../account_page/provider/theme_provider.dart';
+import '../../waypoint/provider/google_api_providers.dart';
+import '../../waypoint/provider/pick_route_providers.dart';
+import '../../waypoint/provider/search_place_providers.dart';
+import '../../waypoint/provider/selected_loc_text_field_providers.dart';
+import '../../waypoint/provider/way_point_list_providers.dart';
+import '../../waypoint/provider/way_point_map_providers.dart';
+import '../../waypoint/widgets/place_lookup_state_view.dart';
+
+class IntercityWaypointsInputSheet extends ConsumerStatefulWidget {
+  final String vehicleType;
+  final Function({
+    required String fromAddress,
+    required String toAddress,
+    required LatLng fromLocation,
+    required LatLng toLocation,
+    required DateTime selectedDate,
+    required TimeOfDay selectedTime,
+  })
+  onConfirm;
+
+  const IntercityWaypointsInputSheet({super.key, required this.vehicleType, required this.onConfirm});
+
+  @override
+  ConsumerState<IntercityWaypointsInputSheet> createState() => _IntercityWaypointsInputSheetState();
+}
+
+class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypointsInputSheet> {
+  Timer? _debounce;
+  late bool isDark;
+  DateTime? selectedDate;
+  TimeOfDay? selectedTime;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    isDark = ref.read(themeModeProvider.notifier).isDarkMode();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeWaypoints();
+      setStatusBar(isDark: isDark);
+    });
+  }
+
+  void _initializeWaypoints() {
+    try {
+      final wayPointNotifier = ref.read(wayPointListNotifierProvider.notifier);
+      wayPointNotifier.resetWayPoint();
+      final _ = ref.refresh(selectedLocTextFieldNotifierProvider.notifier);
+
+      // Initialize with empty waypoints for intercity
+      wayPointNotifier.updateWayPoint(index: 0, name: 'Pick-up', address: '', location: const LatLng(0.0, 0.0));
+      wayPointNotifier.updateWayPoint(index: 1, name: 'Destination', address: '', location: const LatLng(0.0, 0.0));
+    } catch (e) {
+      debugPrint('Error initializing waypoints: $e');
+    }
+  }
+
+  void _onSearchChanged(String? value) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 800), () {
+      if (value == null || value.trim().isEmpty) {
+        ref.read(searchPlaceNotifierProvider.notifier).reset();
+      } else if (value.length > 3) {
+        ref.read(searchPlaceNotifierProvider.notifier).searchPlace(value);
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    setStatusBar(isHome: true, isDark: isDark);
+    super.dispose();
+  }
+
+  Waypoint _getWaypointByName(List<Waypoint> list, String name) => list.firstWhere(
+    (element) => element.name == name,
+    orElse: () => Waypoint(name: '', address: '', location: const LatLng(0, 0)),
+  );
+
+  @override
+  Widget build(BuildContext context) {
+    final wayPointList = ref.watch(wayPointListNotifierProvider);
+    final pickupPoint = _getWaypointByName(wayPointList, 'Pick-up');
+    final dropOffPoint = _getWaypointByName(wayPointList, 'Destination');
+
+    return ExitAppWrapper(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: AppBackButton(color: isDark ? Colors.white : null),
+          centerTitle: true,
+          title: Text(
+            'Search',
+            style: context.titleMedium?.copyWith(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w500,
+              color: isDark ? Colors.white : const Color(0xFF24262D),
+            ),
+          ),
+        ),
+        backgroundColor: isDark ? Colors.black : Colors.white,
+        body: Column(
+          children: [
+            Container(height: 10.h, width: double.infinity, color: isDark ? Colors.black : ColorPalette.neutralF6),
+            Expanded(
+              child: SafeArea(
+                bottom: !isIos(),
+                child: Padding(
+                  padding: const EdgeInsets.all(16).copyWith(bottom: isIos() ? 24.h : 16.h),
+                  child: Column(
+                    children: [
+                      _buildWaypointList(wayPointList, isDark: isDark),
+                      Gap(16.h),
+                      // Date and Time Selection
+                      _buildDateTimeSelector(isDark),
+                      Gap(16.h),
+                      const Expanded(child: PlaceLookupStateView()),
+                      _buildConfirmButton(pickupPoint, dropOffPoint),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDateTimeSelector(bool isDark) {
+    return Row(
+      children: [
+        Expanded(
+          child: GestureDetector(
+            onTap: () async {
+              final date = await showDatePicker(
+                context: context,
+                initialDate: selectedDate ?? DateTime.now(),
+                firstDate: DateTime.now(),
+                lastDate: DateTime.now().add(const Duration(days: 30)),
+              );
+              if (date != null) setState(() => selectedDate = date);
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[900] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.calendar_today, color: Colors.blue, size: 20.sp),
+                  Gap(8.w),
+                  Text(
+                    selectedDate == null
+                        ? 'Select Date'
+                        : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        Gap(16.w),
+        Expanded(
+          child: GestureDetector(
+            onTap: () async {
+              final time = await showTimePicker(context: context, initialTime: selectedTime ?? TimeOfDay.now());
+              if (time != null) setState(() => selectedTime = time);
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey[900] : Colors.grey[100],
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.access_time, color: Colors.blue, size: 20.sp),
+                  Gap(8.w),
+                  Text(
+                    selectedTime == null ? 'Start Time' : selectedTime!.format(context),
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWaypointList(List<Waypoint> wayPointList, {required bool isDark}) {
+    final selectedField = ref.watch(selectedLocTextFieldNotifierProvider);
+    final fieldNotifier = ref.read(selectedLocTextFieldNotifierProvider.notifier);
+    final routePickNotifier = ref.read(pickRouteNotifierProvider.notifier);
+    final wayPointNotifier = ref.read(wayPointListNotifierProvider.notifier);
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Column(
+          children: wayPointList
+              .mapIndexed(
+                (index, _) => Column(
+                  children: [
+                    IconDestination(isPickupPoint: index == 0, color: isDark ? Colors.white : null),
+                    if (index != wayPointList.length - 1)
+                      const DottedLine(
+                        direction: Axis.vertical,
+                        dashColor: ColorPalette.neutral90,
+                        lineThickness: 3,
+                        lineLength: 70,
+                      ),
+                  ],
+                ),
+              )
+              .toList(),
+        ),
+        Gap(6.w),
+        Expanded(
+          child: Column(
+            children: wayPointList
+                .mapIndexed(
+                  (index, e) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: LocationTextField(
+                      initialValue: e,
+                      isFocused: index == selectedField,
+                      onChanged: (value) {
+                        if (selectedField != index) {
+                          fieldNotifier.setSelectedLocation(index);
+                        }
+                        _onSearchChanged(value);
+                      },
+                      index: index,
+                      totalCount: wayPointList.length,
+                      onFocused: () => fieldNotifier.setSelectedLocation(index),
+                      onRemoveStop: () {},
+                      onMapPressed: (value, node) {
+                        node.unfocus();
+                        fieldNotifier.setSelectedLocation(index);
+                        routePickNotifier.setLocation(index: index);
+                        // NavigationService.pushNamed(AppRoutes.waypointPage);
+                      },
+                      onRemoved: (removed) {
+                        if (removed) {
+                          wayPointNotifier.removeWayPointByIndex(index: index);
+                        }
+                      },
+                    ),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildConfirmButton(Waypoint pickup, Waypoint dropOff) {
+    final isEnabled =
+        pickup.address.isNotEmpty && dropOff.address.isNotEmpty && selectedDate != null && selectedTime != null;
+
+    return Container(
+      width: double.infinity,
+      height: 50.h,
+      decoration: BoxDecoration(
+        gradient: isEnabled
+            ? LinearGradient(
+                colors: [const Color(0xFF1469B5), const Color(0xFF942FAF)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              )
+            : null,
+        color: isEnabled ? null : Colors.grey,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: isEnabled
+            ? [BoxShadow(color: const Color(0xFF1469B5).withOpacity(0.3), blurRadius: 4, offset: Offset(0, 2))]
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: isEnabled
+              ? () {
+                  if (pickup.address.isEmpty || dropOff.address.isEmpty) {
+                    ScaffoldMessenger.of(
+                      context,
+                    ).showSnackBar(SnackBar(content: Text('Please select pickup and destination locations')));
+                    return;
+                  }
+                  if (selectedDate == null || selectedTime == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select date and time')));
+                    return;
+                  }
+
+                  // Combine date and time
+                  final dateTime = DateTime(
+                    selectedDate!.year,
+                    selectedDate!.month,
+                    selectedDate!.day,
+                    selectedTime!.hour,
+                    selectedTime!.minute,
+                  );
+
+                  widget.onConfirm(
+                    fromAddress: pickup.address,
+                    toAddress: dropOff.address,
+                    fromLocation: pickup.location,
+                    toLocation: dropOff.location,
+                    selectedDate: selectedDate!,
+                    selectedTime: selectedTime!,
+                  );
+                }
+              : null,
+          borderRadius: BorderRadius.circular(12),
+          child: Center(
+            child: Text(
+              'Confirm',
+              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16.sp),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

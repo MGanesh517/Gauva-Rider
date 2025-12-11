@@ -1,0 +1,2 @@
+/Users/razinsoft/development/rider-app/android/app/.cxx/RelWithDebInfo/3l6d4g4l/arm64-v8a/CMakeFiles/edit_cache.dir
+/Users/razinsoft/development/rider-app/android/app/.cxx/RelWithDebInfo/3l6d4g4l/arm64-v8a/CMakeFiles/rebuild_cache.dir

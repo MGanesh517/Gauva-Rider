@@ -1,0 +1,1 @@
+/Users/razinsoft/development/rider-app/build/app/intermediates/cxx/RelWithDebInfo/3l6d4g4l/obj/x86_64
