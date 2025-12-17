@@ -4,6 +4,7 @@ class ApiEndpoints {
   static const String loginOtpUrl = '/api/v1/auth/login/otp';
   static const String resendSignIn = '/api/v1/auth/login/otp'; // Resend OTP uses same endpoint
   static const String signupUrl = '/api/v1/auth/register/user'; // User registration/signup
+  static const String googleLoginUrl = '/api/v1/auth/login/google'; // Google Sign In
   static const String updatePassword = '/api/v1/user/profile'; // Update password via profile update
   static const String changePassword = '/api/v1/user/profile'; // Change password via profile update
   static const String updateProfile = '/api/v1/user/profile';
@@ -25,7 +26,9 @@ class ApiEndpoints {
   static const String orderDetails = '/api/v1/ride'; // Use /api/v1/ride/{rideId}
   static const String checkActiveTrip = '/api/v1/user'; // Use /api/v1/user/{userId}/rides/current
   static const String rideHistory = '/api/v1/user/rides/completed';
+  static const String cancelledRideHistory = '/api/v1/user/rides/cancelled';
   static const String cancelRide = '/api/v1/ride'; // Use /api/v1/ride/{rideId}/decline
+  static String cancelRideEndpoint(int rideId) => '/api/v1/ride/$rideId/decline';
 
   // Chat endpoints - Spring Boot
   static const String sendMessage = '/api/chat/ride'; // Use /api/chat/ride/{rideId}/messages

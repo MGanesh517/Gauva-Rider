@@ -29,4 +29,6 @@ class AppRoutes {
   static const String sharePoolingSelection = '/share_pooling_selection';
   static const String sharePoolingSearch = '/share_pooling_search';
   static const String privateBooking = '/private_booking';
+  static const String privateBookingSuccess = '/private_booking_success';
+  static const String intercitySelection = '/intercity_selection';
 }

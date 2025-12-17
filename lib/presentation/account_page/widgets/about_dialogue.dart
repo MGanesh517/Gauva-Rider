@@ -116,7 +116,7 @@ Future<void> termsAndConditionDialogue(
                   Gap(16.h),
                   Center(
                     child: Text(
-                      AppLocalizations.of(context).all_rights_reserved('© 2025 Razinsoft.'),
+                      AppLocalizations.of(context).all_rights_reserved('© 2025 Gauva.'),
                       textAlign: TextAlign.center,
                       style: context.bodySmall?.copyWith(fontSize: 12.sp, color: ColorPalette.primary50),
                     ),

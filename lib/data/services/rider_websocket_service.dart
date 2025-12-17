@@ -1,122 +1,91 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
-import 'websocket_service.dart';
+import 'package:gauva_userapp/data/services/websocket_service.dart';
 
 class RiderWebSocketService extends WebSocketService {
   String? userId;
   int? currentRideId;
 
+  bool _isInitializing = false;
+  StreamSubscription<void>? _reconnectSubscription;
+
   /// Initialize and connect for rider
-  Future<void> initializeRider({
-    required String jwtToken,
-    required String userId,
-  }) async {
-    this.userId = userId;
+  Future<void> initializeRider({required String jwtToken, required int userId}) async {
+    // Prevent multiple initialization attempts
+    if (_isInitializing) {
+      print('⚠️ Rider WebSocket: Already initializing, skipping...');
+      return;
+    }
 
-    debugPrint('🔌 ═══════════════════════════════════════════════════════');
-    debugPrint('🔌 INITIALIZING WEBSOCKET FOR RIDER');
-    debugPrint('🔌 User ID: $userId');
-    debugPrint('🔌 ═══════════════════════════════════════════════════════');
+    if (isConnected && this.userId == userId.toString()) {
+      print('⚠️ Rider WebSocket: Already connected for rider $userId, skipping...');
+      return;
+    }
 
-    // PRIMARY: Connect to STOMP (works on Azure)
-    debugPrint('🔌 [PRIMARY] Connecting to STOMP...');
-    await connectStomp(jwtToken);
+    _isInitializing = true;
+    this.userId = userId.toString();
 
-    // OPTIONAL: Try Socket.IO (may not work on Azure - that's OK)
-    // Don't wait for it - continue even if it fails
-    debugPrint('🔌 [OPTIONAL] Attempting Socket.IO connection...');
-    connectSocketIO(jwtToken).catchError((error) {
-      debugPrint('⚠️ Socket.IO connection failed (expected on Azure): $error');
-      debugPrint('✅ Continuing with STOMP only');
+    // Listen for reconnection events to re-join rooms
+    _reconnectSubscription?.cancel();
+    _reconnectSubscription = onReconnected.listen((_) {
+      _rejoinRoomsAfterReconnect();
     });
 
-    // Wait for STOMP connection
-    int attempts = 0;
-    while (!isStompConnected && attempts < 10) {
-      await Future.delayed(const Duration(milliseconds: 500));
-      attempts++;
-    }
+    try {
+      // Connect to Raw WebSocket
+      await connect(jwtToken);
 
-    if (!isStompConnected) {
-      throw Exception('Failed to connect to STOMP WebSocket after ${attempts * 500}ms');
-    }
+      // Wait for connection
+      await Future.delayed(const Duration(seconds: 3));
 
-    // Join user room via Socket.IO (if available)
-    if (isSocketIOConnected) {
-      debugPrint('✅ [OPTIONAL] Socket.IO connected - joining user room');
-      joinRoom('user', userId);
-    } else {
-      debugPrint('ℹ️ [OPTIONAL] Socket.IO not available - using STOMP only');
-    }
+      if (!isConnected) {
+        await Future.delayed(const Duration(seconds: 3));
+        if (!isConnected) {
+          _isInitializing = false;
+          throw Exception('Failed to connect to WebSocket');
+        }
+      }
 
-    debugPrint('✅ Rider WebSocket initialized successfully');
-    debugPrint('✅ STOMP: ${isStompConnected ? "Connected" : "Disconnected"}');
-    debugPrint('✅ Socket.IO: ${isSocketIOConnected ? "Connected" : "Not Available"}');
+      sendMessage({'event': 'join', 'type': 'user', 'id': userId});
+
+      _isInitializing = false;
+      print('✅ Rider WebSocket initialized (Connected: $isConnected)');
+    } catch (e) {
+      _isInitializing = false;
+      print('❌ Rider WebSocket: Error during initialization: $e');
+      rethrow;
+    }
   }
 
+  /// Re-join rooms after reconnection
+  void _rejoinRoomsAfterReconnect() {
+    print('🔄 Rider WebSocket: Re-joining rooms after reconnection...');
+    
+    // Re-join user room
+    if (userId != null) {
+      sendMessage({'event': 'join', 'type': 'user', 'id': userId});
+      print('✅ Rider WebSocket: Re-joined user room: $userId');
+    }
+
+    // Re-join ride room if there's an active ride
+    if (currentRideId != null) {
+      sendMessage({'event': 'join', 'type': 'ride', 'id': currentRideId.toString()});
+      print('✅ Rider WebSocket: Re-joined ride room: $currentRideId');
+    }
+  }
 
   /// Join ride room (when ride is active)
   void joinRideRoom(int rideId) {
     currentRideId = rideId;
 
-    debugPrint('📡 ═══════════════════════════════════════════════════════');
-    debugPrint('📡 JOINING RIDE ROOM');
-    debugPrint('📡 Ride ID: $rideId');
-    debugPrint('📡 ═══════════════════════════════════════════════════════');
-
-    // Join via Socket.IO (for ride_status, driver_location, chat_message)
-    if (isSocketIOConnected) {
-      debugPrint('📡 [Socket.IO] Joining ride and user rooms');
-      joinRoom('ride', rideId);
-      if (userId != null) {
-        joinRoom('user', userId);
-      }
-    }
-
-    // Subscribe to STOMP topics for this ride
-    // Wait a bit for connection to be fully established
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (!isStompConnected || stompClient == null) {
-        debugPrint('⚠️ STOMP not connected, cannot subscribe to ride topics');
-        return;
-      }
-
-      debugPrint('📡 [STOMP] Subscribing to ride-specific topics...');
-
-      // STOMP is used for location tracking and chat
-      subscribeToStompTopic(
-        '/topic/ride/$rideId/location', // Actual backend topic
-        (data) {
-          debugPrint('📍 STOMP Driver Location: $data');
-          addDriverLocation(data);
-        },
-      );
-
-      subscribeToStompTopic(
-        '/topic/chat/ride/$rideId', // Actual backend topic
-        (data) {
-          debugPrint('💬 STOMP Chat Message: $data');
-          addChatMessage(data);
-        },
-      );
-
-      debugPrint('✅ Subscribed to ride-specific STOMP topics');
-    });
+    // Join ride room
+    sendMessage({'event': 'join', 'type': 'ride', 'id': rideId.toString()});
   }
 
   /// Leave ride room (when ride ends)
   void leaveRideRoom() {
     if (currentRideId != null) {
-      debugPrint('🚴 ═══════════════════════════════════════════════════════');
-      debugPrint('🚴 LEAVING RIDE ROOM');
-      debugPrint('🚴 Ride ID: $currentRideId');
-      debugPrint('🚴 ═══════════════════════════════════════════════════════');
-
-      if (isSocketIOConnected) {
-        leaveRoom('ride', currentRideId);
-      }
+      sendMessage({'event': 'leave', 'type': 'ride', 'id': currentRideId.toString()});
       currentRideId = null;
-      debugPrint('✅ Left ride room');
     }
   }
 
@@ -127,23 +96,22 @@ class RiderWebSocketService extends WebSocketService {
     required String senderName,
     required String driverId,
   }) {
-    final messageId = DateTime.now().millisecondsSinceEpoch.toString();
+    // Send via WebSocket
+    sendMessage({
+      'event': 'chat',
+      'rideId': rideId,
+      'senderId': userId,
+      'senderName': senderName,
+      'receiverId': driverId,
+      'message': message,
+      // 'timestamp': DateTime.now().toIso8601String(), // Server might add this
+    });
+  }
 
-    // Send via Socket.IO
-    if (isSocketIOConnected) {
-      sendChatMessage(
-        rideId: rideId,
-        senderId: userId!,
-        senderName: senderName,
-        receiverId: driverId,
-        message: message,
-        messageId: messageId,
-      );
-    }
-
-    // Also send via STOMP (REST API endpoint, not WebSocket)
-    // Chat is sent via REST API: POST /api/chat/ride/{rideId}/messages
-    // The server then broadcasts via Socket.IO and STOMP
+  @override
+  void disconnect() {
+    _reconnectSubscription?.cancel();
+    _reconnectSubscription = null;
+    super.disconnect();
   }
 }
-

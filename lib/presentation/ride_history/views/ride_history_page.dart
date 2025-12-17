@@ -11,7 +11,6 @@ import 'package:gauva_userapp/data/services/navigation_service.dart';
 import 'package:gauva_userapp/generated/l10n.dart';
 
 import '../../../common/loading_view.dart';
-import '../../../core/theme/color_palette.dart';
 import '../../../core/utils/is_dark_mode.dart';
 import '../provider/providers.dart';
 import '../widgets/ride_activity_card.dart';
@@ -47,7 +46,6 @@ class _RideHistoryPageState extends ConsumerState<RideHistoryPage> {
   @override
   Widget build(BuildContext context) {
     final rideState = ref.watch(rideHistoryProvider);
-    final isDark = isDarkMode();
 
     return RefreshIndicator(
       onRefresh: () async {
@@ -226,12 +224,12 @@ class _RideHistoryPageState extends ConsumerState<RideHistoryPage> {
                   return ListView.builder(
                     itemCount: orders.length,
                     itemBuilder: (context, index) {
-                      final order = orders[index];
+                      final ride = orders[index];
                       return rideHistoryCard(
                         context,
-                        order: order,
+                        ride: ride,
                         onTap: () {
-                          NavigationService.pushNamed(AppRoutes.rideHistoryDetail, arguments: order);
+                          NavigationService.pushNamed(AppRoutes.rideHistoryDetail, arguments: ride);
                         },
                         showCancelItem: !isCompleteSelected,
                         isDark: isDarkMode(),

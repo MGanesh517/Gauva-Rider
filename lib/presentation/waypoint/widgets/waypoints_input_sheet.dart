@@ -129,37 +129,43 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
       child: Scaffold(
         appBar: AppBar(
           leading: AppBackButton(color: isDark ? Colors.white : null),
+          centerTitle: true,
           title: Text(
             AppLocalizations.of(context).search_destination,
             style: context.titleMedium?.copyWith(
-              fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
+              fontSize: 18.sp,
+              fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : const Color(0xFF24262D),
             ),
           ),
           // backgroundColor: Colors.white,
         ),
-        backgroundColor: isDark ? Colors.black : Colors.white,
-        body: Column(
-          children: [
-            Container(height: 10.h, width: double.infinity, color: isDark ? Colors.black : ColorPalette.neutralF6),
-            Expanded(
-              child: SafeArea(
-                bottom: !isIos(),
-                child: Padding(
-                  padding: const EdgeInsets.all(16).copyWith(bottom: isIos() ? 24.h : 16.h),
-                  child: Column(
-                    children: [
-                      _buildWaypointList(wayPointList, isDark: isDark),
-                      Gap(16.h),
-                      const Expanded(child: PlaceLookupStateView()),
-                      _buildConfirmButton(pickupPoint, dropOffPoint, stopPoint),
-                    ],
+        body: Container(
+          decoration: BoxDecoration(
+            image: const DecorationImage(image: AssetImage('assets/bg.png'), fit: BoxFit.fill),
+            color: isDark ? Colors.black : Colors.white,
+          ),
+          child: Column(
+            children: [
+              Container(height: 4.h, width: double.infinity, color: isDark ? Colors.black : ColorPalette.neutralF6),
+              Expanded(
+                child: SafeArea(
+                  bottom: !isIos(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16).copyWith(bottom: isIos() ? 24.h : 16.h),
+                    child: Column(
+                      children: [
+                        _buildWaypointList(wayPointList, isDark: isDark),
+                        Gap(16.h),
+                        const Expanded(child: PlaceLookupStateView()),
+                        _buildConfirmButton(pickupPoint, dropOffPoint, stopPoint),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

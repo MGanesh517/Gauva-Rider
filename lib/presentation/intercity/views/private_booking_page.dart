@@ -3,6 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gauva_userapp/core/routes/app_routes.dart';
+import 'package:gauva_userapp/data/services/navigation_service.dart';
 
 class PrivateBookingPage extends ConsumerStatefulWidget {
   const PrivateBookingPage({super.key});
@@ -151,9 +153,8 @@ class _PrivateBookingPageState extends ConsumerState<PrivateBookingPage> {
           height: 50.h,
           child: ElevatedButton(
             onPressed: () {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(const SnackBar(content: Text('Processing Private Booking... Status: HOLD')));
+              // Navigate to success page
+              NavigationService.pushNamed(AppRoutes.privateBookingSuccess);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blue,

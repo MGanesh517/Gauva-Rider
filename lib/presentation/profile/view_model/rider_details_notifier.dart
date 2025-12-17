@@ -10,9 +10,7 @@ import '../../../data/services/local_storage_service.dart';
 class RiderDetailsNotifier extends StateNotifier<AppState<RiderDetailsResponse>> {
   final IAuthRepo authRepo;
   final Ref ref;
-  RiderDetailsNotifier({required this.ref, required this.authRepo}) : super(const AppState.initial()) {
-    getRiderDetails();
-  }
+  RiderDetailsNotifier({required this.ref, required this.authRepo}) : super(const AppState.initial());
 
   Future<void> getRiderDetails() async {
     debugPrint('👤 GET RIDER DETAILS - Starting');

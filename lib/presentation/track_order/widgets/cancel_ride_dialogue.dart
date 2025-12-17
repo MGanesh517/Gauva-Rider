@@ -1,21 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:gauva_userapp/core/utils/is_dark_mode.dart';
-
-import 'cancel_ride_reason.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gauva_userapp/presentation/booking/provider/cancel_ride_provider.dart';
 
 void cancelRideDialogue(BuildContext context) {
-  showModalBottomSheet(
+  showDialog(
     context: context,
-    isDismissible: false,
-    isScrollControlled: true,
-    enableDrag: false,
-    builder: (context) => SafeArea(
-      child: Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom, // handle keyboard overlap
-        ),
-        child: CancelRideReason(isDark: isDarkMode()),
-      ),
+    builder: (context) => Consumer(
+      builder: (context, ref, _) {
+        final state = ref.watch(cancelRideNotifierProvider);
+        final stateNotifier = ref.read(cancelRideNotifierProvider.notifier);
+
+        return AlertDialog(
+          title: const Text('Cancel Ride'),
+          content: const Text('Are you sure you want to cancel this ride?'),
+          actions: [
+            TextButton(
+              onPressed: state.whenOrNull(loading: () => true) == true ? null : () => Navigator.of(context).pop(),
+              child: const Text('No'),
+            ),
+            TextButton(
+              onPressed: state.whenOrNull(loading: () => true) == true
+                  ? null
+                  : () {
+                      stateNotifier.cancelRide();
+                      Navigator.of(context).pop();
+                    },
+              child: state.whenOrNull(loading: () => true) == true
+                  ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Text('Yes, Cancel'),
+            ),
+          ],
+        );
+      },
     ),
   );
 }

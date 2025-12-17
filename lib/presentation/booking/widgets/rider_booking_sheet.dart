@@ -23,62 +23,81 @@ class RideBookingSheet extends ConsumerWidget {
     final isDark = ref.watch(themeModeProvider.notifier).isDarkMode();
     final selectedService = ref.watch(carTypeNotifierProvider).selectedCarType;
 
+    // Calculate dynamic height based on number of services
+    final serviceCount = riderServiceState.whenOrNull(success: (data) => data.data?.servicesList?.length ?? 0) ?? 0;
+
+    // Calculate approximate height needed
+    // Drag handle: ~20h, Each service card: ~70h, Button: ~74h, Padding: ~16h
+    final screenHeight = MediaQuery.of(context).size.height;
+    final dragHandleHeight = 20.h;
+    final buttonHeight = 74.h; // 50h button + 24h padding
+    final serviceCardHeight = 70.h; // Approximate height per card
+    final spacing = 8.h; // Spacing between cards
+    final contentPadding = 16.h;
+
+    final totalContentHeight =
+        dragHandleHeight +
+        (serviceCount * serviceCardHeight) +
+        ((serviceCount > 0 ? serviceCount - 1 : 0) * spacing) +
+        buttonHeight +
+        contentPadding;
+
+    // Calculate initial size as percentage of screen height
+    final calculatedSize = (totalContentHeight / screenHeight).clamp(0.25, 0.9);
+    final minSize = calculatedSize.clamp(0.25, 0.9);
+
     return DraggableScrollableSheet(
-      initialChildSize: 0.25, // Start at 25% of screen height
-      minChildSize: 0.25, // Minimum 25%
+      initialChildSize: calculatedSize,
+      minChildSize: minSize,
       maxChildSize: 0.9, // Maximum 90%
-      builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            boxShadow: [BoxShadow(color: const Color(0x3F0E275D), blurRadius: 20, offset: Offset(2, 4))],
-          ),
-          child: SafeArea(
-            top: false,
-            bottom: true,
-            child: Column(
-              children: [
-                // Drag handle
-                Center(
-                  child: Container(
-                    margin: EdgeInsets.only(top: 8.h, bottom: 8.h),
-                    width: 40.w,
-                    height: 4.h,
-                    decoration: BoxDecoration(color: const Color(0xFFD7DAE0), borderRadius: BorderRadius.circular(10)),
-                  ),
+      builder: (context, scrollController) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          boxShadow: [BoxShadow(color: Color(0x3F0E275D), blurRadius: 20, offset: Offset(2, 4))],
+        ),
+        child: SafeArea(
+          top: false,
+          bottom: true,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Drag handle
+              Center(
+                child: Container(
+                  margin: EdgeInsets.only(top: 8.h, bottom: 8.h),
+                  width: 40.w,
+                  height: 4.h,
+                  decoration: BoxDecoration(color: const Color(0xFFD7DAE0), borderRadius: BorderRadius.circular(10)),
                 ),
-                // Scrollable Content
-                Expanded(
-                  child: SingleChildScrollView(
-                    controller: scrollController,
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.w),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildServiceList(context, riderServiceState, ref, isDark),
-                          SizedBox(height: 8.h), // Small spacing before button
-                        ],
-                      ),
+              ),
+              // Scrollable Content - use Expanded to fill available space, button stays at bottom
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 16.w),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [_buildServiceList(context, riderServiceState, ref, isDark)],
                     ),
                   ),
                 ),
-                // Fixed Bottom Button Bar
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: Offset(0, -2))],
-                  ),
-                  child: _buildBookButton(context, selectedService, isDark),
+              ),
+              // Fixed Bottom Button Bar - always at bottom
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: Offset(0, -2))],
                 ),
-              ],
-            ),
+                child: _buildBookButton(context, selectedService, isDark),
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -107,9 +126,14 @@ class RideBookingSheet extends ConsumerWidget {
         return Column(
           mainAxisSize: MainAxisSize.min,
           children: list.map<Widget>((service) {
+            final selectedService = ref.watch(carTypeNotifierProvider).selectedCarType;
+            // More robust selection check - compare both id and serviceId
             final isSelected =
-                ref.watch(carTypeNotifierProvider).selectedCarType?.id == service.id ||
-                ref.watch(carTypeNotifierProvider).selectedCarType?.serviceId == service.serviceId;
+                selectedService != null &&
+                ((selectedService.id != null && selectedService.id == service.id) ||
+                    (selectedService.serviceId != null &&
+                        selectedService.serviceId == service.serviceId &&
+                        selectedService.serviceId.toString().isNotEmpty));
             return _buildServiceCard(context, service, isSelected, ref, isDark);
           }).toList(),
         );
@@ -121,9 +145,11 @@ class RideBookingSheet extends ConsumerWidget {
     final notifier = ref.read(carTypeNotifierProvider.notifier);
     final serviceName = (service.displayName ?? service.name ?? 'SERVICE').toUpperCase();
 
-    // Get icon - prefer emoji icon, then iconUrl, then logo
+    // Get icon - check iconUrl first, if null/empty then use icon (emoji)
     final iconEmoji = service.icon;
-    final iconUrl = service.iconUrl ?? service.logo;
+    final iconUrl = (service.iconUrl != null && service.iconUrl.toString().trim().isNotEmpty)
+        ? service.iconUrl
+        : ((service.logo != null && service.logo.toString().trim().isNotEmpty) ? service.logo : null);
 
     // Get price - prefer costAfterCoupon (finalTotal), then totalFare, then serviceFare
     final price = service.costAfterCoupon ?? service.totalFare ?? service.serviceFare ?? service.minimumFare ?? 0.0;
@@ -138,7 +164,7 @@ class RideBookingSheet extends ConsumerWidget {
               margin: EdgeInsets.only(bottom: 8.h),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                gradient: LinearGradient(
+                gradient: const LinearGradient(
                   colors: [const Color(0xFF1469B5), const Color(0xFF942FAF)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
@@ -147,16 +173,26 @@ class RideBookingSheet extends ConsumerWidget {
                   BoxShadow(color: const Color(0xFF1469B5).withOpacity(0.3), blurRadius: 4, offset: Offset(0, 2)),
                 ],
               ),
-              padding: EdgeInsets.all(2), // Border width
+              padding: const EdgeInsets.all(2),
               child: Container(
                 padding: EdgeInsets.all(10.w),
                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(6)),
                 child: Row(
                   children: [
-                    // Service Icon - prefer iconUrl, if null then show icon (emoji)
-                    if (iconUrl != null && iconUrl.toString().isNotEmpty)
-                      buildNetworkImage(imageUrl: iconUrl.toString(), width: 40.w, height: 40.h, fit: BoxFit.contain)
-                    else if (iconEmoji != null && iconEmoji.toString().isNotEmpty)
+                    // Service Icon - check iconUrl first, if null/empty then show icon (emoji)
+                    if (iconUrl != null && iconUrl.toString().trim().isNotEmpty)
+                      Container(
+                        width: 40.w,
+                        height: 40.h,
+                        alignment: Alignment.center,
+                        child: buildNetworkImage(
+                          imageUrl: iconUrl.toString(),
+                          width: 40.w,
+                          height: 40.h,
+                          fit: BoxFit.contain,
+                        ),
+                      )
+                    else if (iconEmoji != null && iconEmoji.toString().trim().isNotEmpty)
                       Container(
                         width: 40.w,
                         height: 40.h,
@@ -164,7 +200,12 @@ class RideBookingSheet extends ConsumerWidget {
                         child: Text(iconEmoji.toString(), style: TextStyle(fontSize: 32.sp)),
                       )
                     else
-                      Icon(Icons.directions_car, size: 32.sp, color: Colors.grey[600]),
+                      Container(
+                        width: 40.w,
+                        height: 40.h,
+                        alignment: Alignment.center,
+                        child: Icon(Icons.directions_car, size: 32.sp, color: Colors.grey[600]),
+                      ),
                     Gap(10.w),
                     // Service Details
                     Expanded(
@@ -231,10 +272,20 @@ class RideBookingSheet extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  // Service Icon - prefer iconUrl, if null then show icon (emoji)
-                  if (iconUrl != null && iconUrl.toString().isNotEmpty)
-                    buildNetworkImage(imageUrl: iconUrl.toString(), width: 40.w, height: 40.h, fit: BoxFit.contain)
-                  else if (iconEmoji != null && iconEmoji.toString().isNotEmpty)
+                  // Service Icon - check iconUrl first, if null/empty then show icon (emoji)
+                  if (iconUrl != null && iconUrl.toString().trim().isNotEmpty)
+                    Container(
+                      width: 40.w,
+                      height: 40.h,
+                      alignment: Alignment.center,
+                      child: buildNetworkImage(
+                        imageUrl: iconUrl.toString(),
+                        width: 40.w,
+                        height: 40.h,
+                        fit: BoxFit.contain,
+                      ),
+                    )
+                  else if (iconEmoji != null && iconEmoji.toString().trim().isNotEmpty)
                     Container(
                       width: 40.w,
                       height: 40.h,
@@ -242,7 +293,12 @@ class RideBookingSheet extends ConsumerWidget {
                       child: Text(iconEmoji.toString(), style: TextStyle(fontSize: 32.sp)),
                     )
                   else
-                    Icon(Icons.directions_car, size: 32.sp, color: Colors.grey[600]),
+                    Container(
+                      width: 40.w,
+                      height: 40.h,
+                      alignment: Alignment.center,
+                      child: Icon(Icons.directions_car, size: 32.sp, color: Colors.grey[600]),
+                    ),
                   Gap(10.w),
                   // Service Details
                   Expanded(
@@ -351,11 +407,17 @@ class RideBookingSheet extends ConsumerWidget {
         await notifier.createOrder(orderData: data);
       }
 
-      final serviceName = selectedService?.name?.toUpperCase() ?? 'RIDE';
       return Container(
         width: double.infinity,
         height: 50.h,
-        decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(8)),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [Color(0xFF397098), Color(0xFF942FAF)],
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
         child: Material(
           color: Colors.transparent,
           child: InkWell(
@@ -366,13 +428,20 @@ class RideBookingSheet extends ConsumerWidget {
                   ? SizedBox(
                       width: 24.w,
                       height: 24.h,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      child: ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [Color(0xFF397098), Color(0xFF942FAF)],
+                        ).createShader(bounds),
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
                       ),
                     )
                   : Text(
-                      'Book $serviceName',
+                      'Book Now',
                       style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16.sp),
                     ),
             ),

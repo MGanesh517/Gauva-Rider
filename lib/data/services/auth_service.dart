@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:gauva_userapp/core/config/api_endpoints.dart';
 import 'package:gauva_userapp/data/services/api/dio_client.dart';
 
@@ -291,22 +292,52 @@ class AuthService implements IAuthService {
     String? phone,
     String? deviceToken,
   }) async {
+    debugPrint('');
+    debugPrint('🔵 ═══════════════════════════════════════════════════════');
+    debugPrint('🔵 AUTH SERVICE - GOOGLE SIGN-IN API CALL');
+    debugPrint('🔵 Endpoint: ${ApiEndpoints.googleLoginUrl}');
+    debugPrint('🔵 ═══════════════════════════════════════════════════════');
+    
     // Spring Boot: Google sign-in endpoint
     final Map<String, dynamic> body = {
       'idToken': idToken,
     };
     
+    debugPrint('📦 Request Body:');
+    debugPrint('   🔑 idToken: ${idToken.substring(0, 30)}... (length: ${idToken.length})');
+    
     // Add optional fields only if they are provided
     if (name != null && name.isNotEmpty) {
       body['name'] = name;
-    }
-    if (email != null && email.isNotEmpty) {
-      body['email'] = email;
-    }
-    if (phone != null && phone.isNotEmpty) {
-      body['phone'] = phone;
+      debugPrint('   👤 name: $name');
+    } else {
+      debugPrint('   👤 name: (not provided)');
     }
     
-    return await dioClient.dio.post('/api/v1/auth/login/google', data: body);
+    if (email != null && email.isNotEmpty) {
+      body['email'] = email;
+      debugPrint('   📧 email: $email');
+    } else {
+      debugPrint('   📧 email: (not provided)');
+    }
+    
+    if (phone != null && phone.isNotEmpty) {
+      body['phone'] = phone;
+      debugPrint('   📱 phone: $phone');
+    } else {
+      debugPrint('   📱 phone: (not provided)');
+    }
+    
+    debugPrint('📤 Sending POST request to ${ApiEndpoints.googleLoginUrl}...');
+    final response = await dioClient.dio.post(ApiEndpoints.googleLoginUrl, data: body);
+    
+    debugPrint('📥 Response received:');
+    debugPrint('   📊 Status Code: ${response.statusCode}');
+    debugPrint('   📦 Response Data: ${response.data}');
+    debugPrint('   📦 Response Type: ${response.data.runtimeType}');
+    debugPrint('🔵 ═══════════════════════════════════════════════════════');
+    debugPrint('');
+    
+    return response;
   }
 }

@@ -63,8 +63,17 @@ class LocalStorageService {
   Future<String?> getRegistrationProgress() async => await _storage.safeRead(key: 'registration');
 
   Future<int> getUserId() async {
-    final user = await getSavedUser();
-    return user?.id ?? 0;
+    try {
+      final user = await getSavedUser();
+      if (user != null && user.id != 0) {
+        return user.id;
+      }
+    } catch (e) {
+      debugPrint('⚠️ Error getting saved user: $e');
+    }
+
+    // Fallback: If no valid user in storage, return 0 (logic elsewhere handles this)
+    return 0;
   }
 
   Future<void> saveToken(String token) async {

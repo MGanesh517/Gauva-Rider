@@ -9,21 +9,17 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gauva_userapp/core/utils/change_status_bar.dart';
 import 'package:gauva_userapp/core/utils/exit_app_dialogue.dart';
 import 'package:gauva_userapp/core/widgets/is_ios.dart';
-import 'package:gauva_userapp/generated/l10n.dart';
 import '../../../core/extensions/extensions.dart';
 import '../../../core/utils/color_palette.dart';
 import '../../../core/widgets/buttons/app_back_button.dart';
 import '../../../core/widgets/icon_destination.dart';
 import '../../../core/widgets/location_text_field.dart';
 import '../../../data/models/waypoint.dart';
-import '../../../data/services/navigation_service.dart';
 import '../../account_page/provider/theme_provider.dart';
-import '../../waypoint/provider/google_api_providers.dart';
 import '../../waypoint/provider/pick_route_providers.dart';
 import '../../waypoint/provider/search_place_providers.dart';
 import '../../waypoint/provider/selected_loc_text_field_providers.dart';
 import '../../waypoint/provider/way_point_list_providers.dart';
-import '../../waypoint/provider/way_point_map_providers.dart';
 import '../../waypoint/widgets/place_lookup_state_view.dart';
 
 class IntercityWaypointsInputSheet extends ConsumerStatefulWidget {
@@ -118,35 +114,40 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
             'Search',
             style: context.titleMedium?.copyWith(
               fontSize: 16.sp,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
               color: isDark ? Colors.white : const Color(0xFF24262D),
             ),
           ),
         ),
-        backgroundColor: isDark ? Colors.black : Colors.white,
-        body: Column(
-          children: [
-            Container(height: 10.h, width: double.infinity, color: isDark ? Colors.black : ColorPalette.neutralF6),
-            Expanded(
-              child: SafeArea(
-                bottom: !isIos(),
-                child: Padding(
-                  padding: const EdgeInsets.all(16).copyWith(bottom: isIos() ? 24.h : 16.h),
-                  child: Column(
-                    children: [
-                      _buildWaypointList(wayPointList, isDark: isDark),
-                      Gap(16.h),
-                      // Date and Time Selection
-                      _buildDateTimeSelector(isDark),
-                      Gap(16.h),
-                      const Expanded(child: PlaceLookupStateView()),
-                      _buildConfirmButton(pickupPoint, dropOffPoint),
-                    ],
+        body: Container(
+          decoration: BoxDecoration(
+            image: DecorationImage(image: AssetImage('assets/bg.png'), fit: BoxFit.fill),
+            color: isDark ? Colors.black : Colors.white,
+          ),
+          child: Column(
+            children: [
+              Container(height: 10.h, width: double.infinity, color: isDark ? Colors.black : ColorPalette.neutralF6),
+              Expanded(
+                child: SafeArea(
+                  bottom: !isIos(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16).copyWith(bottom: isIos() ? 24.h : 16.h),
+                    child: Column(
+                      children: [
+                        _buildWaypointList(wayPointList, isDark: isDark),
+                        Gap(16.h),
+                        // Date and Time Selection
+                        _buildDateTimeSelector(isDark),
+                        Gap(16.h),
+                        const Expanded(child: PlaceLookupStateView()),
+                        _buildConfirmButton(pickupPoint, dropOffPoint),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -254,6 +255,8 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
                     child: LocationTextField(
                       initialValue: e,
                       isFocused: index == selectedField,
+                      borderColor: Colors.grey[300],
+                      textColor: Colors.black,
                       onChanged: (value) {
                         if (selectedField != index) {
                           fieldNotifier.setSelectedLocation(index);
@@ -321,15 +324,6 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select date and time')));
                     return;
                   }
-
-                  // Combine date and time
-                  final dateTime = DateTime(
-                    selectedDate!.year,
-                    selectedDate!.month,
-                    selectedDate!.day,
-                    selectedTime!.hour,
-                    selectedTime!.minute,
-                  );
 
                   widget.onConfirm(
                     fromAddress: pickup.address,

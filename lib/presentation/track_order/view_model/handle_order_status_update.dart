@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gauva_userapp/core/routes/app_routes.dart';
+import 'package:gauva_userapp/core/utils/helpers.dart';
 import 'package:gauva_userapp/data/models/waypoint.dart';
 import 'package:gauva_userapp/data/services/navigation_service.dart';
 import 'package:gauva_userapp/presentation/booking/provider/booking_providers.dart';
@@ -50,15 +51,32 @@ void handleOrderStatusUpdate({
 
   Future<void> setMarkerPolylines() async {
     final notifier = ref.read(createOrderNotifierProvider.notifier);
-    ref
-        .read(createOrderNotifierProvider)
-        .whenOrNull(
-          success: (data) async {
-            final List<Waypoint> waypoints = notifier.constructWaypoints(data);
+    final orderState = ref.read(createOrderNotifierProvider);
+    
+    orderState.whenOrNull(
+      success: (data) async {
+        debugPrint('🗺️ Setting up map markers and polylines for order: ${data.id}');
+        debugPrint('📍 Pickup: ${data.addresses?.pickupAddress}');
+        debugPrint('📍 Drop: ${data.addresses?.dropAddress}');
+        debugPrint('🚗 Driver: ${data.driver?.name}');
+        debugPrint('📏 Distance: ${data.distance}');
+        debugPrint('⏱️ Duration: ${data.duration}');
+        
+        // Check if we have valid points for waypoints
+        if (data.points?.pickupLocation != null && data.points?.dropLocation != null) {
+          final List<Waypoint> waypoints = notifier.constructWaypoints(data);
+          if (waypoints.isNotEmpty) {
             ref.read(wayPointListNotifierProvider.notifier).setWayPointList(waypoints);
             ref.read(routeNotifierProvider.notifier).fetchRoutes();
-          },
-        );
+            debugPrint('✅ Map markers and polylines set up successfully');
+          } else {
+            debugPrint('⚠️ No waypoints constructed from order data');
+          }
+        } else {
+          debugPrint('⚠️ Order missing pickup or drop location points');
+        }
+      },
+    );
   }
 
   switch (status) {
@@ -70,7 +88,21 @@ void handleOrderStatusUpdate({
       debugPrint('✅ Status: ACCEPTED - Driver accepted ride');
 
       if (fromPusher) {
-        ref.read(createOrderNotifierProvider.notifier).orderDetailsForCancelRide(orderId: orderId ?? 0);
+        // Fetch order details and then set up map
+        debugPrint('📥 Fetching order details for order ID: $orderId');
+        ref.read(createOrderNotifierProvider.notifier).orderDetailsForCancelRide(orderId: orderId ?? 0).then((_) {
+          debugPrint('✅ Order details fetched, setting up map...');
+          // Wait a bit for state to update, then set up map
+          Future.delayed(const Duration(milliseconds: 300), () {
+            setMarkerPolylines();
+            // Wait a bit more before updating map to ensure waypoints are set
+            Future.delayed(const Duration(milliseconds: 200), () {
+              mapStateNotifier.updateForAccepted();
+            });
+          });
+        }).catchError((error) {
+          debugPrint('❌ Error fetching order details: $error');
+        });
         ref.read(trackOrderNotifierProvider.notifier).goToInProgress();
       } else {
         setMarkerPolylines();
@@ -147,6 +179,21 @@ void handleOrderStatusUpdate({
         debugPrint('🏠 Navigating to dashboard');
         NavigationService.pushNamedAndRemoveUntil(AppRoutes.dashboard);
       }
+      break;
+
+    case 'declined':
+      debugPrint('❌ Status: DECLINED - Driver declined ride');
+      // Leave info in debug, maybe show notification
+      ref.read(websocketProvider.notifier).leaveRideRoom();
+      NavigationService.pushNamedAndRemoveUntil(AppRoutes.dashboard);
+      showNotification(message: 'Ride was declined by driver. Please try again.', isSuccess: false);
+      break;
+
+    case 'cancelled':
+      debugPrint('🚫 Status: CANCELLED - Ride cancelled');
+      ref.read(websocketProvider.notifier).leaveRideRoom();
+      NavigationService.pushNamedAndRemoveUntil(AppRoutes.dashboard);
+      showNotification(message: 'Ride was cancelled.', isSuccess: false);
       break;
 
     default:

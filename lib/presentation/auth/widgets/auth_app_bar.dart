@@ -58,8 +58,8 @@ class AuthAppBar extends ConsumerWidget {
                       showLeading
                           ? Row(
                               children: [
-                                const AppBackButton(color: ColorPalette.neutral100),
-                                SizedBox(width: 16.w),
+                                // const AppBackButton(color: ColorPalette.neutral100),
+                                // SizedBox(width: 16.w),
                                 Expanded(
                                   child: Text(
                                     title ?? '',
@@ -73,17 +73,16 @@ class AuthAppBar extends ConsumerWidget {
                                     ),
                                   ),
                                 ),
-                                countrySelector(showDecoration: true),
                               ],
                             )
                           : Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Flexible(
                                   child: Assets.images.rideIn.image(height: 49.h, fit: BoxFit.contain),
                                   // child: Image.asset(Assets.images.rideIn.path, height: 49.h, fit: BoxFit.contain),
                                 ),
-                                countrySelector(showDecoration: true),
                               ],
                             ),
                     ],

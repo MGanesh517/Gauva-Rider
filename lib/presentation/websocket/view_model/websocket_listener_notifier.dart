@@ -2,10 +2,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../../../data/services/rider_websocket_service.dart';
-import '../../booking/provider/order_providers.dart';
 import '../../track_order/view_model/handle_order_status_update.dart';
-import '../../track_order/provider/track_order_provider.dart';
 import '../../waypoint/provider/way_point_map_providers.dart';
 import '../provider/websocket_provider.dart';
 
@@ -20,19 +17,17 @@ class WebSocketListenerNotifier extends StateNotifier<void> {
 
   /// Start listening to WebSocket streams
   void startListening() {
-    final service = ref.read(websocketServiceProvider);
-    if (service != null) {
-      _listenToRideStatus(service);
-      _listenToDriverLocation(service);
-      _listenToChatMessages(service);
-      _listenToWalletUpdates(service);
-    }
+    final websocketNotifier = ref.read(websocketProvider.notifier);
+    _listenToRideStatus(websocketNotifier);
+    _listenToDriverLocation(websocketNotifier);
+    _listenToChatMessages(websocketNotifier);
+    _listenToWalletUpdates(websocketNotifier);
   }
 
   /// Listen to ride status updates
-  void _listenToRideStatus(RiderWebSocketService service) {
+  void _listenToRideStatus(WebSocketNotifier notifier) {
     _rideStatusSubscription?.cancel();
-    _rideStatusSubscription = service.rideStatusStream.listen((data) {
+    _rideStatusSubscription = notifier.rideStatusStream.listen((data) {
       debugPrint('📱 WebSocket - Ride Status Update: $data');
       
       try {
@@ -68,9 +63,9 @@ class WebSocketListenerNotifier extends StateNotifier<void> {
   }
 
   /// Listen to driver location updates
-  void _listenToDriverLocation(RiderWebSocketService service) {
+  void _listenToDriverLocation(WebSocketNotifier notifier) {
     _driverLocationSubscription?.cancel();
-    _driverLocationSubscription = service.driverLocationStream.listen((data) {
+    _driverLocationSubscription = notifier.driverLocationStream.listen((data) {
       debugPrint('📍 WebSocket - Driver Location Update: $data');
       
       try {
@@ -102,9 +97,9 @@ class WebSocketListenerNotifier extends StateNotifier<void> {
   }
 
   /// Listen to chat messages
-  void _listenToChatMessages(RiderWebSocketService service) {
+  void _listenToChatMessages(WebSocketNotifier notifier) {
     _chatMessageSubscription?.cancel();
-    _chatMessageSubscription = service.chatMessageStream.listen((data) {
+    _chatMessageSubscription = notifier.chatMessageStream.listen((data) {
       debugPrint('💬 WebSocket - Chat Message: $data');
       // Chat messages are handled by chat provider
       // This can be extended if needed
@@ -112,9 +107,9 @@ class WebSocketListenerNotifier extends StateNotifier<void> {
   }
 
   /// Listen to wallet updates
-  void _listenToWalletUpdates(RiderWebSocketService service) {
+  void _listenToWalletUpdates(WebSocketNotifier notifier) {
     _walletUpdateSubscription?.cancel();
-    _walletUpdateSubscription = service.walletUpdateStream.listen((data) {
+    _walletUpdateSubscription = notifier.walletUpdateStream.listen((data) {
       debugPrint('💰 WebSocket - Wallet Update: $data');
       // Wallet updates can be handled here if needed
     });

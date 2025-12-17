@@ -6,7 +6,7 @@ import 'package:gauva_userapp/core/extensions/extensions.dart';
 import '../../../core/theme/color_palette.dart';
 import '../../../generated/l10n.dart';
 
-Widget authMessage(BuildContext context, {required bool isDarkMode, String? version}) => Column(
+Widget authMessage(BuildContext context, {required bool isDarkMode}) => Column(
   crossAxisAlignment: CrossAxisAlignment.start,
   children: [
     Row(
@@ -21,18 +21,18 @@ Widget authMessage(BuildContext context, {required bool isDarkMode, String? vers
             ),
           ),
         ),
-        Gap(16.w),
-        Expanded(
-          child: Text(
-            version ?? '',
-            textAlign: TextAlign.end,
-            style: context.bodyMedium?.copyWith(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w400,
-              color: ColorPalette.primary50,
-            ),
-          ),
-        ),
+        // Gap(16.w),
+        // Expanded(
+        //   child: Text(
+        //     version ?? '',
+        //     textAlign: TextAlign.end,
+        //     style: context.bodyMedium?.copyWith(
+        //       fontSize: 13.sp,
+        //       fontWeight: FontWeight.w400,
+        //       color: ColorPalette.primary50,
+        //     ),
+        //   ),
+        // ),
       ],
     ),
     Gap(4.h),

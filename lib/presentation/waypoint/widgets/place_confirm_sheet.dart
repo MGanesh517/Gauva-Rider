@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
+import 'package:gauva_userapp/common/loading_view.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gauva_userapp/core/extensions/extensions.dart';
 import 'package:gauva_userapp/core/widgets/is_ios.dart';
@@ -51,7 +52,8 @@ class PlaceConfirmSheet extends ConsumerWidget {
                         final state = ref.watch(pickedAddressFetcherNotifierProvider(location));
                         return Expanded(
                           child: state.when(
-                            loading: () => Assets.lottie.loading.lottie(),
+                            // loading: () => Assets.lottie.loading.lottie(),
+                            loading: () => const LoadingView(),
                             data: (address) => PlaceResultItem(
                               title: '',
                               subtitle: address.isNotEmpty ? address : AppLocalizations.of(context).no_address_found,

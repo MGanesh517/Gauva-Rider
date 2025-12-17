@@ -1,137 +1,125 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../data/services/rider_websocket_service.dart';
-import '../../../data/services/local_storage_service.dart';
+import 'package:gauva_userapp/data/services/rider_websocket_service.dart';
+import 'package:gauva_userapp/data/services/local_storage_service.dart';
+import 'package:gauva_userapp/presentation/profile/provider/rider_details_provider.dart';
 
-class WebSocketNotifier extends StateNotifier<WebSocketState> {
-  RiderWebSocketService? _riderService;
+class WebSocketNotifier extends StateNotifier<void> {
+  final Ref ref;
+  final RiderWebSocketService _riderWebSocketService = RiderWebSocketService();
 
-  WebSocketNotifier() : super(const WebSocketState.initial());
+  WebSocketNotifier(this.ref) : super(null);
 
-  bool get isConnected => _riderService?.isStompConnected ?? false;
-
-  // Initialize for rider
-  Future<void> initializeRider({required String jwtToken, required String userId}) async {
+  /// Setup WebSocket and subscribe to necessary topics
+  Future<void> setupWebSocketListeners() async {
     try {
-      state = const WebSocketState.connecting();
+      print('🔌 WebSocket Notifier: Setting up WebSocket listeners...');
 
-      _riderService = RiderWebSocketService();
-      await _riderService!.initializeRider(jwtToken: jwtToken, userId: userId);
-
-      // Wait a bit for connection to establish
-      await Future.delayed(const Duration(seconds: 2));
-
-      if (_riderService!.isStompConnected) {
-        state = WebSocketState.connected(_riderService!);
-        debugPrint('✅ WebSocket connected successfully');
-      } else {
-        state = const WebSocketState.error('Failed to establish connection');
-        debugPrint('❌ WebSocket connection failed');
-      }
-    } catch (e) {
-      state = WebSocketState.error(e.toString());
-      debugPrint('❌ WebSocket initialization error: $e');
-    }
-  }
-
-  // Initialize from stored credentials
-  Future<void> initializeFromStorage() async {
-    try {
+      // Get JWT token first
       final token = await LocalStorageService().getToken();
-      final user = await LocalStorageService().getSavedUser();
-
       if (token == null || token.isEmpty) {
-        debugPrint('⚠️ No token found, skipping WebSocket initialization');
+        print('❌ WebSocket Notifier: No token found');
         return;
       }
 
-      if (user == null) {
-        debugPrint('⚠️ No user found, skipping WebSocket initialization');
+      // Get user ID with retry mechanism (in case user data is still being saved)
+      int userId = await _getUserIdWithRetry();
+
+      // Fallback: If user ID is 0 (invalid), try to fetch profile from API
+      if (userId == 0) {
+        print('⚠️ WebSocket Notifier: User ID missing after retries. Attempting to fetch profile...');
+
+        // Trigger profile fetch
+        await ref.read(riderDetailsNotifierProvider.notifier).getRiderDetails();
+
+        // Try getting ID one more time after fetch
+        userId = await LocalStorageService().getUserId();
+      }
+
+      if (userId == 0) {
+        print('❌ WebSocket Notifier: No user ID found after fallback. Cannot connect.');
         return;
       }
 
-      final userId = user.id.toString();
-      await initializeRider(jwtToken: token, userId: userId);
-    } catch (e) {
-      debugPrint('❌ Error initializing WebSocket from storage: $e');
+      print('🔌 WebSocket Notifier: User ID: $userId');
+      print(
+        '🔑 WebSocket Notifier: Token found (length: ${token.length}, first 20 chars: ${token.substring(0, token.length > 20 ? 20 : token.length)}...)',
+      );
+
+      // Initialize rider WebSocket service
+      await _riderWebSocketService.initializeRider(jwtToken: token, userId: userId);
+
+      print('✅ WebSocket Notifier: Rider WebSocket service initialized');
+    } catch (e, stackTrace) {
+      print('❌ WebSocket Notifier: Error setting up listeners: $e');
+      print('❌ WebSocket Notifier: Stack trace: $stackTrace');
     }
   }
 
-  // Join ride room
-  void joinRideRoom(int rideId) {
-    _riderService?.joinRideRoom(rideId);
+  /// Get user ID with retry mechanism
+  Future<int> _getUserIdWithRetry({int maxRetries = 3, Duration delay = const Duration(milliseconds: 500)}) async {
+    for (int i = 0; i < maxRetries; i++) {
+      final userId = await LocalStorageService().getUserId();
+      if (userId != 0) {
+        return userId;
+      }
+
+      if (i < maxRetries - 1) {
+        print('⏳ WebSocket Notifier: Retrying to get user ID (attempt ${i + 1}/$maxRetries)...');
+        await Future.delayed(delay);
+      }
+    }
+    return 0;
   }
 
-  // Leave ride room
-  void leaveRideRoom() {
-    _riderService?.leaveRideRoom();
+  /// Initialize from stored credentials (for backward compatibility)
+  Future<void> initializeFromStorage() async {
+    await setupWebSocketListeners();
   }
 
-  // Send message to driver
-  void sendMessageToDriver({
+  /// Join ride room
+  Future<void> joinRideRoom(int rideId) async {
+    _riderWebSocketService.joinRideRoom(rideId);
+  }
+
+  /// Leave ride room
+  Future<void> leaveRideRoom() async {
+    _riderWebSocketService.leaveRideRoom();
+  }
+
+  /// Send chat message
+  void sendChatMessage({
     required int rideId,
-    required String message,
+    required String senderId,
     required String senderName,
-    required String driverId,
+    required String receiverId,
+    required String message,
   }) {
-    _riderService?.sendMessageToDriver(
+    _riderWebSocketService.sendMessageToDriver(
       rideId: rideId,
       message: message,
       senderName: senderName,
-      driverId: driverId,
+      driverId: receiverId,
     );
   }
 
-  // Disconnect
-  void disconnect() {
-    _riderService?.disconnect();
-    _riderService = null;
-    state = const WebSocketState.initial();
+  /// Disconnect
+  Future<void> disconnect() async {
+    _riderWebSocketService.disconnect();
   }
 
-  @override
-  void dispose() {
-    disconnect();
-    super.dispose();
-  }
-}
+  /// Get streams
+  Stream<Map<String, dynamic>> get rideStatusStream => _riderWebSocketService.rideStatusStream;
+  Stream<Map<String, dynamic>> get driverLocationStream => _riderWebSocketService.driverLocationStream;
+  Stream<Map<String, dynamic>> get walletUpdateStream => _riderWebSocketService.walletUpdateStream;
+  Stream<Map<String, dynamic>> get chatMessageStream => _riderWebSocketService.chatMessageStream;
+  Stream<Map<String, dynamic>> get driverStatusStream => _riderWebSocketService.driverStatusStream;
+  Stream<Map<String, dynamic>> get newRideRequestStream => _riderWebSocketService.newRideRequestStream;
+  Stream<Map<String, dynamic>> get fleetStatsStream => _riderWebSocketService.fleetStatsStream;
 
-// WebSocket State
-sealed class WebSocketState {
-  const WebSocketState();
-
-  const factory WebSocketState.initial() = _Initial;
-  const factory WebSocketState.connecting() = _Connecting;
-  const factory WebSocketState.connected(RiderWebSocketService service) = _Connected;
-  const factory WebSocketState.error(String message) = _Error;
-}
-
-class _Initial extends WebSocketState {
-  const _Initial();
-}
-
-class _Connecting extends WebSocketState {
-  const _Connecting();
-}
-
-class _Connected extends WebSocketState {
-  final RiderWebSocketService service;
-  const _Connected(this.service);
-}
-
-class _Error extends WebSocketState {
-  final String message;
-  const _Error(this.message);
+  bool get isConnected => _riderWebSocketService.isConnected;
 }
 
 // Provider
-final websocketProvider = StateNotifierProvider<WebSocketNotifier, WebSocketState>((ref) {
-  return WebSocketNotifier();
+final websocketProvider = StateNotifierProvider<WebSocketNotifier, void>((ref) {
+  return WebSocketNotifier(ref);
 });
-
-// Helper provider to get the service when connected
-final websocketServiceProvider = Provider<RiderWebSocketService?>((ref) {
-  final state = ref.watch(websocketProvider);
-  return state is _Connected ? state.service : null;
-});
-

@@ -265,11 +265,18 @@ class AuthRepoImpl extends BaseRepository implements IAuthRepo {
     String? phone,
     String? deviceToken,
   }) async => await safeApiCall(() async {
-    debugPrint('🔵 GOOGLE SIGN-IN - Starting');
-    debugPrint('🔵 idToken: ${idToken.substring(0, 20)}...');
-    debugPrint('🔵 name: $name');
-    debugPrint('🔵 email: $email');
-    debugPrint('🔵 phone: $phone');
+    debugPrint('');
+    debugPrint('🔵 ═══════════════════════════════════════════════════════');
+    debugPrint('🔵 AUTH REPOSITORY - GOOGLE SIGN-IN');
+    debugPrint('🔵 ═══════════════════════════════════════════════════════');
+    debugPrint('📥 Input Parameters:');
+    debugPrint('   🔑 idToken: ${idToken.substring(0, 30)}... (length: ${idToken.length})');
+    debugPrint('   👤 name: $name');
+    debugPrint('   📧 email: $email');
+    debugPrint('   📱 phone: $phone');
+    debugPrint('   📲 deviceToken: ${deviceToken != null ? "${deviceToken.substring(0, 20)}..." : "null"}');
+    
+    debugPrint('📤 Calling auth service...');
     final response = await _authService.signInWithGoogle(
       idToken: idToken,
       name: name,
@@ -277,14 +284,40 @@ class AuthRepoImpl extends BaseRepository implements IAuthRepo {
       phone: phone,
       deviceToken: deviceToken,
     );
-    debugPrint('📥 GOOGLE SIGN-IN Response: ${response.data}');
+    
+    debugPrint('📥 Response received from service:');
+    debugPrint('   📊 Status Code: ${response.statusCode}');
+    debugPrint('   📦 Response Data: ${response.data}');
+    debugPrint('   📦 Response Type: ${response.data.runtimeType}');
+    
+    debugPrint('🔄 Parsing response...');
     try {
       final result = LoginWithPasswordResponse.fromJson(response.data);
       debugPrint('✅ GOOGLE SIGN-IN - Parsed successfully');
+      debugPrint('   ✅ Message: ${result.message}');
+      debugPrint('   ✅ Has Data: ${result.data != null}');
+      if (result.data != null) {
+        debugPrint('   ✅ Has Access Token: ${result.data?.accessToken != null}');
+        debugPrint('   ✅ Has Refresh Token: ${result.data?.refreshToken != null}');
+        debugPrint('   ✅ Has User: ${result.data?.user != null}');
+        if (result.data?.user != null) {
+          debugPrint('   ✅ User ID: ${result.data?.user?.id}');
+          debugPrint('   ✅ User Name: ${result.data?.user?.name}');
+          debugPrint('   ✅ User Email: ${result.data?.user?.email}');
+        }
+      }
+      debugPrint('🔵 ═══════════════════════════════════════════════════════');
+      debugPrint('');
       return result;
     } catch (e, stackTrace) {
-      debugPrint('🔴 GOOGLE SIGN-IN - Parsing error: $e');
+      debugPrint('');
+      debugPrint('🔴 ═══════════════════════════════════════════════════════');
+      debugPrint('🔴 GOOGLE SIGN-IN - PARSING ERROR');
+      debugPrint('🔴 Error: $e');
       debugPrint('🔴 Stack trace: $stackTrace');
+      debugPrint('🔴 Raw response data: ${response.data}');
+      debugPrint('🔴 ═══════════════════════════════════════════════════════');
+      debugPrint('');
       rethrow;
     }
   });

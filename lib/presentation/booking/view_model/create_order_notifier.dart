@@ -78,12 +78,25 @@ class CreateOrderNotifier extends StateNotifier<AppState<Order>> {
 
     // Join WebSocket ride room for real-time updates
     if (data.id != null) {
-      debugPrint('🔌 WebSocket - Joining ride room for ride ${data.id}');
+      debugPrint('🔌 WebSocket - Preparing to join ride room for ride ${data.id}');
       try {
-        ref.read(websocketProvider.notifier).joinRideRoom(data.id!);
-        debugPrint('✅ WebSocket - Joined ride room ${data.id}');
+        final wsNotifier = ref.read(websocketProvider.notifier);
+
+        // Ensure connected
+        if (!wsNotifier.isConnected) {
+          debugPrint('🔌 WebSocket - Not connected, attempting to connect...');
+          await wsNotifier.setupWebSocketListeners();
+          // Give it a moment to stabilize if needed, though initializeRider awaits connection
+        }
+
+        if (wsNotifier.isConnected) {
+          await wsNotifier.joinRideRoom(data.id!);
+          debugPrint('✅ WebSocket - Joined ride room ${data.id}');
+        } else {
+          debugPrint('❌ WebSocket - Failed to connect, cannot join ride room.');
+        }
       } catch (e) {
-        debugPrint('⚠️ WebSocket - Failed to join ride room: $e');
+        debugPrint('⚠️ WebSocket - Error while joining ride room: $e');
         // Continue - app can work without WebSocket
       }
     }

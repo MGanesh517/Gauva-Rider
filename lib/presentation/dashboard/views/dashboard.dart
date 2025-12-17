@@ -37,7 +37,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
 
   Future<void> _initializeWebSocket() async {
     try {
-      await ref.read(websocketProvider.notifier).initializeFromStorage();
+      await ref.read(websocketProvider.notifier).setupWebSocketListeners();
       // Start listening to WebSocket streams after connection
       Future.delayed(const Duration(seconds: 3), () {
         ref.read(websocketListenerNotifierProvider.notifier).startListening();

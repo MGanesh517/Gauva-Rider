@@ -119,15 +119,50 @@ class OrderRepoImpl extends BaseRepository implements IOrderRepo {
     debugPrint('📋 ORDER DETAILS - Order ID: $orderId');
     final response = await orderService.orderDetails(orderId: orderId);
     debugPrint('📥 ORDER DETAILS Response: ${response.data}');
+    debugPrint('📥 ORDER DETAILS Response Type: ${response.data.runtimeType}');
+    
     try {
-      final result = OrderDetailModel.fromJson(response.data);
+      dynamic responseData = response.data;
+      
+      // Handle case where response is the order object directly
+      if (responseData is Map && responseData.containsKey('id') && !responseData.containsKey('data')) {
+        debugPrint('📦 ORDER DETAILS - Response is order object directly, wrapping...');
+        final orderMap = Map<String, dynamic>.from(responseData);
+        responseData = <String, dynamic>{
+          'success': true,
+          'message': 'Order details retrieved',
+          'data': orderMap,
+        };
+      }
+      // Handle case where response is an array (shouldn't happen, but handle it)
+      else if (responseData is List && responseData.isNotEmpty) {
+        debugPrint('📦 ORDER DETAILS - Response is array, extracting first element...');
+        final firstElement = responseData[0];
+        final orderMap = firstElement is Map 
+            ? Map<String, dynamic>.from(firstElement)
+            : firstElement;
+        responseData = <String, dynamic>{
+          'success': true,
+          'message': 'Order details retrieved',
+          'data': orderMap,
+        };
+      }
+      
+      final result = OrderDetailModel.fromJson(responseData);
       debugPrint('✅ ORDER DETAILS - Parsed successfully');
+      debugPrint('✅ Order ID: ${result.data?.id}');
+      debugPrint('✅ Order Status: ${result.data?.status}');
+      debugPrint('✅ Driver: ${result.data?.driver?.name ?? "N/A"}');
+      debugPrint('✅ Pickup: ${result.data?.addresses?.pickupAddress ?? "N/A"}');
+      debugPrint('✅ Drop: ${result.data?.addresses?.dropAddress ?? "N/A"}');
+      debugPrint('✅ Distance: ${result.data?.distance}');
+      debugPrint('✅ Duration: ${result.data?.duration}');
       return result;
     } catch (e, stackTrace) {
       debugPrint('🔴 ORDER DETAILS - Parsing error: $e');
       debugPrint('🔴 Stack trace: $stackTrace');
       debugPrint('🔴 Raw response data: ${response.data}');
-      return OrderDetailModel.fromJson(response.data);
+      rethrow;
     }
   });
 

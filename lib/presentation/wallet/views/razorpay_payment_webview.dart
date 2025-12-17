@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gauva_userapp/common/loading_view.dart';
 import 'package:gauva_userapp/data/services/navigation_service.dart';
 import 'package:gauva_userapp/presentation/wallet/provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -177,7 +178,10 @@ class _RazorpayPaymentWebViewState extends ConsumerState<RazorpayPaymentWebView>
     body: Stack(
       children: [
         WebViewWidget(controller: _controller),
-        if (_isLoading) const Center(child: CircularProgressIndicator()),
+        if (_isLoading)
+          const Center(
+            child: LoadingView(),
+          ),
       ],
     ),
   );

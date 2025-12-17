@@ -1,20 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:gauva_userapp/core/extensions/extensions.dart';
 import 'package:gauva_userapp/core/extensions/number_extension.dart';
-import 'package:gauva_userapp/core/routes/app_routes.dart';
 import 'package:gauva_userapp/core/theme/color_palette.dart';
 import 'package:gauva_userapp/data/models/order_response/order_model/driver/driver.dart';
-import 'package:gauva_userapp/data/services/navigation_service.dart';
 import 'package:gauva_userapp/generated/l10n.dart';
 
 import '../../../data/services/url_launch_serivices.dart';
 
-Widget driverDetails(BuildContext context, Driver? driver, {required bool isDark}) {
+Widget driverDetails(BuildContext context, Driver? driver, {required bool isDark, int? otp}) {
   const double height = 60;
   const double width = 60;
   return Container(
@@ -39,7 +36,16 @@ Widget driverDetails(BuildContext context, Driver? driver, {required bool isDark
                   height: height.h,
                   width: width.w,
                   color: Colors.grey[300],
-                  child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                  child: Center(
+                    child: ShaderMask(
+                      shaderCallback: (bounds) => const LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [Color(0xFF397098), Color(0xFF942FAF)],
+                      ).createShader(bounds),
+                      child: const CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  ),
                 ),
                 errorWidget: (context, url, error) => Container(
                   height: height.h,
@@ -59,7 +65,7 @@ Widget driverDetails(BuildContext context, Driver? driver, {required bool isDark
               Text(
                 driver?.name != null ? driver!.name! : (driver?.mobile ?? 'N/A'),
                 overflow: TextOverflow.ellipsis,
-                maxLines: 2,
+                maxLines: 1,
                 style: context.bodyMedium?.copyWith(
                   fontSize: 14.sp,
                   fontWeight: FontWeight.w500,
@@ -109,21 +115,39 @@ Widget driverDetails(BuildContext context, Driver? driver, {required bool isDark
           ),
         ),
 
-        Consumer(
-          builder: (context, ref, _) {
-            return getBackground(
-              icon: Ionicons.chatbubble_ellipses_outline,
-              backgroundColor: isDark ? const Color(0xFF687387) : const Color(0xFFF6F7F9),
-              iconColor: const Color(0xFF24262D),
-              onTap: () {
-                // TODO: Implement chat functionality
-                // LocalStorageService().saveChatState(isOpen: true);
-                NavigationService.pushNamed(AppRoutes.chatPage);
-              },
-            );
-          },
-        ),
-        Gap(16.w),
+        // OTP display if available
+        if (otp != null) ...[
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
+            decoration: BoxDecoration(
+              color: isDark ? const Color(0xFF687387) : const Color(0xFFF1F7FE),
+              borderRadius: BorderRadius.circular(4.r),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'OTP',
+                  style: context.bodyMedium?.copyWith(
+                    fontSize: 10.sp,
+                    fontWeight: FontWeight.w500,
+                    color: const Color(0xFF687387),
+                  ),
+                ),
+                Gap(2.h),
+                Text(
+                  otp.toString().padLeft(4, '0'),
+                  style: context.bodyMedium?.copyWith(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.w700,
+                    color: isDark ? Colors.white : const Color(0xFF1469B5),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Gap(8.w),
+        ],
         getBackground(
           icon: Ionicons.call_outline,
           backgroundColor: isDark ? const Color(0xFF687387) : const Color(0xFFF1F7FE),

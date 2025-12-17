@@ -8,6 +8,35 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:798219755346:android:d5c9729b23fe0d429f648b",
+        "android_client_info": {
+          "package_name": "com.gauva.driverapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "798219755346-ocqss3oc88fhrjtk0j8rem397ihjeabd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCv2Lm4K4AETbK5Snzm7NwPBx89IBQv3j0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "798219755346-ocqss3oc88fhrjtk0j8rem397ihjeabd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:798219755346:android:d95c1ef50553c92d9f648b",
         "android_client_info": {
           "package_name": "com.gauva.userapp"
@@ -28,6 +57,14 @@
           "android_info": {
             "package_name": "com.gauva.userapp",
             "certificate_hash": "dcb3abac9fac790ac333e5891a812695d3cc1c59"
+          }
+        },
+        {
+          "client_id": "798219755346-uhig7gbeo5r0qfl1lsln68sb00d7m8jq.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gauva.userapp",
+            "certificate_hash": "fedac90958ffd8654b5fadda918b29bb59856c8e"
           }
         },
         {

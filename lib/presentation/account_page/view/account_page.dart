@@ -322,12 +322,12 @@ Widget accountDetails(BuildContext context, {required WidgetRef ref, required bo
             },
             isDark: isDark,
           ),
-          Gap(16.h),
-          Text(
-            version ?? '',
-            textAlign: TextAlign.center,
-            style: context.bodyMedium?.copyWith(fontSize: 14.sp, color: AppColors.primary),
-          ),
+          // Gap(16.h),
+          // Text(
+          //   version ?? '',
+          //   textAlign: TextAlign.center,
+          //   style: context.bodyMedium?.copyWith(fontSize: 14.sp, color: AppColors.primary),
+          // ),
         ],
       ),
     ),

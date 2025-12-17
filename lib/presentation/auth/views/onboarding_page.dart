@@ -73,8 +73,8 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                   children: [
                     // Assets.images.rideIn.image(height: 37.h, width: 50.w),
                     Image.asset("assets/onboarding.jpg", height: 60.h, width: 50.w),
-                    const Spacer(),
-                    countrySelector(),
+                    // const Spacer(),
+                    // countrySelector(),
                     Gap(8.w),
                     CupertinoButton(
                       padding: EdgeInsets.zero,

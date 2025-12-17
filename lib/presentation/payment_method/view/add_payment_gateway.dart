@@ -16,7 +16,6 @@ import 'package:gauva_userapp/presentation/wallet/provider/provider.dart';
 
 import '../../../core/utils/app_colors.dart';
 import '../../../core/widgets/custom_dropdown.dart';
-import '../../../core/widgets/is_ios.dart';
 import '../../account_page/provider/theme_provider.dart';
 
 class CountryModeTest {

@@ -230,7 +230,16 @@ class _ChatSheetState extends ConsumerState<ChatSheet> {
     height: height,
     width: width,
     color: Colors.grey[300],
-    child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+    child: Center(
+      child: ShaderMask(
+        shaderCallback: (bounds) => const LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF397098), Color(0xFF942FAF)],
+        ).createShader(bounds),
+        child: const CircularProgressIndicator(strokeWidth: 2),
+      ),
+    ),
   );
 
   Widget _buildImageError(double height, double width) => Container(

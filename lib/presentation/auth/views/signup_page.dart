@@ -36,22 +36,21 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   bool isPhoneValidLength = false;
   String phoneNumber = '';
-  String version = '';
   bool obscurePassword = true;
   bool obscureConfirmPassword = true;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.microtask(() => loadVersion());
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Future.microtask(() => loadVersion());
+    // });
   }
 
-  Future<void> loadVersion() async {
-    version = await getVersion();
-    setState(() {});
-  }
+  // Future<void> loadVersion() async {
+  //   version = await getVersion();
+  //   setState(() {});
+  // }
 
   @override
   void dispose() {
@@ -86,18 +85,18 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         ),
                       ),
                     ),
-                    Gap(16.w),
-                    Expanded(
-                      child: Text(
-                        version,
-                        textAlign: TextAlign.end,
-                        style: context.bodyMedium?.copyWith(
-                          fontSize: 13.sp,
-                          fontWeight: FontWeight.w400,
-                          color: ColorPalette.primary50,
-                        ),
-                      ),
-                    ),
+                    // Gap(16.w),
+                    // Expanded(
+                    //   child: Text(
+                    //     version,
+                    //     textAlign: TextAlign.end,
+                    //     style: context.bodyMedium?.copyWith(
+                    //       fontSize: 13.sp,
+                    //       fontWeight: FontWeight.w400,
+                    //       color: ColorPalette.primary50,
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                 ),
                 Gap(4.h),
@@ -167,7 +166,7 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                       if (value != null) {
                         phoneNumber = value;
                         setState(() {
-                          isPhoneValidLength = value.length >= 6;
+                          isPhoneValidLength = value.length == 10;
                         });
                       }
                     },
@@ -261,17 +260,16 @@ class _SignupPageState extends ConsumerState<SignupPage> {
                         return;
                       }
 
-                      if (phoneNumber.trim().length < 6) {
-                        showNotification(message: AppLocalizations().phoneMinLengthError);
+                      if (phoneNumber.trim().length != 10) {
+                        showNotification(message: "Mobile number must be 10 digits");
                         return;
                       }
 
                       // Get country code
-                      String? phoneCode = ref.read(selectedCountry).selectedPhoneCode?.phoneCode;
-                      if (phoneCode == null) {
-                        phoneCode = await LocalStorageService().getPhoneCode();
-                      }
-                      if (phoneCode == null || phoneCode.isEmpty) {
+                      String phoneCode =
+                          ref.read(selectedCountry).selectedPhoneCode?.phoneCode ??
+                          await LocalStorageService().getPhoneCode();
+                      if (phoneCode.isEmpty) {
                         phoneCode = '+91'; // Default to India
                       }
 

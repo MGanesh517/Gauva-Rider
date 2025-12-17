@@ -37,20 +37,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   bool isPhoneValidLength = false;
 
   String phoneNumber = '';
-  String version = '';
+  // String version = '';
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Future.microtask(() => loadVersion());
-    });
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     Future.microtask(() => loadVersion());
+  //   });
+  // }
 
-  Future<void> loadVersion() async {
-    version = await getVersion();
-    setState(() {});
-  }
+  // Future<void> loadVersion() async {
+  //   version = await getVersion();
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) => ExitAppWrapper(
@@ -58,10 +58,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       resizeToAvoidBottomInset: true,
       body: AuthAppBar(
         showLeading: false,
+        title: "Login",
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            authMessage(context, isDarkMode: ref.read(themeModeProvider.notifier).isDarkMode(), version: version),
+            authMessage(context, isDarkMode: ref.read(themeModeProvider.notifier).isDarkMode()),
             Gap(12.h),
             FormBuilder(
               key: formKey,
@@ -111,12 +112,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         return;
                       }
                       // Try to get phone code from selected country, fallback to saved phone code, or use default
-                      String? phoneCode = ref.read(selectedCountry).selectedPhoneCode?.phoneCode;
-                      if (phoneCode == null) {
-                        // Fallback to saved phone code from storage
-                        phoneCode = await LocalStorageService().getPhoneCode();
-                      }
-                      if (phoneCode == null || phoneCode.isEmpty) {
+                      String phoneCode =
+                          ref.read(selectedCountry).selectedPhoneCode?.phoneCode ??
+                          await LocalStorageService().getPhoneCode();
+                      if (phoneCode.isEmpty) {
                         // Final fallback to default (India +91)
                         phoneCode = '+91';
                       }

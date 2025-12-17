@@ -56,15 +56,6 @@ class _HomeMapState extends ConsumerState<HomeMap> {
     final state = ref.watch(homeMapNotifierProvider);
     final isDarkMode = isDark();
 
-    // return AnnotatedRegion<SystemUiOverlayStyle>(
-    // value: SystemUiOverlayStyle(
-    //   statusBarColor: Colors.transparent, // Transparent so gradient shows through
-    //   statusBarIconBrightness: Brightness.light, // White icons for visibility on gradient
-    //   statusBarBrightness: Brightness.dark, // For iOS
-    //   systemNavigationBarColor: Colors.transparent,
-    //   systemNavigationBarIconBrightness: Brightness.light,
-    // ),
-
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Stack(
@@ -87,9 +78,7 @@ class _HomeMapState extends ConsumerState<HomeMap> {
               zoomControlsEnabled: false,
               rotateGesturesEnabled: false,
             ),
-          // Services bottom sheet (only show when map is loaded)
           if (state.currentLocation != null) const ServicesAndPromotional(),
-          // App bar - positioned at top, doesn't affect map rendering
           Positioned(top: 0, left: 0, right: 0, child: HomeMapAppbar(isDark: isDarkMode)),
         ],
       ),

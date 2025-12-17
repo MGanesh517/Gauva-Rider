@@ -37,7 +37,7 @@ class SelectedCountryNotifier extends StateNotifier<LangCodeState> {
     
     // Check saved phone code, but default to India if invalid
     final savedPhoneCode = await LocalStorageService().getPhoneCode();
-    if (savedPhoneCode == null || savedPhoneCode.isEmpty || savedPhoneCode == '+880') {
+    if (savedPhoneCode.isEmpty || savedPhoneCode == '+880') {
       LocalStorageService().savePhoneCode(indiaCode.phoneCode!); // savePhoneCode is void, no await needed
     }
     

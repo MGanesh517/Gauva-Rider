@@ -532,16 +532,25 @@ class GoogleSignInNotifier extends StateNotifier<AppState<LoginWithPasswordRespo
     debugPrint('');
     debugPrint('🔵 ═══════════════════════════════════════════════════════');
     debugPrint('🔵 GOOGLE SIGN-IN NOTIFIER - Starting');
-    debugPrint('🔵 idToken: ${idToken.substring(0, 20)}...');
-    debugPrint('🔵 name: $name');
-    debugPrint('🔵 email: $email');
-    debugPrint('🔵 phone: $phone');
     debugPrint('🔵 ═══════════════════════════════════════════════════════');
+    debugPrint('📥 Input Parameters:');
+    debugPrint('   🔑 idToken: ${idToken.substring(0, 30)}... (length: ${idToken.length})');
+    debugPrint('   👤 name: $name');
+    debugPrint('   📧 email: $email');
+    debugPrint('   📱 phone: $phone');
 
+    debugPrint('📱 Step 1: Setting state to loading...');
     state = const AppState.loading();
+    
+    debugPrint('📱 Step 2: Getting device token...');
     final String? deviceToken = await deviceTokenFirebase();
+    debugPrint('   📲 Device Token: ${deviceToken != null ? "${deviceToken.substring(0, 20)}..." : "null"}');
+    
+    debugPrint('📱 Step 3: Clearing old token from storage...');
     await LocalStorageService().clearToken();
+    debugPrint('✅ Step 3: Old token cleared');
 
+    debugPrint('📱 Step 4: Calling auth repository...');
     final result = await authRepo.signInWithGoogle(
       idToken: idToken,
       name: name,
@@ -549,45 +558,104 @@ class GoogleSignInNotifier extends StateNotifier<AppState<LoginWithPasswordRespo
       phone: phone,
       deviceToken: deviceToken,
     );
+    
     result.fold(
       (failure) {
-        debugPrint('🔴 GOOGLE SIGN-IN FAILED: ${failure.message}');
+        debugPrint('');
+        debugPrint('🔴 ═══════════════════════════════════════════════════════');
+        debugPrint('🔴 GOOGLE SIGN-IN NOTIFIER - FAILED');
+        debugPrint('🔴 Error Message: ${failure.message}');
+        debugPrint('🔴 ═══════════════════════════════════════════════════════');
+        debugPrint('');
         showNotification(message: failure.message);
         state = AppState.error(failure);
       },
       (data) async {
-        debugPrint('🟢 GOOGLE SIGN-IN SUCCESS');
+        debugPrint('');
+        debugPrint('🟢 ═══════════════════════════════════════════════════════');
+        debugPrint('🟢 GOOGLE SIGN-IN NOTIFIER - SUCCESS');
+        debugPrint('🟢 ═══════════════════════════════════════════════════════');
+        debugPrint('📦 Response Data:');
+        debugPrint('   📝 Message: ${data.message}');
+        debugPrint('   ✅ Has Data: ${data.data != null}');
+        
         if (data.data?.otherDevice != null && data.data?.otherDevice == true) {
+          debugPrint('⚠️ Other device detected - showing warning...');
           final bool? wantLogin = await showWarning();
           if (wantLogin == true) {
+            debugPrint('✅ User wants to login from this device - Retrying...');
             // Retry with wantLogin flag if needed
             await signInWithGoogle(idToken: idToken, name: name, email: email, phone: phone);
           } else {
+            debugPrint('❌ User cancelled - Going back');
             NavigationService.pop();
             resetStateAfterDelay();
           }
           state = AppState.success(data);
           return;
         }
+        
+        debugPrint('📱 Step 5: Extracting tokens from response...');
         // Spring Boot: Store accessToken and refreshToken
         final accessToken = data.data?.accessToken ?? data.data?.token ?? '';
         final refreshToken = data.data?.refreshToken ?? '';
+        debugPrint('   🔑 Access Token: ${accessToken.isNotEmpty ? "${accessToken.substring(0, 30)}... (length: ${accessToken.length})" : "EMPTY"}');
+        debugPrint('   🔑 Refresh Token: ${refreshToken.isNotEmpty ? "${refreshToken.substring(0, 30)}... (length: ${refreshToken.length})" : "EMPTY"}');
 
         // Ensure token is not empty before saving
         if (accessToken.isEmpty) {
+          debugPrint('❌ Step 5: Access token is EMPTY - Cannot proceed');
           showNotification(message: 'Google sign-in failed: No token received from server');
           state = AppState.error(Failure(message: 'No token received'));
           return;
         }
 
+        debugPrint('✅ Step 5: Tokens extracted successfully');
+        
+        debugPrint('📱 Step 6: Saving tokens to storage...');
         await LocalStorageService().saveToken(accessToken);
+        debugPrint('   ✅ Access token saved');
+        
         if (refreshToken.isNotEmpty) {
           await LocalStorageService().saveRefreshToken(refreshToken);
+          debugPrint('   ✅ Refresh token saved');
+        } else {
+          debugPrint('   ⚠️ No refresh token to save');
         }
+        
+        debugPrint('📱 Step 7: Saving user data...');
         await LocalStorageService().saveUser(user: data.data?.user?.toJson() ?? {});
+        debugPrint('   ✅ User data saved');
+        debugPrint('   👤 User ID: ${data.data?.user?.id}');
+        debugPrint('   👤 User Name: ${data.data?.user?.name}');
+        debugPrint('   📧 User Email: ${data.data?.user?.email}');
+        
+        debugPrint('📱 Step 8: Setting registration progress...');
         LocalStorageService().setRegistrationProgress(AppRoutes.dashboard);
+        debugPrint('   ✅ Registration progress set to dashboard');
+        
+        debugPrint('📱 Step 9: Checking trip activity...');
         ref.read(tripActivityNotifierProvider.notifier).checkTripActivity();
+        debugPrint('   ✅ Trip activity check initiated');
+        
+        debugPrint('📱 Step 10: Showing success notification...');
+        // Show success message
+        showNotification(message: 'Google sign-in successful!', isSuccess: true);
+        debugPrint('   ✅ Success notification shown');
+        
+        debugPrint('📱 Step 11: Navigating to dashboard...');
+        // Navigate to dashboard after successful Google Sign In
+        NavigationService.pushNamedAndRemoveUntil(AppRoutes.dashboard);
+        debugPrint('   ✅ Navigation to dashboard initiated');
+        
+        debugPrint('📱 Step 12: Setting state to success...');
         state = AppState.success(data);
+        debugPrint('   ✅ State set to success');
+        
+        debugPrint('🟢 ═══════════════════════════════════════════════════════');
+        debugPrint('🟢 GOOGLE SIGN-IN COMPLETED SUCCESSFULLY');
+        debugPrint('🟢 ═══════════════════════════════════════════════════════');
+        debugPrint('');
       },
     );
   }

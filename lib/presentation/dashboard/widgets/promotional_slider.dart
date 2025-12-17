@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:gauva_userapp/common/loading_view.dart';
 import 'package:gauva_userapp/core/utils/network_image.dart';
@@ -21,7 +22,7 @@ class PromotionalSlider extends ConsumerStatefulWidget {
 class _PromotionalSliderState extends ConsumerState<PromotionalSlider> {
   int _activeIndex = 0;
 
-  bool isDark()=> ref.read(themeModeProvider.notifier).isDarkMode();
+  bool isDark() => ref.read(themeModeProvider.notifier).isDarkMode();
   Future<void> _handleBannerTap(BannerModel banner) async {
     if (banner.redirectLink != null && banner.redirectLink!.isNotEmpty) {
       try {
@@ -38,14 +39,13 @@ class _PromotionalSliderState extends ConsumerState<PromotionalSlider> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(bannerProvider);
-    final showNothing = state.whenOrNull(
-        error: (e) => true, success: (data) => data.isEmpty) ?? false;
+    final showNothing = state.whenOrNull(error: (e) => true, success: (data) => data.isEmpty) ?? false;
     if (showNothing) {
       return const SizedBox.shrink();
     }
     return Container(
       color: isDark() ? Colors.black : ColorPalette.neutralF6,
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+      padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
       child: state.when(
         initial: () => const SizedBox.shrink(),
         loading: () => const LoadingView(),
@@ -67,11 +67,7 @@ class _PromotionalSliderState extends ConsumerState<PromotionalSlider> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            blurRadius: 4,
-                            offset: const Offset(0, 2),
-                          ),
+                          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: const Offset(0, 2)),
                         ],
                       ),
                       child: ClipRRect(
@@ -80,8 +76,7 @@ class _PromotionalSliderState extends ConsumerState<PromotionalSlider> {
                           fit: StackFit.expand,
                           children: [
                             // Banner Image
-                            if (banner.imageUrl != null &&
-                                banner.imageUrl!.isNotEmpty)
+                            if (banner.imageUrl != null && banner.imageUrl!.isNotEmpty)
                               buildNetworkImage(
                                 imageUrl: banner.imageUrl!,
                                 height: 160,
@@ -91,17 +86,10 @@ class _PromotionalSliderState extends ConsumerState<PromotionalSlider> {
                             else
                               Container(
                                 color: ColorPalette.primary50,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.image,
-                                    size: 48,
-                                    color: Colors.white.withOpacity(0.5),
-                                  ),
-                                ),
+                                child: Center(child: Icon(Icons.image, size: 48, color: Colors.white.withOpacity(0.5))),
                               ),
                             // Gradient overlay for text readability
-                            if (banner.title != null ||
-                                banner.shortDescription != null)
+                            if (banner.title != null || banner.shortDescription != null)
                               Positioned(
                                 bottom: 0,
                                 left: 0,
@@ -120,8 +108,7 @@ class _PromotionalSliderState extends ConsumerState<PromotionalSlider> {
                                     ),
                                   ),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       if (banner.title != null)
@@ -138,10 +125,7 @@ class _PromotionalSliderState extends ConsumerState<PromotionalSlider> {
                                       if (banner.shortDescription != null)
                                         Text(
                                           banner.shortDescription!,
-                                          style: TextStyle(
-                                            color: Colors.white.withOpacity(0.9),
-                                            fontSize: 12,
-                                          ),
+                                          style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
                                         ),
@@ -160,6 +144,8 @@ class _PromotionalSliderState extends ConsumerState<PromotionalSlider> {
                   autoPlay: true,
                   enlargeCenterPage: true,
                   viewportFraction: 0.9,
+                  enableInfiniteScroll: true,
+                  scrollPhysics: const BouncingScrollPhysics(),
                   onPageChanged: (index, reason) {
                     setState(() => _activeIndex = index);
                   },

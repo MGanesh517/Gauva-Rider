@@ -28,6 +28,7 @@ class Order {
     this.service,
     this.driver,
     this.rider,
+    this.otp,
   });
 
   Order.fromJson(dynamic json) {
@@ -53,6 +54,7 @@ class Order {
     service = json['service'] != null ? Services.fromJson(json['service']) : null;
     driver = json['driver'] != null ? Driver.fromJson(json['driver']) : null;
     rider = json['rider'] != null ? Rider.fromJson(json['rider']) : null;
+    otp = json['otp'];
   }
   int? id;
   String? status;
@@ -76,6 +78,7 @@ class Order {
   Services? service;
   Driver? driver;
   Rider? rider;
+  int? otp;
   Order copyWith({  int? id,
     String? status,
     num? distance,
@@ -94,6 +97,7 @@ class Order {
     Services? service,
     Driver? driver,
     Rider? rider,
+    int? otp,
   }) => Order(  id: id ?? this.id,
     status: status ?? this.status,
     distance: distance ?? this.distance,
@@ -111,6 +115,7 @@ class Order {
     service: service ?? this.service,
     driver: driver ?? this.driver,
     rider: rider ?? this.rider,
+    otp: otp ?? this.otp,
   );
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -141,6 +146,7 @@ class Order {
     if (rider != null) {
       map['rider'] = rider?.toJson();
     }
+    map['otp'] = otp;
     return map;
   }
 

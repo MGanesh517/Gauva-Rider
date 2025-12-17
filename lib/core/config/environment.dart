@@ -44,4 +44,15 @@ class Environment {
         return _baseUrl;
     }
   }
+
+  /// WebSocket URL for raw WebSocket connections
+  static String get webSocketUrl {
+    final base = baseUrl;
+    // Convert https:// to wss:// and http:// to ws://
+    final wsUrl = base.startsWith('https')
+        ? base.replaceFirst('https://', 'wss://')
+        : base.replaceFirst('http://', 'ws://');
+    // WebSocket endpoint - typically /ws for Spring Boot
+    return '$wsUrl/ws';
+  }
 }

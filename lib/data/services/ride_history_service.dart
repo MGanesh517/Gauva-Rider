@@ -10,13 +10,24 @@ class RideHistoryService implements IRideHistoryService {
   RideHistoryService({required this.dioClient});
   @override
   Future<Response> getRideHistory(String? status, String? date) async {
-    // Spring Boot: /api/v1/user/rides/completed (GET with pagination)
+    // Spring Boot: Use different endpoints for completed vs cancelled rides
+    final endpoint = (status?.toLowerCase() == 'cancelled' || status?.toLowerCase() == 'canceled')
+        ? ApiEndpoints.cancelledRideHistory
+        : ApiEndpoints.rideHistory;
+    
+    final queryParams = <String, dynamic>{
+      'page': 0, // Spring Boot uses pagination
+      'size': 20,
+    };
+    
+    // Add date filter if provided
+    if (date != null && date.isNotEmpty) {
+      queryParams['date'] = date;
+    }
+    
     return await dioClient.dio.get(
-      ApiEndpoints.rideHistory, 
-      queryParameters: {
-        'page': 0, // Spring Boot uses pagination
-        'size': 20,
-      }
+      endpoint,
+      queryParameters: queryParams,
     );
   }
 

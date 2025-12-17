@@ -106,6 +106,7 @@ class Services {
     this.maxDistance,
     this.maxWaitTime,
     this.category,
+    this.isIntercity,
     // Legacy fields for backward compatibility
     this.logo,
     this.personCapacity,
@@ -138,6 +139,7 @@ class Services {
     maxDistance = json['maxDistance'];
     maxWaitTime = json['maxWaitTime'];
     category = json['category'];
+    isIntercity = json['isIntercity'];
     // Legacy fields (for backward compatibility)
     logo = json['logo'] ?? json['iconUrl'];
     personCapacity = json['person_capacity'] ?? json['capacity'];
@@ -170,6 +172,7 @@ class Services {
   num? maxDistance;
   num? maxWaitTime;
   String? category;
+  bool? isIntercity;
   // Legacy fields
   String? logo;
   num? personCapacity;
@@ -206,6 +209,7 @@ class Services {
     num? maxDistance,
     num? maxWaitTime,
     String? category,
+    bool? isIntercity,
     String? logo,
     num? personCapacity,
     num? minimumFee,
@@ -234,6 +238,7 @@ class Services {
     maxDistance: maxDistance ?? this.maxDistance,
     maxWaitTime: maxWaitTime ?? this.maxWaitTime,
     category: category ?? this.category,
+    isIntercity: isIntercity ?? this.isIntercity,
     logo: logo ?? this.logo,
     personCapacity: personCapacity ?? this.personCapacity,
     minimumFee: minimumFee ?? this.minimumFee,
@@ -265,6 +270,7 @@ class Services {
     map['maxDistance'] = maxDistance;
     map['maxWaitTime'] = maxWaitTime;
     map['category'] = category;
+    map['isIntercity'] = isIntercity;
     return map;
   }
 

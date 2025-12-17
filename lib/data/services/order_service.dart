@@ -16,15 +16,23 @@ class OrderService implements IOrderService {
     final pickupLocation = data['pickup_location'] as List<dynamic>? ?? [];
     final dropLocation = data['drop_location'] as List<dynamic>? ?? [];
     final waitLocation = data['wait_location'] as List<dynamic>? ?? [];
-    
+
     final rideRequest = {
       'pickupArea': data['pickup_area'] ?? data['pickupArea'] ?? data['pickup_address'] ?? '',
       'destinationArea': data['destination_area'] ?? data['destinationArea'] ?? data['drop_address'] ?? '',
-      'pickupLatitude': pickupLocation.isNotEmpty ? pickupLocation[0] : (data['pickup_latitude'] ?? data['pickupLatitude'] ?? 0),
-      'pickupLongitude': pickupLocation.length > 1 ? pickupLocation[1] : (data['pickup_longitude'] ?? data['pickupLongitude'] ?? 0),
-      'destinationLatitude': dropLocation.isNotEmpty ? dropLocation[0] : (data['destination_latitude'] ?? data['destinationLatitude'] ?? 0),
-      'destinationLongitude': dropLocation.length > 1 ? dropLocation[1] : (data['destination_longitude'] ?? data['destinationLongitude'] ?? 0),
-      'serviceId': data['service_id'] ?? data['serviceId'],
+      'pickupLatitude': pickupLocation.isNotEmpty
+          ? pickupLocation[0]
+          : (data['pickup_latitude'] ?? data['pickupLatitude'] ?? 0),
+      'pickupLongitude': pickupLocation.length > 1
+          ? pickupLocation[1]
+          : (data['pickup_longitude'] ?? data['pickupLongitude'] ?? 0),
+      'destinationLatitude': dropLocation.isNotEmpty
+          ? dropLocation[0]
+          : (data['destination_latitude'] ?? data['destinationLatitude'] ?? 0),
+      'destinationLongitude': dropLocation.length > 1
+          ? dropLocation[1]
+          : (data['destination_longitude'] ?? data['destinationLongitude'] ?? 0),
+      'serviceType': data['service_id'] ?? data['serviceId'],
       'couponCode': data['coupon_code'] ?? data['couponCode'] ?? '',
       'serviceOptionIds': data['service_option_ids'] ?? data['serviceOptionIds'] ?? [],
       if (waitLocation.isNotEmpty) ...{
@@ -36,9 +44,10 @@ class OrderService implements IOrderService {
     final response = await dioClient.dio.post(ApiEndpoints.createOrder, data: rideRequest);
     return response;
   }
+
   @override
-  Future<Response> orderDetails({required int orderId}) async => await dioClient.dio
-        .get('${ApiEndpoints.orderDetails}/$orderId');
+  Future<Response> orderDetails({required int orderId}) async =>
+      await dioClient.dio.get('${ApiEndpoints.orderDetails}/$orderId');
 
   @override
   Future<Response> checkActiveTrip() async {
@@ -55,16 +64,14 @@ class OrderService implements IOrderService {
           data: [],
         );
       }
-      
+
       // Try to get requested rides which may include active trips
       // Spring Boot may use Authorization header instead of userId in path
       try {
         final userId = await LocalStorageService().getUserId();
         final response = await dioClient.dio.get(
           '/api/v1/user/$userId/rides/requested',
-          options: Options(
-            headers: {'Authorization': 'Bearer $token'}
-          )
+          options: Options(headers: {'Authorization': 'Bearer $token'}),
         );
         return response;
       } catch (e) {
@@ -72,9 +79,7 @@ class OrderService implements IOrderService {
         try {
           final response = await dioClient.dio.get(
             '/api/v1/user/rides/completed',
-            options: Options(
-              headers: {'Authorization': 'Bearer $token'}
-            )
+            options: Options(headers: {'Authorization': 'Bearer $token'}),
           );
           return response;
         } catch (e2) {

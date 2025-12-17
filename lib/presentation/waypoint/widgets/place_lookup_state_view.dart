@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:gauva_userapp/common/loading_view.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../../gen/assets.gen.dart';
@@ -95,7 +96,8 @@ class PlaceLookupStateView extends ConsumerWidget {
             ),
           ),
         ),
-        loading: () => Assets.lottie.loading.lottie(),
+        // loading: () => Assets.lottie.loading.lottie(),
+        loading: () => const LoadingView(),
       ),
     );
   }

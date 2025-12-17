@@ -16,19 +16,16 @@ class AppPhoneNumberTextField extends StatelessWidget {
   final void Function(String?)? onChanged;
   final String? initialValue;
 
-  const AppPhoneNumberTextField({
-    super.key,
-    required this.initialValue,
-    this.onChanged,
-  });
+  const AppPhoneNumberTextField({super.key, required this.initialValue, this.onChanged});
 
   @override
   Widget build(BuildContext context) => Column(
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Consumer(builder: (context, ref, _) {
+    children: [
+      Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Consumer(
+            builder: (context, ref, _) {
               final state = ref.watch(selectedCountry);
               // Default to India (+91) if no phone code is selected
               final phoneCode = state.selectedPhoneCode?.phoneCode ?? '+91';
@@ -38,7 +35,7 @@ class AppPhoneNumberTextField extends StatelessWidget {
                 onTap: () async {
                   showModalBottomSheet(
                     context: context,
-                    builder: (context) => const CountryCodeBottomSheet(selectCountryCode: true,),
+                    builder: (context) => const CountryCodeBottomSheet(selectCountryCode: true),
                     isScrollControlled: true,
                   );
                 },
@@ -46,10 +43,7 @@ class AppPhoneNumberTextField extends StatelessWidget {
                   height: 48.h,
                   padding: EdgeInsets.symmetric(horizontal: 8.w),
                   decoration: BoxDecoration(
-                    border: Border.all(
-                      color: context.theme.inputDecorationTheme.enabledBorder!
-                          .borderSide.color,
-                    ),
+                    border: Border.all(color: context.theme.inputDecorationTheme.enabledBorder!.borderSide.color),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -65,42 +59,46 @@ class AppPhoneNumberTextField extends StatelessWidget {
                       Gap(8.w),
                       Text(
                         phoneCode,
-                        style: context.bodyMedium?.copyWith(fontSize: 16.sp, fontWeight: FontWeight.w400, color: const Color(0xFF687387)),
+                        style: context.bodyMedium?.copyWith(
+                          fontSize: 16.sp,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF687387),
+                        ),
                       ),
                       const SizedBox(width: 8),
-
                     ],
                   ),
                 ),
               );
-            }),
-            const SizedBox(width: 8),
-            Expanded(
-              child: SizedBox(
-                height: 48.h,
-                child: FormBuilderTextField(
-                  name: 'phoneNumber',
-                  keyboardType: TextInputType.phone,
-                  inputFormatters: [
-                    FilteringTextInputFormatter.digitsOnly,
-                  ],
-                  initialValue: initialValue,
-                  validator: FormBuilderValidators.compose([
-                    FormBuilderValidators.required(),
-                    FormBuilderValidators.min(6),
-                  ]),
-                  decoration: InputDecoration(
-                    hintText: AppLocalizations().enterPhoneNumber,
-                    fillColor: context.surface,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h)
-                  ),
-                  onChanged: onChanged,
+            },
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: SizedBox(
+              height: 48.h,
+              child: FormBuilderTextField(
+                name: 'phoneNumber',
+                keyboardType: TextInputType.phone,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10), // Limit input to 10 digits
+                ],
+                initialValue: initialValue,
+                validator: FormBuilderValidators.compose([
+                  FormBuilderValidators.required(),
+                  FormBuilderValidators.equalLength(10, errorText: "Mobile number must be 10 digits"),
+                ]),
+                decoration: InputDecoration(
+                  hintText: AppLocalizations().enterPhoneNumber,
+                  fillColor: context.surface,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
                 ),
+                onChanged: onChanged,
               ),
-            )
-          ],
-        ),
-      ],
-    );
+            ),
+          ),
+        ],
+      ),
+    ],
+  );
 }
-

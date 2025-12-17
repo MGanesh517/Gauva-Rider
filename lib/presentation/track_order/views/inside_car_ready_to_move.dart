@@ -10,7 +10,7 @@ import '../widgets/driver_details.dart';
 
 Widget insideCarReadyToMove(BuildContext context, Order order, {required bool isDark}) => Column(
   children: [
-    driverDetails(context, order.driver, isDark: isDark),
+    driverDetails(context, order.driver, isDark: isDark, otp: order.otp),
     Gap(8.h),
     Text(
       AppLocalizations.of(context).ride_ready,

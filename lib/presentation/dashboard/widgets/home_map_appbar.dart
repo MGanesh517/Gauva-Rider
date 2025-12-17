@@ -20,36 +20,34 @@ class HomeMapAppbar extends StatelessWidget {
   const HomeMapAppbar({super.key, required this.isDark});
 
   @override
-  Widget build(BuildContext context) {
-    return ClipRect(
-      child: Container(
-        width: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF397098), Color(0xFF942FAF)],
-          ),
-        ),
-        child: SafeArea(
-          bottom: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Content area
-              Padding(
-                padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8, top: 8),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [locationAndCountrySelection(context), const Gap(12), searchBar(context)],
-                ),
-              ),
-            ],
-          ),
+  Widget build(BuildContext context) => ClipRect(
+    child: Container(
+      width: double.infinity,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF397098), Color(0xFF942FAF)],
         ),
       ),
-    );
-  }
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Content area
+            Padding(
+              padding: const EdgeInsets.only(left: 16, right: 16, bottom: 8, top: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [locationAndCountrySelection(context), const Gap(12), searchBar(context)],
+              ),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 
   Widget locationAndCountrySelection(BuildContext context) => Consumer(
     builder: (context, ref, _) {
@@ -67,60 +65,7 @@ class HomeMapAppbar extends StatelessWidget {
               style: context.bodyMedium?.copyWith(fontSize: 12, fontWeight: FontWeight.w400, color: Colors.white),
             ),
           ),
-          Gap(isIos() ? 0 : 16),
-          isIos()
-              ? const SizedBox.shrink()
-              : InkWell(
-                  onTap: () {
-                    debugPrint('--------------button tapped');
-                    showModalBottomSheet(
-                      context: context,
-                      isScrollControlled: true,
-                      useRootNavigator: true,
-                      builder: (context) => const CountryCodeBottomSheet(selectCountryCode: false),
-                    );
-                  },
-                  child: Container(
-                    height: 35,
-                    width: 95,
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: .12),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.white12),
-                    ),
-                    child: state.selectedLang == null
-                        ? const SizedBox.shrink()
-                        : Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              buildNetworkImage(
-                                imageUrl: state.selectedLang!.flag,
-                                width: 16,
-                                height: 16,
-                                fit: BoxFit.contain,
-                                errorIconSize: 16,
-                              ),
-                              const Gap(8),
-                              Expanded(
-                                child: Text(
-                                  state.selectedLang?.code ?? '',
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: context.bodyMedium?.copyWith(
-                                    fontSize: 12.sp,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                              const Gap(8),
-                              const Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 18),
-                              const Gap(8),
-                            ],
-                          ),
-                  ),
-                ),
+          const Gap(16),
         ],
       );
     },

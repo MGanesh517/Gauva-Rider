@@ -214,8 +214,9 @@ class WayPointMapNotifier extends StateNotifier<WayPointMapState> {
     const center = Offset(size / 2, size / 2);
 
     canvas
-      ..drawCircle(center, size / 2, Paint()..color = Colors.white)
-      ..drawCircle(center, size / 2 - 3, Paint()..color = Colors.green);
+      ..drawCircle(center, size / 2, Paint()..color = const Color(0xFF27AE60))
+      ..drawCircle(center, size / 2 - 4.5, Paint()..color = Colors.white)
+      ..drawCircle(center, 3, Paint()..color = const Color(0xFF27AE60));
 
     final img = await recorder.endRecording().toImage(size, size);
     final byteData = await img.toByteData(format: ImageByteFormat.png);
@@ -223,31 +224,15 @@ class WayPointMapNotifier extends StateNotifier<WayPointMapState> {
   }
 
   Future<Uint8List> _createRedPin() async {
-    const size = 30;
+    const size = 20;
     final recorder = PictureRecorder();
     final canvas = Canvas(recorder);
     const center = Offset(size / 2, size / 2);
 
-    // Draw red pin shape (teardrop shape - circle on top, triangle at bottom)
-    final path = Path()
-      // Top circle
-      ..addOval(Rect.fromCircle(center: Offset(center.dx, center.dy - 5), radius: 6))
-      // Bottom triangle/point
-      ..moveTo(center.dx - 4, center.dy + 1)
-      ..lineTo(center.dx, center.dy + 11)
-      ..lineTo(center.dx + 4, center.dy + 1)
-      ..close();
-
-    // Fill with red
-    canvas.drawPath(path, Paint()..color = Colors.red);
-    // Add white border for better visibility
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = Colors.white
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.5,
-    );
+    canvas
+      ..drawCircle(center, size / 2, Paint()..color = const Color(0xFFEB5757))
+      ..drawCircle(center, size / 2 - 4.5, Paint()..color = Colors.white)
+      ..drawCircle(center, 3, Paint()..color = const Color(0xFFEB5757));
 
     final img = await recorder.endRecording().toImage(size, size);
     final byteData = await img.toByteData(format: ImageByteFormat.png);

@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:gauva_userapp/common/loading_view.dart';
-import 'package:gauva_userapp/core/utils/network_image.dart';
 import 'package:gauva_userapp/generated/l10n.dart';
 import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.dart';
 import 'package:gauva_userapp/presentation/intercity/provider/intercity_service_providers.dart';
@@ -54,7 +53,7 @@ class _SharePoolingSelectionPageState extends ConsumerState<SharePoolingSelectio
             Expanded(child: _buildServiceList(context, intercityState.serviceListState, ref, isDark)),
             // Fixed Bottom Button Bar
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+              padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 16.h),
               decoration: BoxDecoration(
                 color: isDark ? Colors.black : Colors.white,
                 boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: Offset(0, -2))],
@@ -91,7 +90,7 @@ class _SharePoolingSelectionPageState extends ConsumerState<SharePoolingSelectio
           );
         }
         return SingleChildScrollView(
-          padding: EdgeInsets.all(16.w),
+          padding: EdgeInsets.fromLTRB(16.w, 16.h, 16.w, 8.h),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: list.map<Widget>((service) {
@@ -114,9 +113,6 @@ class _SharePoolingSelectionPageState extends ConsumerState<SharePoolingSelectio
     final notifier = ref.read(intercityServiceNotifierProvider.notifier);
     final serviceName = (service.displayName ?? service.vehicleType ?? 'SERVICE').toUpperCase();
 
-    // Get icon - use imageUrl from IntercityServiceType
-    final iconUrl = service.imageUrl;
-
     // Get price - use totalPrice from IntercityServiceType
     final price = service.totalPrice ?? 0.0;
 
@@ -125,11 +121,12 @@ class _SharePoolingSelectionPageState extends ConsumerState<SharePoolingSelectio
 
     return InkWell(
       onTap: () => notifier.selectServiceType(service),
+      borderRadius: BorderRadius.circular(8),
       child: isSelected
           ? Container(
-              margin: EdgeInsets.only(bottom: 8.h),
+              margin: EdgeInsets.only(bottom: 12.h),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(12),
                 gradient: LinearGradient(
                   colors: [const Color(0xFF1469B5), const Color(0xFF942FAF)],
                   begin: Alignment.topLeft,
@@ -141,25 +138,13 @@ class _SharePoolingSelectionPageState extends ConsumerState<SharePoolingSelectio
               ),
               padding: EdgeInsets.all(2), // Border width
               child: Container(
-                padding: EdgeInsets.all(10.w),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
                 decoration: BoxDecoration(
                   color: isDark ? Colors.grey[900] : Colors.white,
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: BorderRadius.circular(10),
                 ),
                 child: Row(
                   children: [
-                    // Service Icon - prefer imageUrl, if null or empty then show dummy image
-                    if (iconUrl != null && iconUrl.toString().trim().isNotEmpty)
-                      buildNetworkImage(
-                        imageUrl: iconUrl.toString(),
-                        width: 40.w,
-                        height: 40.h,
-                        fit: BoxFit.contain,
-                        errorWidget: Icon(Icons.directions_car, size: 32.sp, color: Colors.grey[600]),
-                      )
-                    else
-                      Icon(Icons.directions_car, size: 32.sp, color: Colors.grey[600]),
-                    Gap(10.w),
                     // Service Details
                     Expanded(
                       child: Column(
@@ -171,37 +156,38 @@ class _SharePoolingSelectionPageState extends ConsumerState<SharePoolingSelectio
                               Text(
                                 serviceName,
                                 style: TextStyle(
-                                  fontSize: 14.sp,
+                                  fontSize: 15.sp,
                                   fontWeight: FontWeight.w700,
                                   color: isDark ? Colors.white : Colors.black,
                                 ),
                               ),
                               if (capacity != null) ...[
+                                Gap(8.w),
+                                Icon(Ionicons.person, size: 14.sp, color: isDark ? Colors.white70 : Colors.black87),
                                 Gap(4.w),
-                                Icon(Ionicons.person, size: 12.sp, color: isDark ? Colors.white70 : Colors.black87),
-                                Gap(2.w),
                                 Text(
                                   capacity.toString(),
-                                  style: TextStyle(fontSize: 12.sp, color: isDark ? Colors.white70 : Colors.black87),
+                                  style: TextStyle(fontSize: 13.sp, color: isDark ? Colors.white70 : Colors.black87),
                                 ),
                               ],
                             ],
                           ),
                           if (service.description != null && service.description.toString().isNotEmpty) ...[
-                            Gap(2.h),
+                            Gap(4.h),
                             Text(
                               service.description.toString(),
-                              style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
+                              style: TextStyle(fontSize: 12.sp, color: isDark ? Colors.grey[400] : Colors.grey[600]),
                             ),
                           ],
                         ],
                       ),
                     ),
+                    Gap(12.w),
                     // Price
                     Text(
                       '₹${price.toStringAsFixed(0)}',
                       style: TextStyle(
-                        fontSize: 16.sp,
+                        fontSize: 18.sp,
                         fontWeight: FontWeight.w700,
                         color: isDark ? Colors.white : Colors.black,
                       ),
@@ -211,27 +197,15 @@ class _SharePoolingSelectionPageState extends ConsumerState<SharePoolingSelectio
               ),
             )
           : Container(
-              margin: EdgeInsets.only(bottom: 8.h),
-              padding: EdgeInsets.all(10.w),
+              margin: EdgeInsets.only(bottom: 12.h),
+              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 14.h),
               decoration: BoxDecoration(
                 color: isDark ? Colors.grey[900] : Colors.white,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[300]!, width: 1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: isDark ? Colors.grey[700]! : Colors.grey[300]!, width: 1),
               ),
               child: Row(
                 children: [
-                  // Service Icon - prefer imageUrl, if null or empty then show dummy image
-                  if (iconUrl != null && iconUrl.toString().trim().isNotEmpty)
-                    buildNetworkImage(
-                      imageUrl: iconUrl.toString(),
-                      width: 40.w,
-                      height: 40.h,
-                      fit: BoxFit.contain,
-                      errorWidget: Icon(Icons.directions_car, size: 32.sp, color: Colors.grey[600]),
-                    )
-                  else
-                    Icon(Icons.directions_car, size: 32.sp, color: Colors.grey[600]),
-                  Gap(10.w),
                   // Service Details
                   Expanded(
                     child: Column(
@@ -243,37 +217,38 @@ class _SharePoolingSelectionPageState extends ConsumerState<SharePoolingSelectio
                             Text(
                               serviceName,
                               style: TextStyle(
-                                fontSize: 14.sp,
+                                fontSize: 15.sp,
                                 fontWeight: FontWeight.w700,
                                 color: isDark ? Colors.white : Colors.black,
                               ),
                             ),
                             if (capacity != null) ...[
+                              Gap(8.w),
+                              Icon(Ionicons.person, size: 14.sp, color: isDark ? Colors.white70 : Colors.black87),
                               Gap(4.w),
-                              Icon(Ionicons.person, size: 12.sp, color: isDark ? Colors.white70 : Colors.black87),
-                              Gap(2.w),
                               Text(
                                 capacity.toString(),
-                                style: TextStyle(fontSize: 12.sp, color: isDark ? Colors.white70 : Colors.black87),
+                                style: TextStyle(fontSize: 13.sp, color: isDark ? Colors.white70 : Colors.black87),
                               ),
                             ],
                           ],
                         ),
                         if (service.description != null && service.description.toString().isNotEmpty) ...[
-                          Gap(2.h),
+                          Gap(4.h),
                           Text(
                             service.description.toString(),
-                            style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
+                            style: TextStyle(fontSize: 12.sp, color: isDark ? Colors.grey[400] : Colors.grey[600]),
                           ),
                         ],
                       ],
                     ),
                   ),
+                  Gap(12.w),
                   // Price
                   Text(
                     '₹${price.toStringAsFixed(0)}',
                     style: TextStyle(
-                      fontSize: 16.sp,
+                      fontSize: 18.sp,
                       fontWeight: FontWeight.w700,
                       color: isDark ? Colors.white : Colors.black,
                     ),
@@ -283,6 +258,46 @@ class _SharePoolingSelectionPageState extends ConsumerState<SharePoolingSelectio
             ),
     );
   }
+
+  // Build service icon with proper fallback: imageUrl -> icon -> dummy
+  // // Widget _buildServiceIcon(IntercityServiceType service, bool isDark) {
+  // //   final iconUrl = service.imageUrl;
+
+  // //   // First priority: imageUrl (network image)
+  // //   if (iconUrl != null && iconUrl.toString().trim().isNotEmpty) {
+  // //     return ClipRRect(
+  // //       borderRadius: BorderRadius.circular(4.r),
+  // //       child: buildNetworkImage(
+  // //         imageUrl: iconUrl.toString(),
+  // //         width: 40.w,
+  // //         height: 40.h,
+  // //         fit: BoxFit.contain,
+  // //         errorWidget: _buildDummyIcon(isDark),
+  // //       ),
+  // //     );
+  // //   }
+
+  //   // Second priority: icon (emoji/text) - if IntercityServiceType had this property
+  //   // For now, we'll skip this as the model doesn't have an icon property
+  //   // If you add it later, uncomment below:
+  //   // if (service.icon != null && service.icon!.isNotEmpty) {
+  //   //   return FittedBox(
+  //   //     fit: BoxFit.scaleDown,
+  //   //     child: Text(
+  //   //       service.icon!,
+  //   //       style: TextStyle(fontSize: 32.sp),
+  //   //     ),
+  //   //   );
+  //   // }
+
+  //   // Third priority: dummy icon
+  //   // return _buildDummyIcon(isDark);
+  // }
+
+  // Build dummy icon
+  // Widget _buildDummyIcon(bool isDark) {
+  //   return Icon(Icons.directions_car, size: 32.sp, color: isDark ? Colors.grey[400] : Colors.grey[600]);
+  // }
 
   Widget _buildContinueButton(BuildContext context, IntercityServiceType? selectedService, bool isDark) {
     // final serviceName = 'CONTINUE';

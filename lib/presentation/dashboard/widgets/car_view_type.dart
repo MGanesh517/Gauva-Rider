@@ -25,7 +25,7 @@ class CarSelectionView extends ConsumerWidget {
     }
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 0, bottom: 12.h),
       decoration: BoxDecoration(color: isDark() ? Colors.black : Colors.white),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -43,7 +43,7 @@ class CarSelectionView extends ConsumerWidget {
               AppLocalizations().please_wait,
               style: context.bodyMedium?.copyWith(fontSize: 15.sp, fontWeight: FontWeight.w500, color: Colors.black),
             ),
-            loading: () => const SizedBox(height: 100, child: Center(child: LoadingView())),
+            loading: () => const SizedBox(height: 80, child: Center(child: LoadingView())),
             success: (data) => carGridView(list: data, notifier: notifier, state: state),
             error: (e) => Text(
               e.message,

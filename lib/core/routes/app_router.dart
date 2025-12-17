@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gauva_userapp/data/models/order_response/order_model/order/order.dart';
+import 'package:gauva_userapp/data/models/ride_history_response/ride_history_item.dart';
 import 'package:gauva_userapp/presentation/auth/views/change_password.dart';
 import 'package:gauva_userapp/presentation/auth/views/login_page.dart';
 import 'package:gauva_userapp/presentation/auth/views/login_with_password_page.dart';
@@ -29,8 +29,10 @@ import '../../presentation/wallet/views/wallet_page.dart';
 import '../../presentation/wallet/views/razorpay_payment_webview.dart';
 import '../../presentation/intercity/views/share_pooling_selection_page.dart';
 import '../../presentation/intercity/views/share_pooling_search_page.dart';
-import '../../presentation/intercity/views/private_booking_selection_page.dart';
 import '../../presentation/intercity/views/private_booking_search_page.dart';
+import '../../presentation/intercity/views/private_booking_page.dart';
+import '../../presentation/intercity/views/private_booking_success_page.dart';
+import '../../presentation/intercity/views/intercity_selection_page.dart';
 import '../config/slide_right_route.dart';
 
 class AppRouter {
@@ -72,8 +74,8 @@ class AppRouter {
       case '/ride-history':
         return SlideRightRoute(page: const RideHistoryPage());
       case '/ride-history-detail':
-        final order = settings.arguments as Order;
-        return SlideRightRoute(page: RideDetailsPage(order: order));
+        final ride = settings.arguments as RideHistoryItem;
+        return SlideRightRoute(page: RideDetailsPage(ride: ride));
 
       case '/payment-page':
         final paymentUrl = settings.arguments as String;
@@ -124,7 +126,9 @@ class AppRouter {
         }
         return SlideRightRoute(page: SharePoolingSearchPage(vehicleType: vehicleType));
       case '/private_booking':
-        return SlideRightRoute(page: const PrivateBookingSelectionPage());
+        return SlideRightRoute(page: const PrivateBookingPage());
+      case '/private_booking_success':
+        return SlideRightRoute(page: const PrivateBookingSuccessPage());
       case '/private_booking_search':
         final args = settings.arguments as Map<String, dynamic>?;
         String vehicleType = 'CAR_NORMAL'; // Default fallback
@@ -135,6 +139,8 @@ class AppRouter {
           }
         }
         return SlideRightRoute(page: PrivateBookingSearchPage(vehicleType: vehicleType));
+      case '/intercity_selection':
+        return SlideRightRoute(page: const IntercitySelectionPage());
       default:
         return SlideRightRoute(
           page: Scaffold(body: ErrorView(message: 'No route defined for ${settings.name}')),
