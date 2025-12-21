@@ -11,11 +11,10 @@ class RideServicesService implements IRideServicesService {
 
   RideServicesService({required this.dioClient});
   @override
-  Future<Response> getRideServices(
-      {required RiderServiceState riderServiceState}) async {
+  Future<Response> getRideServices({required RiderServiceState riderServiceState}) async {
     // Spring Boot: /api/v1/services/fare-estimates expects FareEstimateRequest (POST)
     final userId = await LocalStorageService().getUserId();
-    
+
     final fareRequest = {
       'distanceKm': riderServiceState.distanceKm ?? 0.0,
       'durationMin': riderServiceState.durationMin ?? 0,
@@ -32,6 +31,17 @@ class RideServicesService implements IRideServicesService {
   }
 
   @override
+  Future<Response> getAvailableServicesForRoute({required RiderServiceState riderServiceState}) async {
+    final queryParams = {
+      'pickupLat': riderServiceState.pickupLocation.isNotEmpty ? riderServiceState.pickupLocation[0] : 0.0,
+      'pickupLng': riderServiceState.pickupLocation.length > 1 ? riderServiceState.pickupLocation[1] : 0.0,
+      'destinationLat': riderServiceState.dropLocation.isNotEmpty ? riderServiceState.dropLocation[0] : 0.0,
+      'destinationLng': riderServiceState.dropLocation.length > 1 ? riderServiceState.dropLocation[1] : 0.0,
+    };
+    return dioClient.dio.get(ApiEndpoints.availableServicesForRoute, queryParameters: queryParams);
+  }
+
+  @override
   Future<Response> getServicesHome() => dioClient.dio.get(ApiEndpoints.servicesHome);
 
   @override
@@ -39,12 +49,12 @@ class RideServicesService implements IRideServicesService {
     // Spring Boot: /api/promotions/coupons/apply expects ApplyCouponRequest (POST)
     final userId = await LocalStorageService().getUserId();
     return await dioClient.dio.post(
-      ApiEndpoints.applyCoupon, 
+      ApiEndpoints.applyCoupon,
       data: {
         'code': coupon ?? '',
         'userId': userId,
         'baseFare': 0, // This should be the actual fare amount
-      }
+      },
     );
   }
 }

@@ -5,15 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:gauva_userapp/core/routes/app_routes.dart';
 import 'package:gauva_userapp/core/utils/exit_app_dialogue.dart';
-import 'package:gauva_userapp/core/utils/get_version.dart';
 import 'package:gauva_userapp/core/utils/helpers.dart';
 import 'package:gauva_userapp/data/services/navigation_service.dart';
 import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.dart';
 import 'package:gauva_userapp/presentation/auth/widgets/auth_app_bar.dart';
 import 'package:gauva_userapp/presentation/auth/widgets/auth_bottom_buttons.dart';
 import 'package:gauva_userapp/presentation/auth/widgets/auth_message.dart';
-import 'package:gauva_userapp/presentation/auth/widgets/google_sign_in_button.dart';
-
 import '../../../core/extensions/extensions.dart';
 import '../../../core/theme/color_palette.dart';
 import '../../../core/utils/app_colors.dart';
@@ -123,8 +120,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       stateNotifier.login(phone: phone, countryCode: phoneCode);
                     },
                   ),
-                  Gap(8.h),
-                  const GoogleSignInButton(),
+                  // Gap(8.h),
+                  // const GoogleSignInButton(),
                   // Sign Up Link
                   Padding(
                     padding: EdgeInsets.only(bottom: 16.h, top: 8.h),

@@ -1,3 +1,5 @@
+import 'intercity_trip_model.dart';
+
 class IntercitySearchResponse {
   IntercitySearchResponse({
     this.vehicleOptions,
@@ -17,7 +19,7 @@ class IntercitySearchResponse {
     if (json['availableTrips'] != null) {
       availableTrips = [];
       json['availableTrips'].forEach((v) {
-        availableTrips?.add(v);
+        availableTrips?.add(IntercityTripModel.fromJson(v));
       });
     }
     route = json['route'] != null ? RouteInfo.fromJson(json['route']) : null;
@@ -26,7 +28,7 @@ class IntercitySearchResponse {
   }
 
   List<VehicleOption>? vehicleOptions;
-  List<dynamic>? availableTrips;
+  List<IntercityTripModel>? availableTrips;
   RouteInfo? route;
   String? recommendedVehicle;
   String? recommendationReason;

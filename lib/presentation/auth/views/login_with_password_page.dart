@@ -92,31 +92,31 @@ class _LoginWithPasswordPageState extends ConsumerState<LoginWithPasswordPage> {
                 ),
               ),
             ),
-            Gap(16.h),
-            Consumer(
-              builder: (context, ref, _) {
-                final resentOTPNotifier = ref.read(resendOTPNotifierProvider.notifier);
-                final loginResponse = ref
-                    .watch(loginNotifierProvider)
-                    .maybeWhen(success: (data) => data, orElse: () => null);
+            // Gap(16.h),
+            // Consumer(
+            //   builder: (context, ref, _) {
+            //     final resentOTPNotifier = ref.read(resendOTPNotifierProvider.notifier);
+            //     final loginResponse = ref
+            //         .watch(loginNotifierProvider)
+            //         .maybeWhen(success: (data) => data, orElse: () => null);
 
-                return Center(
-                  child: AppTextButton(
-                    isDense: true,
-                    text: AppLocalizations.of(context).use_otp_instead,
-                    onPressed: () async {
-                      await resentOTPNotifier.resendOtp(
-                        mobile: loginResponse?.data?.mobile ?? '',
-                        onSuccess: (d) {
-                          NavigationService.pushNamed(AppRoutes.verifyOtp, arguments: d.data?.otp);
-                        },
-                      );
-                    },
-                    isDark: isDark(),
-                  ),
-                );
-              },
-            ),
+            //     return Center(
+            //       child: AppTextButton(
+            //         isDense: true,
+            //         text: AppLocalizations.of(context).use_otp_instead,
+            //         onPressed: () async {
+            //           await resentOTPNotifier.resendOtp(
+            //             mobile: loginResponse?.data?.mobile ?? '',
+            //             onSuccess: (d) {
+            //               NavigationService.pushNamed(AppRoutes.verifyOtp, arguments: d.data?.otp);
+            //             },
+            //           );
+            //         },
+            //         isDark: isDark(),
+            //       ),
+            //     );
+            //   },
+            // ),
           ],
         ),
       ),

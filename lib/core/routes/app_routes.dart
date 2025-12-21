@@ -31,4 +31,5 @@ class AppRoutes {
   static const String privateBooking = '/private_booking';
   static const String privateBookingSuccess = '/private_booking_success';
   static const String intercitySelection = '/intercity_selection';
+  static const String intercitySearchResults = '/intercity_search_results';
 }

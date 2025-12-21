@@ -21,7 +21,7 @@ class RiderServiceRepoImpl extends BaseRepository implements IRideServicesRepo {
       debugPrint('📥 GET RIDE SERVICES Response: ${response.data}');
       try {
         dynamic responseData = response.data;
-        
+
         // If response is a direct array (new fare estimate API format)
         if (responseData is List) {
           debugPrint('📋 Response is a List (array format) - transforming...');
@@ -29,7 +29,7 @@ class RiderServiceRepoImpl extends BaseRepository implements IRideServicesRepo {
           final List<Map<String, dynamic>> transformedServices = responseData.map<Map<String, dynamic>>((item) {
             final Map<String, dynamic> itemMap = item is Map ? Map<String, dynamic>.from(item) : <String, dynamic>{};
             final Map<String, dynamic> serviceMap = Map<String, dynamic>.from(itemMap);
-            
+
             // Extract vehicle info and merge with fare info
             if (itemMap['vehicle'] != null && itemMap['vehicle'] is Map) {
               final vehicle = itemMap['vehicle'] as Map<String, dynamic>;
@@ -46,7 +46,7 @@ class RiderServiceRepoImpl extends BaseRepository implements IRideServicesRepo {
                 'estimatedArrival': vehicle['estimatedArrival'] ?? serviceMap['estimatedArrival'],
                 'description': vehicle['description'] ?? serviceMap['description'],
               });
-              
+
               // Map fare fields
               serviceMap['baseFare'] = itemMap['baseFare'] ?? serviceMap['baseFare'];
               serviceMap['perKmRate'] = itemMap['perKmRate'] ?? serviceMap['perKmRate'];
@@ -56,22 +56,19 @@ class RiderServiceRepoImpl extends BaseRepository implements IRideServicesRepo {
               serviceMap['costAfterCoupon'] = itemMap['finalTotal'] ?? serviceMap['costAfterCoupon'];
               serviceMap['cancellationFee'] = itemMap['cancellationFee'] ?? serviceMap['cancellationFee'];
               serviceMap['isCouponApplicable'] = itemMap['appliedCoupon'] != null;
-              
+
               // Remove nested vehicle object
               serviceMap.remove('vehicle');
             }
-            
+
             return serviceMap;
           }).toList();
-          
+
           // Transform to expected format
-          responseData = <String, dynamic>{
-            'services': transformedServices,
-            'total': transformedServices.length,
-          };
+          responseData = <String, dynamic>{'services': transformedServices, 'total': transformedServices.length};
           debugPrint('✅ Transformed ${transformedServices.length} services');
         }
-        
+
         // If response has services at root level
         if (responseData is Map && responseData['services'] == null && responseData['data'] == null) {
           // Check if it's an array wrapped in response
@@ -82,7 +79,7 @@ class RiderServiceRepoImpl extends BaseRepository implements IRideServicesRepo {
             };
           }
         }
-        
+
         final result = RideServiceResponse.fromJson(responseData);
         debugPrint('✅ GET RIDE SERVICES - Parsed successfully');
         debugPrint('✅ Services count: ${result.data?.servicesList?.length ?? 0}');
@@ -99,6 +96,21 @@ class RiderServiceRepoImpl extends BaseRepository implements IRideServicesRepo {
   }
 
   @override
+  Future<Either<Failure, RideServiceResponse>> getAvailableServicesForRoute({
+    required RiderServiceState riderServiceFilter,
+  }) async {
+    return await safeApiCall(() async {
+      debugPrint('🚕 GET AVAILABLE SERVICES FOR ROUTE');
+      final response = await _rideServicesService.getAvailableServicesForRoute(riderServiceState: riderServiceFilter);
+      debugPrint('📥 GET AVAILABLE SERVICES Response: ${response.data}');
+      if (response.data is Map && response.data['services'] != null) {
+        // ensure fields are correct if needed, but assuming API matches
+      }
+      return RideServiceResponse.fromJson(response.data);
+    });
+  }
+
+  @override
   Future<Either<Failure, RideServiceResponse>> getServicesHome() async => await safeApiCall(() async {
     debugPrint('🏠 GET SERVICES HOME');
     final response = await _rideServicesService.getServicesHome();
@@ -107,9 +119,7 @@ class RiderServiceRepoImpl extends BaseRepository implements IRideServicesRepo {
       // Handle new API format: {total: X, services: [...]}
       // Filter only active services and sort by displayOrder
       if (response.data is Map && response.data['services'] != null) {
-        final services = (response.data['services'] as List)
-            .where((s) => s['isActive'] == true)
-            .toList()
+        final services = (response.data['services'] as List).where((s) => s['isActive'] == true).toList()
           ..sort((a, b) {
             final orderA = a['displayOrder'] ?? 999;
             final orderB = b['displayOrder'] ?? 999;
@@ -128,10 +138,10 @@ class RiderServiceRepoImpl extends BaseRepository implements IRideServicesRepo {
       debugPrint('🔴 Raw response: ${response.data}');
       rethrow;
     }
-    });
+  });
 
   @override
-  Future<Either<Failure, CommonResponse>> applyCoupon({required String? coupon}) async => safeApiCall(()async{
+  Future<Either<Failure, CommonResponse>> applyCoupon({required String? coupon}) async => safeApiCall(() async {
     final response = await _rideServicesService.applyCoupon(coupon: coupon);
     return CommonResponse.fromMap(response.data);
   });

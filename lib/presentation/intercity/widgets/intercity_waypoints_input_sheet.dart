@@ -23,18 +23,19 @@ import '../../waypoint/provider/way_point_list_providers.dart';
 import '../../waypoint/widgets/place_lookup_state_view.dart';
 
 class IntercityWaypointsInputSheet extends ConsumerStatefulWidget {
-  final String vehicleType;
+  final String? vehicleType;
+  final String? bookingType;
   final Function({
     required String fromAddress,
     required String toAddress,
     required LatLng fromLocation,
     required LatLng toLocation,
     required DateTime selectedDate,
-    required TimeOfDay selectedTime,
+    required int seats,
   })
   onConfirm;
 
-  const IntercityWaypointsInputSheet({super.key, required this.vehicleType, required this.onConfirm});
+  const IntercityWaypointsInputSheet({super.key, this.vehicleType, this.bookingType, required this.onConfirm});
 
   @override
   ConsumerState<IntercityWaypointsInputSheet> createState() => _IntercityWaypointsInputSheetState();
@@ -45,20 +46,12 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
   late bool isDark;
   DateTime? selectedDate;
   TimeOfDay? selectedTime;
+  int seats = 1;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     isDark = ref.read(themeModeProvider.notifier).isDarkMode();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeWaypoints();
-      setStatusBar(isDark: isDark);
-    });
   }
 
   void _initializeWaypoints() {
@@ -99,6 +92,49 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
     orElse: () => Waypoint(name: '', address: '', location: const LatLng(0, 0)),
   );
 
+  Widget _buildSeatSelector(bool isDark) => Container(
+    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+    decoration: BoxDecoration(
+      color: isDark ? Colors.grey[900] : Colors.grey[100],
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          'Seats Needed',
+          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500, color: isDark ? Colors.white : Colors.black),
+        ),
+        Row(
+          children: [
+            IconButton(
+              onPressed: seats > 1 ? () => setState(() => seats--) : null,
+              icon: Icon(
+                Icons.remove_circle_outline,
+                color: seats > 1 ? (isDark ? Colors.white : Colors.black) : Colors.grey,
+              ),
+            ),
+            Text(
+              '$seats',
+              style: TextStyle(
+                fontSize: 18.sp,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black,
+              ),
+            ),
+            IconButton(
+              onPressed: seats < 6 ? () => setState(() => seats++) : null,
+              icon: Icon(
+                Icons.add_circle_outline,
+                color: seats < 6 ? (isDark ? Colors.white : Colors.black) : Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
+
   @override
   Widget build(BuildContext context) {
     final wayPointList = ref.watch(wayPointListNotifierProvider);
@@ -108,10 +144,15 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
     return ExitAppWrapper(
       child: Scaffold(
         appBar: AppBar(
+          // toolbarHeight: 110.h,
           leading: AppBackButton(color: isDark ? Colors.white : null),
           centerTitle: true,
           title: Text(
-            'Search',
+            widget.bookingType == 'SHARE_POOL'
+                ? 'Share Pooling'
+                : widget.bookingType == 'PRIVATE'
+                ? 'Private Booking'
+                : 'Search',
             style: context.titleMedium?.copyWith(
               fontSize: 16.sp,
               fontWeight: FontWeight.w600,
@@ -153,70 +194,56 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
     );
   }
 
-  Widget _buildDateTimeSelector(bool isDark) {
-    return Row(
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () async {
-              final date = await showDatePicker(
-                context: context,
-                initialDate: selectedDate ?? DateTime.now(),
-                firstDate: DateTime.now(),
-                lastDate: DateTime.now().add(const Duration(days: 30)),
-              );
-              if (date != null) setState(() => selectedDate = date);
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[900] : Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.calendar_today, color: Colors.blue, size: 20.sp),
-                  Gap(8.w),
-                  Text(
-                    selectedDate == null
-                        ? 'Select Date'
-                        : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        Gap(16.w),
-        Expanded(
-          child: GestureDetector(
-            onTap: () async {
-              final time = await showTimePicker(context: context, initialTime: selectedTime ?? TimeOfDay.now());
-              if (time != null) setState(() => selectedTime = time);
-            },
-            child: Container(
-              padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[900] : Colors.grey[100],
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.access_time, color: Colors.blue, size: 20.sp),
-                  Gap(8.w),
-                  Text(
-                    selectedTime == null ? 'Start Time' : selectedTime!.format(context),
-                    style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeWaypoints();
+      setStatusBar(isDark: isDark);
+    });
   }
+
+  Widget _buildDateTimeSelector(bool isDark) => Column(
+    children: [
+      Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () async {
+                final date = await showDatePicker(
+                  context: context,
+                  initialDate: selectedDate ?? DateTime.now(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime.now().add(const Duration(days: 30)),
+                );
+                if (date != null) setState(() => selectedDate = date);
+              },
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[900] : Colors.grey[100],
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.calendar_today, color: Colors.blue, size: 20.sp),
+                    Gap(8.w),
+                    Text(
+                      selectedDate == null
+                          ? 'Select Date'
+                          : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
+                      style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      if (widget.bookingType == 'SHARE_POOL') ...[Gap(16.h), _buildSeatSelector(isDark)],
+    ],
+  );
 
   Widget _buildWaypointList(List<Waypoint> wayPointList, {required bool isDark}) {
     final selectedField = ref.watch(selectedLocTextFieldNotifierProvider);
@@ -289,8 +316,8 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
   }
 
   Widget _buildConfirmButton(Waypoint pickup, Waypoint dropOff) {
-    final isEnabled =
-        pickup.address.isNotEmpty && dropOff.address.isNotEmpty && selectedDate != null && selectedTime != null;
+    // Only check date, not time
+    final isEnabled = pickup.address.isNotEmpty && dropOff.address.isNotEmpty && selectedDate != null;
 
     return Container(
       width: double.infinity,
@@ -320,8 +347,8 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
                     ).showSnackBar(SnackBar(content: Text('Please select pickup and destination locations')));
                     return;
                   }
-                  if (selectedDate == null || selectedTime == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select date and time')));
+                  if (selectedDate == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Please select date')));
                     return;
                   }
 
@@ -331,14 +358,14 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
                     fromLocation: pickup.location,
                     toLocation: dropOff.location,
                     selectedDate: selectedDate!,
-                    selectedTime: selectedTime!,
+                    seats: seats, // Pass selected seats
                   );
                 }
               : null,
           borderRadius: BorderRadius.circular(12),
           child: Center(
             child: Text(
-              'Confirm',
+              'Search',
               style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16.sp),
             ),
           ),

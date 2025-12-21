@@ -1,114 +1,139 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gauva_userapp/core/routes/app_routes.dart';
-import 'package:gauva_userapp/data/services/navigation_service.dart';
+import 'package:gauva_userapp/presentation/intercity/provider/intercity_service_providers.dart';
+import 'package:gauva_userapp/presentation/intercity/widgets/intercity_waypoints_input_sheet.dart';
 
-class IntercitySelectionPage extends ConsumerWidget {
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
+
+class IntercitySelectionPage extends ConsumerStatefulWidget {
   const IntercitySelectionPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final isDark = ref.watch(themeModeProvider.notifier).isDarkMode();
+  ConsumerState<IntercitySelectionPage> createState() => _IntercitySelectionPageState();
+}
 
-    return Scaffold(
-      backgroundColor: isDark ? Colors.black : Colors.white,
-      appBar: AppBar(
-        backgroundColor: isDark ? Colors.black : Colors.white,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(Icons.chevron_left, color: isDark ? Colors.white : Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'Intercity Services',
-          style: TextStyle(color: isDark ? Colors.white : Colors.black, fontSize: 20, fontWeight: FontWeight.bold),
-        ),
-      ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // Ride as you like it section
-              _buildRideAsYouLikeItSection(context, isDark),
-              // Add bottom padding for safe scrolling
-              SizedBox(height: MediaQuery.of(context).padding.bottom + 16.h),
-            ],
-          ),
-        ),
-      ),
-    );
+class _IntercitySelectionPageState extends ConsumerState<IntercitySelectionPage> {
+  String? _selectedBookingType;
+  bool _isInitialized = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_isInitialized) {
+      final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      if (args != null && args.containsKey('bookingType')) {
+        setState(() {
+          _selectedBookingType = args['bookingType'];
+        });
+      }
+      _isInitialized = true;
+    }
   }
 
-  Widget _buildRideAsYouLikeItSection(BuildContext context, bool isDark) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          // Text(
-          //   'Ride as you like it',
-          //   style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black),
-          // ),
-          //           SizedBox(height: 12.h),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            scrollDirection: Axis.vertical,
-            itemCount: 2,
-            separatorBuilder: (_, __) => SizedBox(height: 12.h),
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return _buildSharePoolingBanner(context, isDark);
+  @override
+  Widget build(BuildContext context) {
+    if (_selectedBookingType != null) {
+      return IntercityWaypointsInputSheet(
+        vehicleType: null,
+        bookingType: _selectedBookingType,
+        onConfirm:
+            ({
+              required String fromAddress,
+              required String toAddress,
+              required LatLng fromLocation,
+              required LatLng toLocation,
+              required DateTime selectedDate,
+              required int seats,
+            }) async {
+              final notifier = ref.read(intercityServiceNotifierProvider.notifier);
+
+              // Combine date with default time logic (from previous implementation)
+              final now = DateTime.now();
+              TimeOfDay time;
+
+              if (selectedDate.year == now.year && selectedDate.month == now.month && selectedDate.day == now.day) {
+                time = TimeOfDay.now();
+              } else {
+                time = const TimeOfDay(hour: 9, minute: 0); // Default start time for future dates
               }
-              return GestureDetector(
-                onTap: () {
-                  NavigationService.pushNamed(AppRoutes.privateBooking);
-                },
-                child: _buildPrivateBookingCard(context, isDark),
+
+              final dt = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, time.hour, time.minute);
+
+              // Trigger search
+              await notifier.searchIntercity(
+                fromLocation: fromLocation,
+                toLocation: toLocation,
+                vehicleType: null, // Search ALL types
+                preferredDeparture: dt,
+                seatsNeeded: seats,
+                searchRadiusKm: 50,
               );
+
+              if (mounted) {
+                Navigator.pushNamed(
+                  context,
+                  AppRoutes.intercitySearchResults,
+                  arguments: {
+                    'vehicleType': 'Any',
+                    'fromAddress': fromAddress,
+                    'toAddress': toAddress,
+                    'fromLocation': fromLocation,
+                    'toLocation': toLocation,
+                    'bookingType': _selectedBookingType,
+                    'seatsNeeded': seats,
+                    'isPrivateBooking': _selectedBookingType == 'PRIVATE',
+                  },
+                );
+              }
             },
-          ),
-        ],
+      );
+    }
+
+    // If no bookingType, show selection screen
+    return Scaffold(
+      appBar: AppBar(title: const Text("Select Intercity Service")),
+      body: ListView(
+        padding: const EdgeInsets.all(16),
+        children: [_buildSharePoolingBanner(context), const Gap(16), _buildPrivateBookingCard(context)],
       ),
     );
   }
 
-  Widget _buildSharePoolingBanner(BuildContext context, bool isDark) {
-    return GestureDetector(
-      onTap: () {
-        NavigationService.pushNamed(AppRoutes.sharePoolingSelection);
-      },
-      child: Container(
-        width: double.infinity,
-        height: 150.h,
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.asset(
-            "assets/images/share-pooling-banner.png",
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: 150.h,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPrivateBookingCard(BuildContext context, bool isDark) {
-    return Container(
+  Widget _buildSharePoolingBanner(BuildContext context) => GestureDetector(
+    onTap: () {
+      setState(() {
+        _selectedBookingType = 'SHARE_POOL';
+      });
+    },
+    child: Container(
       width: double.infinity,
       height: 150.h,
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(8),
-        child: Image.asset("assets/privatebooking.jpg", fit: BoxFit.cover, width: double.infinity, height: 150.h),
+        child: Image.asset("assets/images/share-pooling-banner.png", fit: BoxFit.fill),
       ),
-    );
-  }
+    ),
+  );
+
+  Widget _buildPrivateBookingCard(BuildContext context) => GestureDetector(
+    onTap: () {
+      setState(() {
+        _selectedBookingType = 'PRIVATE';
+      });
+    },
+    child: Container(
+      width: double.infinity,
+      height: 150.h,
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(8)),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.asset("assets/privatebooking.png", fit: BoxFit.fill),
+      ),
+    ),
+  );
 }

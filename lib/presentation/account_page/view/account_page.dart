@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -20,9 +21,14 @@ import '../../../core/utils/is_dark_mode.dart';
 import '../../../core/widgets/country_code_bottom_sheet.dart';
 import '../../profile/provider/rider_details_provider.dart';
 import '../provider/select_country_provider.dart';
-import '../provider/terms_and_privacy_provider.dart';
 import '../provider/theme_provider.dart';
-import '../widgets/about_dialogue.dart';
+
+Future<void> _launchUrl(String urlString) async {
+  final Uri url = Uri.parse(urlString);
+  if (!await launchUrl(url)) {
+    throw Exception('Could not launch $url');
+  }
+}
 
 class AccountPage extends ConsumerStatefulWidget {
   const AccountPage({super.key});
@@ -137,7 +143,7 @@ Widget userDetails(BuildContext context) => Padding(
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) => Container(
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [Color(0xFF397098), Color(0xFF942FAF)],
@@ -256,22 +262,6 @@ Widget accountDetails(BuildContext context, {required WidgetRef ref, required bo
           Gap(8.h),
           accountButton(
             context,
-            leading: Assets.images.theme.image(height: 24.h, width: 24.w, fit: BoxFit.fill),
-            title: AppLocalizations.of(context).theme,
-            trailing: const ThemeSwitchTile(),
-            isDark: isDark,
-          ),
-          Gap(8.h),
-          accountButton(
-            context,
-            leading: Assets.images.language.image(height: 24.h, width: 24.w, fit: BoxFit.fill),
-            title: AppLocalizations.of(context).language,
-            trailing: countrySelector(),
-            isDark: isDark,
-          ),
-          Gap(8.h),
-          accountButton(
-            context,
             leading: Assets.images.changePassword.image(height: 24.h, width: 24.w, fit: BoxFit.fill),
             title: AppLocalizations.of(context).change_password,
             onTap: () => NavigationService.pushNamed(AppRoutes.changePassword),
@@ -283,8 +273,7 @@ Widget accountDetails(BuildContext context, {required WidgetRef ref, required bo
             leading: Assets.images.terms.image(height: 24.h, width: 24.w, fit: BoxFit.fill),
             title: AppLocalizations.of(context).terms_conditions,
             onTap: () {
-              ref.read(termsAndConditionProvider.notifier).termsAndCondition();
-              termsAndConditionDialogue(context, isDark: isDark);
+              _launchUrl('https://gleaming-begonia-69d7b2.netlify.app/terms');
             },
             isDark: isDark,
           ),
@@ -294,12 +283,10 @@ Widget accountDetails(BuildContext context, {required WidgetRef ref, required bo
             leading: Assets.images.privacy.image(height: 24.h, width: 24.w, fit: BoxFit.fill),
             title: AppLocalizations.of(context).privacy_policy,
             onTap: () {
-              ref.read(privacyAndPolicyProvider.notifier).privacyPolicy();
-              termsAndConditionDialogue(context, showTermsAndCondition: false, isDark: isDark);
+              _launchUrl('https://gleaming-begonia-69d7b2.netlify.app/privacy-policy');
             },
             isDark: isDark,
           ),
-
           Gap(8.h),
           Consumer(
             builder: (context, refs, _) => accountButton(
@@ -322,12 +309,6 @@ Widget accountDetails(BuildContext context, {required WidgetRef ref, required bo
             },
             isDark: isDark,
           ),
-          // Gap(16.h),
-          // Text(
-          //   version ?? '',
-          //   textAlign: TextAlign.center,
-          //   style: context.bodyMedium?.copyWith(fontSize: 14.sp, color: AppColors.primary),
-          // ),
         ],
       ),
     ),

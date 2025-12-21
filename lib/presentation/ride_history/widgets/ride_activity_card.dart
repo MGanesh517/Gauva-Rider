@@ -77,10 +77,7 @@ Widget ratingDate(BuildContext context, {bool showCancelItem = false, required R
           showCancelItem
               ? Container(
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4.r),
-                    color: const Color(0xFFFFE4E4),
-                  ),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(4.r), color: const Color(0xFFFFE4E4)),
                   child: Text(
                     'Cancelled',
                     maxLines: 1,
@@ -125,14 +122,11 @@ Widget rideDetails(
   bool showCancelItem = false,
   required bool isDark,
 }) {
-  final driver = ride.driver;
-  final displayName = driver?.name ?? driver?.mobile ?? 'N/A';
-
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(
-        displayName,
+        ride.status ?? 'N/A',
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
         style: context.bodyMedium?.copyWith(

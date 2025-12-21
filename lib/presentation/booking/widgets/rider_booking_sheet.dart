@@ -14,11 +14,25 @@ import '../../../core/utils/helpers.dart';
 import '../provider/ride_services_providers.dart';
 import '../provider/selection_providers.dart';
 
-class RideBookingSheet extends ConsumerWidget {
+class RideBookingSheet extends ConsumerStatefulWidget {
   const RideBookingSheet({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<RideBookingSheet> createState() => _RideBookingSheetState();
+}
+
+class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final filter = ref.read(rideServiceFilterNotiferProvider);
+      ref.read(rideServicesNotifierProvider.notifier).getAvailableServicesForRoute(riderServiceFilter: filter);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final riderServiceState = ref.watch(rideServicesNotifierProvider);
     final isDark = ref.watch(themeModeProvider.notifier).isDarkMode();
     final selectedService = ref.watch(carTypeNotifierProvider).selectedCarType;

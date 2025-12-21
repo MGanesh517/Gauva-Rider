@@ -297,15 +297,13 @@ class AuthService implements IAuthService {
     debugPrint('🔵 AUTH SERVICE - GOOGLE SIGN-IN API CALL');
     debugPrint('🔵 Endpoint: ${ApiEndpoints.googleLoginUrl}');
     debugPrint('🔵 ═══════════════════════════════════════════════════════');
-    
+
     // Spring Boot: Google sign-in endpoint
-    final Map<String, dynamic> body = {
-      'idToken': idToken,
-    };
-    
+    final Map<String, dynamic> body = {'idToken': idToken};
+
     debugPrint('📦 Request Body:');
     debugPrint('   🔑 idToken: ${idToken.substring(0, 30)}... (length: ${idToken.length})');
-    
+
     // Add optional fields only if they are provided
     if (name != null && name.isNotEmpty) {
       body['name'] = name;
@@ -313,31 +311,31 @@ class AuthService implements IAuthService {
     } else {
       debugPrint('   👤 name: (not provided)');
     }
-    
+
     if (email != null && email.isNotEmpty) {
       body['email'] = email;
       debugPrint('   📧 email: $email');
     } else {
       debugPrint('   📧 email: (not provided)');
     }
-    
+
     if (phone != null && phone.isNotEmpty) {
       body['phone'] = phone;
       debugPrint('   📱 phone: $phone');
     } else {
       debugPrint('   📱 phone: (not provided)');
     }
-    
+
     debugPrint('📤 Sending POST request to ${ApiEndpoints.googleLoginUrl}...');
     final response = await dioClient.dio.post(ApiEndpoints.googleLoginUrl, data: body);
-    
+
     debugPrint('📥 Response received:');
     debugPrint('   📊 Status Code: ${response.statusCode}');
     debugPrint('   📦 Response Data: ${response.data}');
     debugPrint('   📦 Response Type: ${response.data.runtimeType}');
     debugPrint('🔵 ═══════════════════════════════════════════════════════');
     debugPrint('');
-    
+
     return response;
   }
 }

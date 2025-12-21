@@ -2,7 +2,7 @@ name: gauva_userapp
 description: A Flutter project for Gauva Rider App.
 publish_to: "none"
 
-version: 1.0.3+13
+version: 1.0.1+101
 
 environment:
   sdk: ^3.8.1
@@ -96,6 +96,7 @@ dependencies:
   shimmer: ^3.0.0
   change_app_package_name: ^1.5.0
   intl: ^0.20.2
+  firebase_auth: ^6.1.3
 
 dependency_overrides:
   geolocator_android: ^4.1.7

@@ -19,6 +19,7 @@ class ApiEndpoints {
 
   // Ride endpoints - Spring Boot
   static const String rideServices = '/api/v1/services/fare-estimates'; // Fare estimation
+  static const String availableServicesForRoute = '/api/v1/services/available-for-route'; // Available services for route
   static const String servicesHome = '/api/v1/services'; // Services list
   static const String getDrivers = '/api/customer/drivers-near-me';
   static const String applyCoupon = '/api/promotions/coupons/apply';
@@ -80,5 +81,6 @@ class ApiEndpoints {
   // Intercity endpoints - Spring Boot
   static const String intercityServiceTypes = '/api/customer/intercity/service-types'; // Intercity service types list
   static const String intercitySearch = '/api/customer/intercity/search'; // Intercity search
+  static const String intercityDrivers = '/api/customer/intercity/drivers'; // Fetch drivers for vehicle type
   static const String intercityBooking = '/api/customer/intercity/bookings'; // Intercity booking
 }

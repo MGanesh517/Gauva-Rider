@@ -121,8 +121,8 @@ class _SeatSelectionSheetState extends ConsumerState<SeatSelectionSheet> {
               width: double.infinity,
               height: 50.h,
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [const Color(0xFF1469B5), const Color(0xFF942FAF)],
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF1469B5), Color(0xFF942FAF)],
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
@@ -135,8 +135,8 @@ class _SeatSelectionSheetState extends ConsumerState<SeatSelectionSheet> {
                 color: Colors.transparent,
                 child: InkWell(
                   onTap: () {
-                    widget.onConfirm(selectedSeats);
                     Navigator.pop(context);
+                    widget.onConfirm(selectedSeats);
                   },
                   borderRadius: BorderRadius.circular(12),
                   child: Center(

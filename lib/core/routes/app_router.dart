@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:gauva_userapp/data/models/ride_history_response/ride_history_item.dart';
 import 'package:gauva_userapp/presentation/auth/views/change_password.dart';
 import 'package:gauva_userapp/presentation/auth/views/login_page.dart';
@@ -12,6 +13,7 @@ import 'package:gauva_userapp/presentation/stripe_payment/view/stripe_payment_pa
 import 'package:gauva_userapp/presentation/track_order/views/chat_sheet.dart';
 import 'package:gauva_userapp/presentation/waypoint/views/way_point_page.dart';
 import 'package:gauva_userapp/presentation/waypoint/widgets/waypoints_input_sheet.dart';
+import 'package:gauva_userapp/presentation/intercity/views/intercity_search_results_page.dart';
 
 import '../../common/error_view.dart';
 import '../../presentation/auth/views/set_password_page.dart';
@@ -28,8 +30,6 @@ import '../../presentation/ride_history/views/ride_history_page.dart';
 import '../../presentation/wallet/views/wallet_page.dart';
 import '../../presentation/wallet/views/razorpay_payment_webview.dart';
 import '../../presentation/intercity/views/share_pooling_selection_page.dart';
-import '../../presentation/intercity/views/share_pooling_search_page.dart';
-import '../../presentation/intercity/views/private_booking_search_page.dart';
 import '../../presentation/intercity/views/private_booking_page.dart';
 import '../../presentation/intercity/views/private_booking_success_page.dart';
 import '../../presentation/intercity/views/intercity_selection_page.dart';
@@ -46,9 +46,9 @@ class AppRouter {
         return SlideRightRoute(page: const LoginPage());
       case '/signup':
         return SlideRightRoute(page: const SignupPage());
-      case '/verify-otp':
-        final num? otp = settings.arguments as num?;
-        return SlideRightRoute(page: VerifyOtpPage(otp: otp));
+      // case '/verify-otp':
+      //   final args = settings.arguments as Map<String, dynamic>?;
+      //   return SlideRightRoute(page: VerifyOtpPage(arguments: args));
       case '/login-with-password-page':
         return SlideRightRoute(page: const LoginWithPasswordPage());
       case '/set-password':
@@ -76,7 +76,6 @@ class AppRouter {
       case '/ride-history-detail':
         final ride = settings.arguments as RideHistoryItem;
         return SlideRightRoute(page: RideDetailsPage(ride: ride));
-
       case '/payment-page':
         final paymentUrl = settings.arguments as String;
         return SlideRightRoute(page: StripePaymentWebView(paymentUrl: paymentUrl));
@@ -101,46 +100,24 @@ class AppRouter {
         return MaterialPageRoute(builder: (_) => const BrokenPage());
       case '/share_pooling_selection':
         return SlideRightRoute(page: const SharePoolingSelectionPage());
-      case '/share_pooling_search':
-        final args = settings.arguments as Map<String, dynamic>?;
-        // Extract vehicleType from arguments
-        String vehicleType = 'CAR_NORMAL'; // Default fallback
-
-        if (args != null) {
-          if (args['vehicleType'] != null && args['vehicleType'] is String) {
-            vehicleType = args['vehicleType'] as String;
-          } else if (args['vehicle'] != null && args['vehicle'] is String) {
-            vehicleType = args['vehicle'] as String;
-          } else if (args['service'] != null) {
-            // Extract vehicle type from service object (for backward compatibility)
-            final service = args['service'];
-            try {
-              final dynamic serviceObj = service;
-              final vehicleTypeFromService = serviceObj.vehicleType?.toString();
-              vehicleType = vehicleTypeFromService ?? 'CAR_NORMAL';
-            } catch (e) {
-              debugPrint('Error extracting vehicleType from service: $e');
-              vehicleType = 'CAR_NORMAL';
-            }
-          }
-        }
-        return SlideRightRoute(page: SharePoolingSearchPage(vehicleType: vehicleType));
       case '/private_booking':
         return SlideRightRoute(page: const PrivateBookingPage());
       case '/private_booking_success':
         return SlideRightRoute(page: const PrivateBookingSuccessPage());
-      case '/private_booking_search':
-        final args = settings.arguments as Map<String, dynamic>?;
-        String vehicleType = 'CAR_NORMAL'; // Default fallback
-
-        if (args != null) {
-          if (args['vehicleType'] != null && args['vehicleType'] is String) {
-            vehicleType = args['vehicleType'] as String;
-          }
-        }
-        return SlideRightRoute(page: PrivateBookingSearchPage(vehicleType: vehicleType));
       case '/intercity_selection':
         return SlideRightRoute(page: const IntercitySelectionPage());
+      case '/intercity_search_results':
+        final args = settings.arguments as Map<String, dynamic>;
+        return SlideRightRoute(
+          page: IntercitySearchResultsPage(
+            vehicleType: args['vehicleType'] as String,
+            fromAddress: args['fromAddress'] as String,
+            toAddress: args['toAddress'] as String,
+            fromLocation: args['fromLocation'] as LatLng,
+            toLocation: args['toLocation'] as LatLng,
+            isPrivateBooking: args['bookingType'] == 'PRIVATE',
+          ),
+        );
       default:
         return SlideRightRoute(
           page: Scaffold(body: ErrorView(message: 'No route defined for ${settings.name}')),

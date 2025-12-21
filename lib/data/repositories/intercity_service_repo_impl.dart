@@ -6,6 +6,7 @@ import '../models/intercity_service_type.dart';
 import '../models/intercity_search_response.dart';
 import 'base_repository.dart';
 import 'interfaces/intercity_service_repo_interface.dart';
+import '../models/intercity_trip_model.dart';
 
 class IntercityServiceRepoImpl extends BaseRepository implements IIntercityServiceRepo {
   final IIntercityService _intercityService;
@@ -61,7 +62,7 @@ class IntercityServiceRepoImpl extends BaseRepository implements IIntercityServi
     required double pickupLongitude,
     required double dropLatitude,
     required double dropLongitude,
-    required String vehicleType,
+    String? vehicleType,
     required String preferredDeparture,
     int seatsNeeded = 0,
     double searchRadiusKm = 0,
@@ -97,45 +98,78 @@ class IntercityServiceRepoImpl extends BaseRepository implements IIntercityServi
   }
 
   @override
+  Future<Either<Failure, List<IntercityTripModel>>> getIntercityDrivers({
+    required String vehicleType,
+    required int seatsNeeded,
+    double? pickupLatitude,
+    double? pickupLongitude,
+    int? routeId,
+  }) async {
+    return await safeApiCall(() async {
+      debugPrint('🚕 GET INTERCITY DRIVERS');
+      final response = await _intercityService.getIntercityDrivers(
+        vehicleType: vehicleType,
+        seatsNeeded: seatsNeeded,
+        pickupLatitude: pickupLatitude,
+        pickupLongitude: pickupLongitude,
+        routeId: routeId,
+      );
+      debugPrint('📥 GET INTERCITY DRIVERS Response: ${response.data}');
+
+      try {
+        final List<dynamic> data = response.data is List ? response.data : (response.data['data'] ?? []);
+        final result = data.map((json) => IntercityTripModel.fromJson(json)).toList();
+        debugPrint('✅ GET INTERCITY DRIVERS - Parsed ${result.length} drivers');
+        return result;
+      } catch (e) {
+        debugPrint('🔴 GET INTERCITY DRIVERS - Parsing error: $e');
+        rethrow;
+      }
+    });
+  }
+
+  @override
   Future<Either<Failure, Map<String, dynamic>>> createIntercityBooking({
     required String vehicleType,
     required String bookingType,
     required int seatsToBook,
+    int? tripId,
+    int? routeId,
     required String pickupAddress,
     required double pickupLatitude,
     required double pickupLongitude,
     required String dropAddress,
     required double dropLatitude,
     required double dropLongitude,
+    required String paymentMethod,
+    required String fullName,
+    required String email,
+    String? contactPhone,
+    String? specialInstructions,
   }) async {
     return await safeApiCall(() async {
       debugPrint('📝 CREATE INTERCITY BOOKING');
-      debugPrint('VehicleType: $vehicleType, BookingType: $bookingType, Seats: $seatsToBook');
       final response = await _intercityService.createIntercityBooking(
         vehicleType: vehicleType,
         bookingType: bookingType,
         seatsToBook: seatsToBook,
+        tripId: tripId,
+        routeId: routeId,
         pickupAddress: pickupAddress,
         pickupLatitude: pickupLatitude,
         pickupLongitude: pickupLongitude,
         dropAddress: dropAddress,
         dropLatitude: dropLatitude,
         dropLongitude: dropLongitude,
+        paymentMethod: paymentMethod,
+        fullName: fullName,
+        email: email,
+        contactPhone: contactPhone,
+        specialInstructions: specialInstructions,
       );
       debugPrint('📥 CREATE INTERCITY BOOKING Response: ${response.data}');
 
-      try {
-        final result = response.data is Map<String, dynamic>
-            ? response.data as Map<String, dynamic>
-            : {'data': response.data};
-        debugPrint('✅ CREATE INTERCITY BOOKING - Success');
-        return result;
-      } catch (e, stackTrace) {
-        debugPrint('🔴 CREATE INTERCITY BOOKING - Parsing error: $e');
-        debugPrint('🔴 Stack trace: $stackTrace');
-        debugPrint('🔴 Raw response: ${response.data}');
-        rethrow;
-      }
+      return response.data is Map<String, dynamic> ? response.data as Map<String, dynamic> : {'data': response.data};
     });
   }
 }

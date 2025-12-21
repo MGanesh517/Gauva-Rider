@@ -275,7 +275,7 @@ class AuthRepoImpl extends BaseRepository implements IAuthRepo {
     debugPrint('   📧 email: $email');
     debugPrint('   📱 phone: $phone');
     debugPrint('   📲 deviceToken: ${deviceToken != null ? "${deviceToken.substring(0, 20)}..." : "null"}');
-    
+
     debugPrint('📤 Calling auth service...');
     final response = await _authService.signInWithGoogle(
       idToken: idToken,
@@ -284,12 +284,12 @@ class AuthRepoImpl extends BaseRepository implements IAuthRepo {
       phone: phone,
       deviceToken: deviceToken,
     );
-    
+
     debugPrint('📥 Response received from service:');
     debugPrint('   📊 Status Code: ${response.statusCode}');
     debugPrint('   📦 Response Data: ${response.data}');
     debugPrint('   📦 Response Type: ${response.data.runtimeType}');
-    
+
     debugPrint('🔄 Parsing response...');
     try {
       final result = LoginWithPasswordResponse.fromJson(response.data);

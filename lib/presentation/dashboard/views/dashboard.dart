@@ -6,7 +6,7 @@ import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.
 import 'package:gauva_userapp/presentation/account_page/view/account_page.dart';
 import 'package:gauva_userapp/presentation/dashboard/widgets/home_map.dart';
 import 'package:gauva_userapp/presentation/ride_history/views/ride_history_page.dart';
-import 'package:gauva_userapp/presentation/wallet/views/wallet_page.dart';
+// import 'package:gauva_userapp/presentation/wallet/views/wallet_page.dart';
 import 'package:gauva_userapp/presentation/websocket/provider/websocket_provider.dart';
 import 'package:gauva_userapp/presentation/websocket/view_model/websocket_listener_notifier.dart';
 
@@ -47,7 +47,7 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     }
   }
 
-  final List<Widget> _pages = const [HomeMap(), WalletPage(), RideHistoryPage(), AccountPage()];
+  final List<Widget> _pages = const [HomeMap(), /*WalletPage(),*/ RideHistoryPage(), AccountPage()];
 
   void _onItemTapped(int index) {
     setState(() {

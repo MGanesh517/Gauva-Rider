@@ -20,7 +20,7 @@ class IntercityService implements IIntercityService {
     required double pickupLongitude,
     required double dropLatitude,
     required double dropLongitude,
-    required String vehicleType,
+    String? vehicleType,
     required String preferredDeparture,
     int seatsNeeded = 0,
     double searchRadiusKm = 0,
@@ -33,10 +33,30 @@ class IntercityService implements IIntercityService {
         'pickupLongitude': pickupLongitude,
         'dropLatitude': dropLatitude,
         'dropLongitude': dropLongitude,
-        'vehicleType': vehicleType,
+        if (vehicleType != null) 'vehicleType': vehicleType,
         'preferredDeparture': preferredDeparture,
         'seatsNeeded': seatsNeeded,
         'searchRadiusKm': searchRadiusKm,
+      },
+    );
+  }
+
+  @override
+  Future<Response> getIntercityDrivers({
+    required String vehicleType,
+    required int seatsNeeded,
+    double? pickupLatitude,
+    double? pickupLongitude,
+    int? routeId,
+  }) {
+    return dioClient.dio.get(
+      ApiEndpoints.intercityDrivers,
+      queryParameters: {
+        'vehicleType': vehicleType,
+        'seatsNeeded': seatsNeeded,
+        if (pickupLatitude != null) 'pickupLatitude': pickupLatitude,
+        if (pickupLongitude != null) 'pickupLongitude': pickupLongitude,
+        if (routeId != null) 'routeId': routeId,
       },
     );
   }
@@ -46,12 +66,19 @@ class IntercityService implements IIntercityService {
     required String vehicleType,
     required String bookingType,
     required int seatsToBook,
+    int? tripId,
+    int? routeId,
     required String pickupAddress,
     required double pickupLatitude,
     required double pickupLongitude,
     required String dropAddress,
     required double dropLatitude,
     required double dropLongitude,
+    required String paymentMethod,
+    required String fullName,
+    required String email,
+    String? contactPhone,
+    String? specialInstructions,
   }) {
     return dioClient.dio.post(
       ApiEndpoints.intercityBooking,
@@ -59,12 +86,19 @@ class IntercityService implements IIntercityService {
         'vehicleType': vehicleType,
         'bookingType': bookingType,
         'seatsToBook': seatsToBook,
+        if (tripId != null) 'tripId': tripId,
+        if (routeId != null) 'routeId': routeId,
         'pickupAddress': pickupAddress,
         'pickupLatitude': pickupLatitude,
         'pickupLongitude': pickupLongitude,
         'dropAddress': dropAddress,
         'dropLatitude': dropLatitude,
         'dropLongitude': dropLongitude,
+        'paymentMethod': paymentMethod,
+        'fullName': fullName,
+        'email': email,
+        if (contactPhone != null) 'contactPhone': contactPhone,
+        if (specialInstructions != null) 'specialInstructions': specialInstructions,
       },
     );
   }

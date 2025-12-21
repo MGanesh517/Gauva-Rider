@@ -10,13 +10,10 @@ class RideServicesNotifier extends StateNotifier<AppState<RideServiceResponse>> 
   final IRideServicesRepo rideServicesRepo;
   final Ref ref;
 
-  RideServicesNotifier({
-    required this.ref,
-    required this.rideServicesRepo,
-  }) : super(const AppState.initial());
+  RideServicesNotifier({required this.ref, required this.rideServicesRepo}) : super(const AppState.initial());
 
   Future<void> getRideServices({required RiderServiceState riderServiceFilter}) async {
-    if(riderServiceFilter.pickupLocation.isEmpty || riderServiceFilter.dropLocation.isEmpty){
+    if (riderServiceFilter.pickupLocation.isEmpty || riderServiceFilter.dropLocation.isEmpty) {
       return;
     }
     state = const AppState.loading();
@@ -28,7 +25,23 @@ class RideServicesNotifier extends StateNotifier<AppState<RideServiceResponse>> 
       },
       (data) {
         state = AppState.success(data);
+      },
+    );
+  }
 
+  Future<void> getAvailableServicesForRoute({required RiderServiceState riderServiceFilter}) async {
+    if (riderServiceFilter.pickupLocation.isEmpty || riderServiceFilter.dropLocation.isEmpty) {
+      return;
+    }
+    state = const AppState.loading();
+    final result = await rideServicesRepo.getAvailableServicesForRoute(riderServiceFilter: riderServiceFilter);
+    result.fold(
+      (failure) {
+        state = AppState.error(failure);
+        showNotification(message: failure.message);
+      },
+      (data) {
+        state = AppState.success(data);
       },
     );
   }

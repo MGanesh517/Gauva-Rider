@@ -23,12 +23,10 @@ class RideHistoryPage extends ConsumerStatefulWidget {
 }
 
 class _RideHistoryPageState extends ConsumerState<RideHistoryPage> {
-  bool isCompleteSelected = true;
   DateTime? date;
   @override
   void initState() {
     super.initState();
-    isCompleteSelected = true;
     date = null;
     // Optionally fetch ride history when page loads
     Future.microtask(() => ref.read(rideHistoryProvider.notifier).fetchRideHistory(status: 'Completed'));
@@ -37,10 +35,7 @@ class _RideHistoryPageState extends ConsumerState<RideHistoryPage> {
   void _fetchData() {
     ref
         .read(rideHistoryProvider.notifier)
-        .fetchRideHistory(
-          status: isCompleteSelected ? 'Completed' : 'Cancelled',
-          date: date == null ? null : DateFormat('yyyy-MM-dd', 'en').format(date!),
-        );
+        .fetchRideHistory(status: 'Completed', date: date == null ? null : DateFormat('yyyy-MM-dd', 'en').format(date!));
   }
 
   @override
@@ -50,11 +45,6 @@ class _RideHistoryPageState extends ConsumerState<RideHistoryPage> {
     return RefreshIndicator(
       onRefresh: () async {
         _fetchData();
-        // ref
-        //     .read(rideHistoryProvider.notifier)
-        //     .fetchRideHistory(
-        //       status: isCompleteSelected ? 'Completed' : 'Canceled',
-        //     );
       },
       child: Scaffold(
         // appBar: AppBar(
@@ -166,47 +156,8 @@ class _RideHistoryPageState extends ConsumerState<RideHistoryPage> {
         ),
         body: Column(
           children: [
-            Container(
-              width: double.infinity,
-              margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 2.w),
-              padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12.r),
-                color: isDarkMode() ? Colors.black : Colors.white,
-              ),
-              child: Row(
-                children: [
-                  button(
-                    isSelected: isCompleteSelected,
-                    isDark: isDarkMode(),
-                    label: AppLocalizations.of(context).complete_ride,
-                    onTap: () {
-                      if (!isCompleteSelected) {
-                        setState(() {
-                          isCompleteSelected = true;
-                        });
-                        _fetchData();
-                      }
-                    },
-                    context: context,
-                  ),
-                  button(
-                    isSelected: !isCompleteSelected,
-                    isDark: isDarkMode(),
-                    label: AppLocalizations.of(context).cancel_ride,
-                    onTap: () {
-                      if (isCompleteSelected) {
-                        setState(() {
-                          isCompleteSelected = false;
-                        });
-                        _fetchData();
-                      }
-                    },
-                    context: context,
-                  ),
-                ],
-              ),
-            ),
+            // Tabs removed as requested
+            Gap(10.h),
             Expanded(
               child: rideState.when(
                 initial: () => Center(child: Text(AppLocalizations.of(context).please_wait)),
@@ -231,7 +182,7 @@ class _RideHistoryPageState extends ConsumerState<RideHistoryPage> {
                         onTap: () {
                           NavigationService.pushNamed(AppRoutes.rideHistoryDetail, arguments: ride);
                         },
-                        showCancelItem: !isCompleteSelected,
+                        showCancelItem: false,
                         isDark: isDarkMode(),
                       );
                     },
@@ -244,36 +195,4 @@ class _RideHistoryPageState extends ConsumerState<RideHistoryPage> {
       ),
     );
   }
-
-  Widget button({
-    required bool isSelected,
-    required String label,
-    required VoidCallback onTap,
-    required BuildContext context,
-    required bool isDark,
-  }) => Expanded(
-    child: InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 10.h),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8.r),
-          border: Border.all(color: isSelected ? const Color(0xFF1469B5) : Colors.transparent),
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: context.bodyMedium?.copyWith(
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w600,
-            color: isSelected
-                ? const Color(0xFF1469B5)
-                : isDark
-                ? Colors.white
-                : const Color(0xFF24262D),
-          ),
-        ),
-      ),
-    ),
-  );
 }

@@ -58,8 +58,8 @@ class AuthAppBar extends ConsumerWidget {
                       showLeading
                           ? Row(
                               children: [
-                                // const AppBackButton(color: ColorPalette.neutral100),
-                                // SizedBox(width: 16.w),
+                                const AppBackButton(color: ColorPalette.neutral100),
+                                SizedBox(width: 16.w),
                                 Expanded(
                                   child: Text(
                                     title ?? '',

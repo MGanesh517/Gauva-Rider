@@ -11,20 +11,15 @@ import '../view_model/cancel_ride_notifier.dart';
 
 // RideService Provider (depends on Dio)
 final cancelRideServiceProvider = Provider<ICancelRideService>(
-      (ref) => CancelRideService(dioClient: ref.read(dioClientChattingProvider)),
+  (ref) => CancelRideService(dioClient: ref.read(dioClientProvider)),
 );
 
 // RideRepo Provider (depends on RideService)
 final cancelRideRepoProvider = Provider<ICancelRideRepo>(
-      (ref) => CancelRideRepoImpl(rideService: ref.read(cancelRideServiceProvider)),
+  (ref) => CancelRideRepoImpl(rideService: ref.read(cancelRideServiceProvider)),
 );
 
 // AcceptRide ViewModel Provider (autoDispose)
-final cancelRideNotifierProvider = StateNotifierProvider<
-    CancelRideNotifier, AppState<CommonResponse>>(
-      (ref) => CancelRideNotifier(
-    ref,
-    ref.read(cancelRideRepoProvider),
-  ),
+final cancelRideNotifierProvider = StateNotifierProvider<CancelRideNotifier, AppState<CommonResponse>>(
+  (ref) => CancelRideNotifier(ref, ref.read(cancelRideRepoProvider)),
 );
-
