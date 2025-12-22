@@ -45,7 +45,7 @@ class _PromotionalSliderState extends ConsumerState<PromotionalSlider> {
     }
     return Container(
       color: isDark() ? Colors.black : ColorPalette.neutralF6,
-      padding: EdgeInsets.symmetric(vertical: 12.h, horizontal: 16.w),
+      padding: EdgeInsets.symmetric(vertical: 12.h),
       child: state.when(
         initial: () => const SizedBox.shrink(),
         loading: () => const LoadingView(),
@@ -81,7 +81,7 @@ class _PromotionalSliderState extends ConsumerState<PromotionalSlider> {
                                 imageUrl: banner.imageUrl!,
                                 height: 160,
                                 width: double.infinity,
-                                fit: BoxFit.cover,
+                                fit: BoxFit.fill,
                               )
                             else
                               Container(

@@ -39,6 +39,8 @@ class IntercitySearchResultsPage extends ConsumerStatefulWidget {
 }
 
 class _IntercitySearchResultsPageState extends ConsumerState<IntercitySearchResultsPage> {
+  String? _loadingVehicleType;
+
   void _showTripSeatSelection(IntercityTripModel trip) {
     showModalBottomSheet(
       context: context,
@@ -106,14 +108,18 @@ class _IntercitySearchResultsPageState extends ConsumerState<IntercitySearchResu
                   seatsNeeded: widget.seatsNeeded, // Pass seatsNeeded
                 ),
               ),
-            );
+            ).then((_) {
+              if (mounted) setState(() => _loadingVehicleType = null);
+            });
           } else {
+            setState(() => _loadingVehicleType = null);
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(const SnackBar(content: Text('No drivers found for this vehicle type')));
           }
         },
         error: (failure) {
+          setState(() => _loadingVehicleType = null);
           ScaffoldMessenger.of(
             context,
           ).showSnackBar(SnackBar(content: Text('Failed to load drivers: ${failure.message}')));
@@ -293,172 +299,200 @@ class _IntercitySearchResultsPageState extends ConsumerState<IntercitySearchResu
   );
 
   Widget _buildTripCard(BuildContext context, IntercityTripModel trip, bool isDark) =>
-    IntercityTripCard(trip: trip, isDark: isDark, onJoinPressed: (trip) => _showTripSeatSelection(trip));
+      IntercityTripCard(trip: trip, isDark: isDark, onJoinPressed: (trip) => _showTripSeatSelection(trip));
 
   Widget _buildVehicleOptionCard(BuildContext context, VehicleOption option, bool isDark, String? recommendedVehicle) {
     final isRecommended = option.isRecommended == true || option.vehicleType == recommendedVehicle;
-    final isLoading = ref
+    final isGlobalLoading = ref
         .watch(intercityServiceNotifierProvider)
         .driverListState
         .maybeWhen(loading: () => true, orElse: () => false);
 
+    final isThisCardLoading = isGlobalLoading && option.vehicleType == _loadingVehicleType;
+    final isSelected = isThisCardLoading;
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
-      padding: EdgeInsets.all(16.w),
       decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(isDark ? 0.3 : 0.08), blurRadius: 10, offset: const Offset(0, 4)),
         ],
-        border: isRecommended
-            ? Border.all(color: Colors.amber, width: 2)
-            : Border.all(color: isDark ? Colors.grey[800]! : Colors.grey[200]!),
+        gradient: isSelected ? const LinearGradient(colors: [Color(0xFF1469B5), Color(0xFF42A5F5)]) : null,
+        color: isSelected ? null : (isRecommended ? Colors.amber : (isDark ? Colors.grey[800]! : Colors.grey[200]!)),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Header
-          Row(
-            children: [
-              Container(
-                width: 60.w,
-                height: 60.w,
-                decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12)),
-                child: Center(
-                  child: Icon(Ionicons.car_sport, size: 32.sp, color: Colors.grey.shade700),
+      padding: EdgeInsets.all(isSelected || isRecommended ? 2.0 : 1.0),
+      child: Container(
+        padding: EdgeInsets.all(16.w),
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E1E1E) : Colors.white,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Header
+            Row(
+              children: [
+                Container(
+                  width: 60.w,
+                  height: 60.w,
+                  decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12)),
+                  child: Center(
+                    child: Icon(Ionicons.car_sport, size: 32.sp, color: Colors.grey.shade700),
+                  ),
                 ),
-              ),
-              Gap(12.w),
-              Expanded(
-                child: Column(
+                Gap(12.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              option.displayName ?? option.vehicleType ?? 'Vehicle',
+                              style: TextStyle(
+                                fontSize: 18.sp,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white : const Color(0xFF24262D),
+                              ),
+                            ),
+                          ),
+                          if (isRecommended)
+                            Container(
+                              padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                              decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(6)),
+                              child: Text(
+                                'RECOMMENDED',
+                                style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.bold, color: Colors.white),
+                              ),
+                            ),
+                        ],
+                      ),
+                      Gap(4.h),
+                      Row(
+                        children: [
+                          Icon(Ionicons.people, size: 14.sp, color: Colors.grey[600]),
+                          Gap(4.w),
+                          Text(
+                            '${option.seatsRemaining ?? 0} seats avail',
+                            style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+
+            Gap(12.h),
+            Divider(color: isDark ? Colors.grey[800] : Colors.grey[200], thickness: 1),
+            Gap(12.h),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            option.displayName ?? option.vehicleType ?? 'Vehicle',
-                            style: TextStyle(
-                              fontSize: 18.sp,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : const Color(0xFF24262D),
-                            ),
-                          ),
-                        ),
-                        if (isRecommended)
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                            decoration: BoxDecoration(color: Colors.amber, borderRadius: BorderRadius.circular(6)),
-                            child: Text(
-                              'RECOMMENDED',
-                              style: TextStyle(fontSize: 10.sp, fontWeight: FontWeight.bold, color: Colors.white),
-                            ),
-                          ),
-                      ],
+                    Text(
+                      'Price per seat',
+                      style: TextStyle(fontSize: 10.sp, color: Colors.grey[500]),
                     ),
-                    Gap(4.h),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Icon(Ionicons.people, size: 14.sp, color: Colors.grey[600]),
-                        Gap(4.w),
                         Text(
-                          '${option.seatsRemaining ?? 0} seats avail',
-                          style: TextStyle(fontSize: 12.sp, color: Colors.grey[600]),
+                          '₹${option.currentPerHeadPrice?.toStringAsFixed(0) ?? 0}',
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : const Color(0xFF24262D),
+                          ),
                         ),
                       ],
                     ),
                   ],
                 ),
-              ),
-            ],
-          ),
-
-          Gap(12.h),
-          Divider(color: isDark ? Colors.grey[800] : Colors.grey[200], thickness: 1),
-          Gap(12.h),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Price per seat',
-                    style: TextStyle(fontSize: 10.sp, color: Colors.grey[500]),
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(10),
+                    gradient: (!isGlobalLoading || isThisCardLoading)
+                        ? const LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0xFF397098), Color(0xFF942FAF)],
+                          )
+                        : null,
+                    color: (!isGlobalLoading || isThisCardLoading)
+                        ? null
+                        : (isDark ? Colors.grey[700] : Colors.grey[300]),
                   ),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        '₹${option.currentPerHeadPrice?.toStringAsFixed(0) ?? 0}',
-                        style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : const Color(0xFF24262D),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              ElevatedButton(
-                onPressed: isLoading
-                    ? null
-                    : () {
-                        ref
-                            .read(intercityServiceNotifierProvider.notifier)
-                            .getIntercityDrivers(
-                              vehicleType: option.vehicleType!,
-                              seatsNeeded: widget.seatsNeeded,
-                              pickupLatitude: widget.fromLocation.latitude,
-                              pickupLongitude: widget.fromLocation.longitude,
-                              routeId: option.routeId,
-                            );
-                      },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF1469B5),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
-                  elevation: 0,
-                ),
-                child: isLoading
-                    ? SizedBox(
-                        width: 20.w,
-                        height: 20.w,
-                        child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                      )
-                    : Text(
-                        'Get Drivers',
-                        style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white, fontSize: 14.sp),
-                      ),
-              ),
-            ],
-          ),
-          if (option.description != null && option.description!.isNotEmpty) ...[
-            Gap(12.h),
-            Container(
-              padding: EdgeInsets.all(8.w),
-              decoration: BoxDecoration(
-                color: isDark ? Colors.grey[800] : Colors.grey[50],
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.info_outline, size: 14.sp, color: Colors.grey),
-                  Gap(8.w),
-                  Expanded(
-                    child: Text(
-                      option.description!,
-                      style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
+                  child: ElevatedButton(
+                    onPressed: isGlobalLoading
+                        ? null
+                        : () {
+                            setState(() {
+                              _loadingVehicleType = option.vehicleType;
+                            });
+                            ref
+                                .read(intercityServiceNotifierProvider.notifier)
+                                .getIntercityDrivers(
+                                  vehicleType: option.vehicleType!,
+                                  seatsNeeded: widget.seatsNeeded,
+                                  pickupLatitude: widget.fromLocation.latitude,
+                                  pickupLongitude: widget.fromLocation.longitude,
+                                  routeId: option.routeId,
+                                );
+                          },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.transparent,
+                      disabledBackgroundColor: Colors.transparent,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 12.h),
+                      elevation: 0,
                     ),
+                    child: isThisCardLoading
+                        ? SizedBox(
+                            width: 20.w,
+                            height: 20.w,
+                            child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          )
+                        : Text(
+                            'Get Drivers',
+                            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.white, fontSize: 14.sp),
+                          ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+            if (option.description != null && option.description!.isNotEmpty) ...[
+              Gap(12.h),
+              Container(
+                padding: EdgeInsets.all(8.w),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey[800] : Colors.grey[50],
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 14.sp, color: Colors.grey),
+                    Gap(8.w),
+                    Expanded(
+                      child: Text(
+                        option.description!,
+                        style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

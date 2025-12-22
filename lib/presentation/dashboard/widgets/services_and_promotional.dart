@@ -149,6 +149,7 @@ class ServicesAndPromotional extends ConsumerWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      useSafeArea: true,
       backgroundColor: Colors.transparent,
       builder: (context) => IntercityWaypointsInputSheet(
         vehicleType: null,
@@ -185,7 +186,7 @@ class ServicesAndPromotional extends ConsumerWidget {
               );
 
               if (context.mounted) {
-                Navigator.pop(context); // Close the bottom sheet
+                Navigator.pop(context);
                 Navigator.pushNamed(
                   context,
                   AppRoutes.intercitySearchResults,
