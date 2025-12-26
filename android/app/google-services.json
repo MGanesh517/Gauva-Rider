@@ -15,6 +15,22 @@
       },
       "oauth_client": [
         {
+          "client_id": "798219755346-6ksjae3cgudeu2m44d0dl050eivspd6p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gauva.driverapp",
+            "certificate_hash": "dcb3abac9fac790ac333e5891a812695d3cc1c59"
+          }
+        },
+        {
+          "client_id": "798219755346-a4hrd9vuvurifkhq0qt6p6ki8cmes6vr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.gauva.driverapp",
+            "certificate_hash": "fedac90958ffd8654b5fadda918b29bb59856c8e"
+          }
+        },
+        {
           "client_id": "798219755346-ocqss3oc88fhrjtk0j8rem397ihjeabd.apps.googleusercontent.com",
           "client_type": 3
         }

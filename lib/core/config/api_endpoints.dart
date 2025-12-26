@@ -42,13 +42,6 @@ class ApiEndpoints {
   // Rating endpoint - Spring Boot
   static const String rating = '/api/reviews';
 
-  // Wallet endpoints - Spring Boot
-  static const String wallets = '/api/wallet/USER'; // Use /api/wallet/USER/{userId}
-  static const String addBalance = '/api/wallet/USER'; // Use /api/wallet/USER/{userId} with credit
-  static const String addCard = '/api/payments'; // Card management
-  static const String myCard = '/api/payments'; // Get cards
-  static const String deleteCard = '/api/payments'; // Delete card
-
   // Report endpoints - Spring Boot (may need to check if these exist)
   static const String getReportTypes = '/api/admin/reviews'; // Report types - check if exists
   static const String submitReport = '/api/reviews'; // Submit report as review

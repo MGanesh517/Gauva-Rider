@@ -9,12 +9,8 @@ import 'package:gauva_userapp/core/widgets/buttons/app_primary_button.dart';
 import 'package:gauva_userapp/data/models/order_response/order_model/order/order.dart';
 import 'package:gauva_userapp/gen/assets.gen.dart';
 import 'package:gauva_userapp/generated/l10n.dart';
-import 'package:gauva_userapp/presentation/payment_method/provider/provider.dart';
 
 import '../../../core/utils/is_arabic.dart';
-import '../../../core/widgets/payment_method_select_field.dart';
-import '../../../data/services/local_storage_service.dart';
-import '../../stripe_payment/provier/payment_confirm_provider.dart';
 
 Widget confirmPay(BuildContext context, Order order, {required bool isDark}) => Column(
   children: [
@@ -40,8 +36,8 @@ Widget confirmPay(BuildContext context, Order order, {required bool isDark}) => 
     Gap(16.h),
     Consumer(
       builder: (context, ref, _) {
-        final state = ref.watch(paymentConfirmNotifierProvider);
-        final bool isLoading = state.whenOrNull(loading: () => true) ?? false;
+        // final state = ref.watch(paymentConfirmNotifierProvider);
+        final bool isLoading = false;
         return AppPrimaryButton(
           isLoading: isLoading,
           isDisabled: isLoading,
@@ -58,18 +54,26 @@ Widget confirmPay(BuildContext context, Order order, {required bool isDark}) => 
   ],
 );
 
-Widget selectedCashView(bool isDark) => Consumer(
-  builder: (context, ref, _) {
-    final selectedPaymentMethod = ref.watch(selectedPayMethodProvider);
-    return PaymentMethodSelectField(
-      paymentMethod: selectedPaymentMethod,
-      onPressed: () async {
-        ref.read(paymentMethodsNotifierProvider.notifier).getPaymentMethods();
-        // showPaymentMethodSheet(context: context);
-      },
-      isDark: isDark,
-    );
-  },
+Widget selectedCashView(bool isDark) => Container(
+  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+  decoration: BoxDecoration(
+    borderRadius: BorderRadius.circular(8.r),
+    border: Border.all(color: isDark ? Colors.grey.shade700 : const Color(0xFFF1F7FE)),
+  ),
+  child: Row(
+    children: [
+      Icon(Icons.payment, color: isDark ? Colors.white70 : const Color(0xFF687387)),
+      Gap(12.w),
+      Text(
+        'Cash Payment',
+        style: TextStyle(
+          fontSize: 14.sp,
+          fontWeight: FontWeight.w500,
+          color: isDark ? Colors.white : const Color(0xFF24262D),
+        ),
+      ),
+    ],
+  ),
 );
 
 Widget serviceOverView(BuildContext context, Order order, {List<Widget>? widgets, required bool isDark}) => Container(
@@ -175,11 +179,7 @@ Widget rowText(
 );
 
 void handleTripCompletion(WidgetRef ref) async {
-  final orderId = await LocalStorageService().getOrderId() ?? 0;
-  final paymentMethod = ref.watch(selectedPayMethodProvider)?.value?.toLowerCase() ?? '';
-  if (paymentMethod.isEmpty) {
-    showNotification(message: AppLocalizations().please_select_payment_type);
-    return;
-  }
-  ref.read(paymentConfirmNotifierProvider.notifier).paymentConfirm(orderId: orderId, paymentMethodName: paymentMethod);
+  // Payment is handled as cash by default
+  showNotification(message: 'Payment confirmed');
+  // TODO: Implement actual payment confirmation logic if needed
 }

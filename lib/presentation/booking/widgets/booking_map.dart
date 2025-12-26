@@ -107,6 +107,33 @@ class _BookingMapState extends ConsumerState<BookingMap> {
                       polylines: state.polyline,
                       markers: state.markers,
                     ),
+                    // Back button
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      child: SafeArea(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Material(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(30),
+                            elevation: 4,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).pop();
+                              },
+                              borderRadius: BorderRadius.circular(30),
+                              child: Container(
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(30)),
+                                child: const Icon(Icons.arrow_back, color: Colors.black87),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                     Positioned.fill(
                       child: AnimatedSwitcher(
                         duration: AnimationDuration.pageStateTransitionMobile,

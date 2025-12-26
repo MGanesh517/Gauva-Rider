@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:collection/collection.dart';
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,7 +11,6 @@ import 'package:gauva_userapp/core/utils/exit_app_dialogue.dart';
 import 'package:gauva_userapp/core/utils/helpers.dart';
 import 'package:gauva_userapp/core/widgets/is_ios.dart';
 import 'package:gauva_userapp/generated/l10n.dart';
-import 'package:gauva_userapp/presentation/payment_method/provider/provider.dart';
 
 import '../../../core/extensions/extensions.dart';
 import '../../../core/routes/app_routes.dart';
@@ -20,8 +18,6 @@ import '../../../core/state/rider_service_state.dart';
 import '../../../core/utils/color_palette.dart';
 import '../../../core/widgets/buttons/app_back_button.dart';
 import '../../../core/widgets/buttons/app_primary_button.dart';
-import '../../../core/widgets/icon_destination.dart';
-import '../../../core/widgets/location_text_field.dart';
 import '../../../data/models/waypoint.dart';
 import '../../../data/services/navigation_service.dart';
 import '../../account_page/provider/theme_provider.dart';
@@ -33,7 +29,6 @@ import '../../booking/provider/route_providers.dart';
 import '../../dashboard/provider/home_map_providers.dart';
 import '../../track_order/provider/order_in_progress_provider.dart';
 import '../provider/google_api_providers.dart';
-import '../provider/pick_route_providers.dart';
 import '../provider/search_place_providers.dart';
 import '../provider/selected_loc_text_field_providers.dart';
 import '../provider/way_point_list_providers.dart';
@@ -142,7 +137,7 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
         ),
         body: Container(
           decoration: BoxDecoration(
-            image: const DecorationImage(image: AssetImage('assets/bg.png'), fit: BoxFit.fill),
+            // image: const DecorationImage(image: AssetImage('assets/bg.png'), fit: BoxFit.fill),
             color: isDark ? Colors.black : Colors.white,
           ),
           child: Column(
@@ -174,69 +169,106 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
   Widget _buildWaypointList(List<Waypoint> wayPointList, {required bool isDark}) {
     final selectedField = ref.watch(selectedLocTextFieldNotifierProvider);
     final fieldNotifier = ref.read(selectedLocTextFieldNotifierProvider.notifier);
-    final routePickNotifier = ref.read(pickRouteNotifierProvider.notifier);
     final wayPointNotifier = ref.read(wayPointListNotifierProvider.notifier);
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          children: wayPointList
-              .mapIndexed(
-                (index, _) => Column(
-                  children: [
-                    IconDestination(isPickupPoint: index == 0, color: isDark ? Colors.white : null),
-                    if (index != wayPointList.length - 1)
-                      const DottedLine(
-                        direction: Axis.vertical,
-                        dashColor: ColorPalette.neutral90,
-                        lineThickness: 3,
-                        lineLength: 70,
-                      ),
-                  ],
-                ),
-              )
-              .toList(),
-        ),
-        Gap(6.w),
-        Expanded(
-          child: Column(
-            children: wayPointList
+    // Only show first 2 waypoints (pickup and destination)
+    final displayList = wayPointList.take(2).toList();
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        // color: isDark ? const Color(0xFF1E1E1E) : const Color(0xFFF5F5F5),
+        border: Border.all(color: isDark ? Colors.grey.shade800 : const Color(0xFFE0E0E0), width: 1),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Icon column with dots and line
+          Column(
+            children: displayList
                 .mapIndexed(
-                  (index, e) => Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: LocationTextField(
-                      initialValue: e,
-                      isFocused: index == selectedField,
-                      onChanged: (value) {
-                        // Ensure selected field is set when user types
-                        if (selectedField != index) {
-                          fieldNotifier.setSelectedLocation(index);
-                        }
-                        _onSearchChanged(value);
-                      },
-                      index: index,
-                      totalCount: wayPointList.length,
-                      onFocused: () => fieldNotifier.setSelectedLocation(index),
-                      onRemoveStop: () {},
-                      onMapPressed: (value, node) {
-                        node.unfocus();
-                        fieldNotifier.setSelectedLocation(index);
-                        routePickNotifier.setLocation(index: index);
-                        NavigationService.pushNamed(AppRoutes.waypointPage);
-                      },
-                      onRemoved: (removed) {
-                        if (removed) {
-                          wayPointNotifier.removeWayPointByIndex(index: index);
-                        }
-                      },
-                    ),
+                  (index, _) => Column(
+                    children: [
+                      Container(
+                        width: 16.w,
+                        height: 16.h,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: index == 0
+                                ? const Color(0xFF34A853) // Green for pickup
+                                : const Color(0xFFEA4335), // Orange/Red for destination
+                            width: 2.5,
+                          ),
+                        ),
+                      ),
+                      if (index != displayList.length - 1)
+                        Container(
+                          width: 1,
+                          height: 40.h,
+                          margin: EdgeInsets.symmetric(vertical: 2.h),
+                          color: isDark ? Colors.grey.shade700 : const Color(0xFFBDBDBD),
+                        ),
+                    ],
                   ),
                 )
                 .toList(),
           ),
-        ),
-      ],
+          Gap(12.w),
+          // Text fields column
+          Expanded(
+            child: Column(
+              children: displayList
+                  .mapIndexed(
+                    (index, e) => Container(
+                      key: ValueKey('waypoint_${index}_${e.address}'),
+                      // height: index == 0 ? 60.h : null,
+                      alignment: Alignment.centerLeft,
+                      child: TextFormField(
+                        key: ValueKey('textfield_${index}_${e.address}'),
+                        initialValue: e.address,
+                        onChanged: (value) {
+                          if (selectedField != index) {
+                            fieldNotifier.setSelectedLocation(index);
+                          }
+                          _onSearchChanged(value);
+                        },
+                        onTap: () => fieldNotifier.setSelectedLocation(index),
+                        style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400, color: const Color(0xFF212121)),
+                        decoration: InputDecoration(
+                          hintText: index == 0 ? 'Your Current Location' : 'Enter destination',
+                          hintStyle: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                            color: isDark ? Colors.grey.shade600 : const Color(0xFF757575),
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                          isDense: true,
+                          suffixIcon: e.address.isNotEmpty
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.cancel,
+                                    size: 20.sp,
+                                    color: isDark ? Colors.grey.shade600 : const Color(0xFF9E9E9E),
+                                  ),
+                                  onPressed: () {
+                                    wayPointNotifier.removeWayPointByIndex(index: index);
+                                  },
+                                )
+                              : null,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -305,7 +337,7 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
         ref.read(bookingNotifierProvider.notifier).resetState();
         ref.read(createOrderNotifierProvider.notifier).reset();
         ref.read(orderInProgressNotifier.notifier).resetState();
-        ref.read(selectedPayMethodProvider.notifier).reset();
+        // ref.read(selectedPayMethodProvider.notifier).reset();
         ref.read(selectedRideNotifierProvider.notifier).reset();
         ref.read(bookingNotifierProvider.notifier).selectVehicle();
 
@@ -351,4 +383,30 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
     final double durationHours = distanceKm / averageSpeedKmh;
     return (durationHours * 60).round(); // Convert to minutes
   }
+}
+
+// Custom painter for dotted vertical line
+class DottedLinePainter extends CustomPainter {
+  final Color color;
+  final double dashHeight;
+  final double dashSpace;
+
+  DottedLinePainter({required this.color, this.dashHeight = 4, this.dashSpace = 4});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round;
+
+    double startY = 0;
+    while (startY < size.height) {
+      canvas.drawLine(Offset(size.width / 2, startY), Offset(size.width / 2, startY + dashHeight), paint);
+      startY += dashHeight + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

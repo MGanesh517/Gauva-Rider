@@ -1,0 +1,26 @@
+﻿Alias name: gauva
+Creation date: 27-Jul-2025
+Entry type: PrivateKeyEntry
+Certificate chain length: 1
+Certificate[1]:
+Owner: CN=gauva, OU=gauva, O=gauva, L=gauva, ST=Andhe, C=in
+Issuer: CN=gauva, OU=gauva, O=gauva, L=gauva, ST=Andhe, C=in
+Serial number: 70c045934de293dc
+Valid from: Sun Jul 27 12:43:57 IST 2025 until: Thu Dec 12 12:43:57 IST 2052
+Certificate fingerprints:
+	 SHA1: DC:B3:AB:AC:9F:AC:79:0A:C3:33:E5:89:1A:81:26:95:D3:CC:1C:59
+	 SHA256: 58:72:F3:1A:FE:CF:E2:1D:7C:1C:3C:15:99:F7:11:B3:79:DD:7F:5F:99:BD:8C:9D:D6:EC:6E:F8:7F:F5:FF:B8
+Signature algorithm name: SHA256withRSA
+Subject Public Key Algorithm: 2048-bit RSA key
+Version: 3
+
+Extensions: 
+
+#1: ObjectId: 2.5.29.14 Criticality=false
+SubjectKeyIdentifier [
+KeyIdentifier [
+0000: A4 48 1B F2 78 AF F4 73   09 5A BA DB 11 5C 88 9C  .H..x..s.Z...\..
+0010: C3 78 DE 3A                                        .x.:
+]
+]
+

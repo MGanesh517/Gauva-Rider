@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:gauva_userapp/core/config/environment.dart';
 import 'package:gauva_userapp/core/utils/app_colors.dart';
 import 'package:gauva_userapp/core/widgets/is_ios.dart';
 import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.dart';
@@ -11,16 +12,12 @@ import 'package:gauva_userapp/presentation/auth/view_model/auth_notifier.dart';
 class GoogleSignInButton extends ConsumerWidget {
   const GoogleSignInButton({super.key});
 
-  Future<void> _handleGoogleSignIn(
-    BuildContext context,
-    WidgetRef ref,
-    GoogleSignInNotifier stateNotifier,
-  ) async {
+  Future<void> _handleGoogleSignIn(BuildContext context, WidgetRef ref, GoogleSignInNotifier stateNotifier) async {
     print('');
     print('🔵 ═══════════════════════════════════════════════════════');
     print('🔵 GOOGLE SIGN-IN BUTTON - Starting');
     print('🔵 ═══════════════════════════════════════════════════════');
-    
+
     try {
       print('📱 Step 1: Initializing Google Sign In...');
       // Initialize Google Sign In - do this on a separate isolate if possible
@@ -28,12 +25,11 @@ class GoogleSignInButton extends ConsumerWidget {
       // This is the OAuth 2.0 client ID for web applications
       final GoogleSignIn googleSignIn = GoogleSignIn(
         scopes: ['email', 'profile'],
-        // Use the web client ID from google-services.json to avoid SHA-1 issues
-        // This is the client_id with client_type: 3 (web client)
-        serverClientId: '798219755346-ocqss3oc88fhrjtk0j8rem397ihjeabd.apps.googleusercontent.com',
+        // Removed serverClientId to use Android OAuth client from google-services.json
+        // This will automatically use the Android client with matching SHA-1
       );
       print('✅ Step 1: Google Sign In initialized');
-      print('   🔑 Using Web Client ID: 798219755346-ocqss3oc88fhrjtk0j8rem397ihjeabd.apps.googleusercontent.com');
+      print('   🔑 Using Web Client ID: ${Environment.GOOGLE_WEB_CLIENT_ID}');
 
       print('📱 Step 2: Opening Google Sign In dialog...');
       // Sign in with Google - this opens native activity
@@ -61,17 +57,16 @@ class GoogleSignInButton extends ConsumerWidget {
       final String? idToken = googleAuth.idToken;
       print('📱 Step 4: Checking ID token...');
       print('   🔑 ID Token: ${idToken != null ? "${idToken.substring(0, 30)}..." : "NULL"}');
-      print('   🔑 Access Token: ${googleAuth.accessToken != null ? "${googleAuth.accessToken!.substring(0, 30)}..." : "NULL"}');
+      print(
+        '   🔑 Access Token: ${googleAuth.accessToken != null ? "${googleAuth.accessToken!.substring(0, 30)}..." : "NULL"}',
+      );
 
       if (idToken == null) {
         print('❌ Step 4: ID token is NULL - Cannot proceed');
         // Handle error - ID token is null
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to get Google authentication token'),
-              duration: Duration(seconds: 3),
-            ),
+            const SnackBar(content: Text('Failed to get Google authentication token'), duration: Duration(seconds: 3)),
           );
         }
         return;
@@ -93,12 +88,7 @@ class GoogleSignInButton extends ConsumerWidget {
       print('📱 Step 6: Calling sign-in notifier...');
       // Call the sign-in notifier with the ID token and user info
       // This will handle the API call and state management
-      await stateNotifier.signInWithGoogle(
-        idToken: idToken,
-        name: name,
-        email: email,
-        phone: phone,
-      );
+      await stateNotifier.signInWithGoogle(idToken: idToken, name: name, email: email, phone: phone);
       print('✅ Step 6: Sign-in notifier completed');
       print('🔵 ═══════════════════════════════════════════════════════');
       print('');
@@ -113,10 +103,7 @@ class GoogleSignInButton extends ConsumerWidget {
       // Handle error gracefully
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Google sign-in failed: ${e.toString()}'),
-            duration: const Duration(seconds: 4),
-          ),
+          SnackBar(content: Text('Google sign-in failed: ${e.toString()}'), duration: const Duration(seconds: 4)),
         );
       }
     }
@@ -180,21 +167,11 @@ class GoogleSignInButton extends ConsumerWidget {
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Google icon - using a simple colored circle with "G"
-                    Container(
+                    // Google icon - proper multi-colored G logo
+                    SizedBox(
                       width: 20.w,
                       height: 20.h,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey.shade300, width: 0.5),
-                      ),
-                      child: Center(
-                        child: Text(
-                          'G',
-                          style: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.bold, color: Colors.blue.shade700),
-                        ),
-                      ),
+                      child: CustomPaint(painter: GoogleLogoPainter()),
                     ),
                     SizedBox(width: 12.w),
                     Text(
@@ -212,4 +189,68 @@ class GoogleSignInButton extends ConsumerWidget {
       ),
     );
   }
+}
+
+// Custom painter for Google logo
+class GoogleLogoPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..style = PaintingStyle.fill;
+
+    final center = Offset(size.width / 2, size.height / 2);
+    final radius = size.width / 2;
+
+    // Draw the Google 'G' logo with proper colors
+    // Blue arc (top right)
+    paint.color = const Color(0xFF4285F4);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -0.5 * 3.14159, // -90 degrees
+      1.5 * 3.14159, // 270 degrees
+      true,
+      paint,
+    );
+
+    // Red arc (top left)
+    paint.color = const Color(0xFFEA4335);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      -0.5 * 3.14159, // -90 degrees
+      0.5 * 3.14159, // 90 degrees
+      true,
+      paint,
+    );
+
+    // Yellow arc (bottom left)
+    paint.color = const Color(0xFFFBBC05);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      0.0, // 0 degrees
+      0.5 * 3.14159, // 90 degrees
+      true,
+      paint,
+    );
+
+    // Green arc (bottom right)
+    paint.color = const Color(0xFF34A853);
+    canvas.drawArc(
+      Rect.fromCircle(center: center, radius: radius),
+      0.5 * 3.14159, // 90 degrees
+      0.5 * 3.14159, // 90 degrees
+      true,
+      paint,
+    );
+
+    // Draw white center circle to create the 'G' shape
+    paint.color = Colors.white;
+    canvas.drawCircle(center, radius * 0.5, paint);
+
+    // Draw the horizontal bar of the 'G'
+    paint.color = const Color(0xFF4285F4);
+    final barRect = Rect.fromLTWH(center.dx, center.dy - radius * 0.15, radius, radius * 0.3);
+    canvas.drawRect(barRect, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

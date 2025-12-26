@@ -8,7 +8,9 @@ import 'package:gauva_userapp/data/services/navigation_service.dart';
 import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.dart';
 
 class PrivateBookingSuccessPage extends ConsumerStatefulWidget {
-  const PrivateBookingSuccessPage({super.key});
+  final String bookingType; // 'private' or 'share'
+
+  const PrivateBookingSuccessPage({super.key, this.bookingType = 'private'});
 
   @override
   ConsumerState<PrivateBookingSuccessPage> createState() => _PrivateBookingSuccessPageState();
@@ -51,11 +53,7 @@ class _PrivateBookingSuccessPageState extends ConsumerState<PrivateBookingSucces
                       end: Alignment.bottomRight,
                     ),
                   ),
-                  child: Icon(
-                    Icons.check_circle,
-                    size: 80.sp,
-                    color: Colors.white,
-                  ),
+                  child: Icon(Icons.check_circle, size: 80.sp, color: Colors.white),
                 ),
                 Gap(32.h),
                 // Success Message
@@ -70,21 +68,16 @@ class _PrivateBookingSuccessPageState extends ConsumerState<PrivateBookingSucces
                 ),
                 Gap(16.h),
                 Text(
-                  'Your private booking request has been submitted successfully.',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                  ),
+                  widget.bookingType == 'share'
+                      ? 'Your share pooling booking request has been submitted successfully.'
+                      : 'Your private booking request has been submitted successfully.',
+                  style: TextStyle(fontSize: 16.sp, color: isDark ? Colors.grey[400] : Colors.grey[600]),
                   textAlign: TextAlign.center,
                 ),
                 Gap(8.h),
                 Text(
                   'Your booking is on HOLD and will be confirmed by Admin.',
-                  style: TextStyle(
-                    fontSize: 14.sp,
-                    color: Colors.orange,
-                    fontStyle: FontStyle.italic,
-                  ),
+                  style: TextStyle(fontSize: 14.sp, color: Colors.orange, fontStyle: FontStyle.italic),
                   textAlign: TextAlign.center,
                 ),
                 Gap(48.h),
@@ -94,18 +87,13 @@ class _PrivateBookingSuccessPageState extends ConsumerState<PrivateBookingSucces
                   height: 24.h,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      isDark ? Colors.white : Colors.black,
-                    ),
+                    valueColor: AlwaysStoppedAnimation<Color>(isDark ? Colors.white : Colors.black),
                   ),
                 ),
                 Gap(8.h),
                 Text(
                   'Redirecting to homepage...',
-                  style: TextStyle(
-                    fontSize: 12.sp,
-                    color: isDark ? Colors.grey[400] : Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 12.sp, color: isDark ? Colors.grey[400] : Colors.grey[600]),
                 ),
               ],
             ),
@@ -115,4 +103,3 @@ class _PrivateBookingSuccessPageState extends ConsumerState<PrivateBookingSucces
     );
   }
 }
-

@@ -8,6 +8,16 @@ class Environment {
   static const String _prodUrl = 'https://gauva-f6f6d9ddagfqc9fw.southindia-01.azurewebsites.net';
   static const String _devUrl = 'https://gauva-f6f6d9ddagfqc9fw.canadacentral-01.azurewebsites.net';
 
+  // Firebase Configuration (from google-services.json)
+  static const String FIREBASE_API_KEY = 'AIzaSyCv2Lm4K4AETbK5Snzm7NwPBx89IBQv3j0';
+  static const String FIREBASE_PROJECT_ID = 'gauva-15d9a';
+  static const String FIREBASE_PROJECT_NUMBER = '798219755346';
+  static const String FIREBASE_STORAGE_BUCKET = 'gauva-15d9a.firebasestorage.app';
+  static const String FIREBASE_DATABASE_URL = 'https://gauva-15d9a-default-rtdb.firebaseio.com';
+
+  // Google OAuth Web Client ID (client_type: 3 - Web Application)
+  static const String GOOGLE_WEB_CLIENT_ID = '798219755346-ocqss3oc88fhrjtk0j8rem397ihjeabd.apps.googleusercontent.com';
+
   static const EnvironmentType currentEnvironment = EnvironmentType.prod;
 
   static String? _overrideApiUrl;

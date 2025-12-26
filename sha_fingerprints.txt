@@ -1,0 +1,32 @@
+======================================== 
+  SHA FINGERPRINT EXTRACTION RESULTS 
+======================================== 
+ 
+1. DEBUG KEYSTORE FINGERPRINTS 
+   Location: C:\Users\lapto\.android\debug.keystore 
+ 
+	 SHA1: FE:DA:C9:09:58:FF:D8:65:4B:5F:AD:DA:91:8B:29:BB:59:85:6C:8E
+	 SHA256: C2:98:9D:D7:58:FA:DE:E8:5C:B6:29:B5:00:85:8D:6F:CA:F2:9F:9A:99:79:58:06:E9:DD:30:83:4F:F9:1B:80
+Signature algorithm name: SHA256withRSA
+ 
+======================================== 
+ 
+2. RELEASE KEYSTORE FINGERPRINTS 
+   Location: android\app\gauva.keystore 
+ 
+	 SHA1: DC:B3:AB:AC:9F:AC:79:0A:C3:33:E5:89:1A:81:26:95:D3:CC:1C:59
+	 SHA256: 58:72:F3:1A:FE:CF:E2:1D:7C:1C:3C:15:99:F7:11:B3:79:DD:7F:5F:99:BD:8C:9D:D6:EC:6E:F8:7F:F5:FF:B8
+Signature algorithm name: SHA256withRSA
+ 
+======================================== 
+ 
+NEXT STEPS: 
+1. Open sha_fingerprints.txt to see your SHA values 
+2. Go to Firebase Console: https://console.firebase.google.com/ 
+3. Select project: gauva-15d9a 
+4. Go to Project Settings > Your apps > Android app 
+5. Add ALL fingerprints (both debug and release) 
+6. Download updated google-services.json 
+7. Replace android/app/google-services.json 
+8. Run: flutter clean && flutter pub get && flutter run 
+ 

@@ -8,7 +8,6 @@ import 'package:gauva_userapp/core/theme/color_palette.dart';
 import 'package:gauva_userapp/core/utils/helpers.dart';
 import 'package:gauva_userapp/core/widgets/buttons/app_primary_button.dart';
 import 'package:gauva_userapp/gen/assets.gen.dart';
-import 'package:gauva_userapp/presentation/payment_method/provider/provider.dart';
 import 'package:gauva_userapp/presentation/track_order/provider/rating_provider.dart';
 
 import '../../../data/models/order_response/order_model/order/order.dart';
@@ -30,7 +29,7 @@ Widget feedback(BuildContext context, Order order, {required bool isDark}) => Co
     Gap(4.h),
     Consumer(
       builder: (context, ref, _) {
-        final selectedPaymentMethod = ref.watch(selectedPayMethodProvider);
+        // final selectedPaymentMethod = ref.watch(selectedPayMethodProvider);
         return RichText(
           textAlign: TextAlign.center,
           text: TextSpan(
@@ -49,7 +48,7 @@ Widget feedback(BuildContext context, Order order, {required bool isDark}) => Co
                   fontWeight: FontWeight.w400,
                   color: const Color(0xFF687387),
                 ),
-                text: AppLocalizations.of(context).payment_confirmation(selectedPaymentMethod?.value ?? ''),
+                text: AppLocalizations.of(context).payment_confirmation('N/A'),
               ),
             ],
           ),

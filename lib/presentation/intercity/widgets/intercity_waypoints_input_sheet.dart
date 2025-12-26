@@ -162,7 +162,7 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
         ),
         body: Container(
           decoration: BoxDecoration(
-            image: DecorationImage(image: AssetImage('assets/bg.png'), fit: BoxFit.fill),
+            // image: DecorationImage(image: AssetImage('assets/bg.png'), fit: BoxFit.fill),
             color: isDark ? Colors.black : Colors.white,
           ),
           child: Column(

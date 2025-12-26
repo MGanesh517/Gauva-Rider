@@ -45,9 +45,9 @@ class ApiErrorHandler {
 
     if (statusCode == 400) {
       return Failure(message: data['message'] ?? AppLocalizations().bad_request, code: statusCode);
-    }else if(statusCode == 204){
+    } else if (statusCode == 204) {
       return Failure(message: data['message'] ?? 'No Data', code: statusCode);
-  }else if (statusCode == 401) {
+    } else if (statusCode == 401) {
       LocalStorageService().destroyAll();
       NavigationService.navigateToLogin();
       return Failure(
@@ -61,11 +61,10 @@ class ApiErrorHandler {
       );
     } else if (statusCode == 404) {
       return Failure(message: data['message'] ?? AppLocalizations().resource_not_found, code: statusCode);
-    } else if(statusCode == 413){
-      return Failure(
-          message: AppLocalizations().requestEntityTooLarge, code: statusCode);
+    } else if (statusCode == 413) {
+      return Failure(message: AppLocalizations().requestEntityTooLarge, code: statusCode);
     } else if (statusCode == 422) {
-      if(data['message'] != null){
+      if (data['message'] != null) {
         return Failure(message: data['message'], code: statusCode);
       }
       if (data['errors'] != null) {
@@ -81,6 +80,6 @@ class ApiErrorHandler {
     return Failure(message: AppLocalizations().something_went_wrong, code: statusCode);
   }
 
-  static String _extractValidationError({required Map<String, dynamic> error}) => error.entries.map((e) => "${e.key}: ${e.value.join(', ')}").join('\n');
-
+  static String _extractValidationError({required Map<String, dynamic> error}) =>
+      error.entries.map((e) => "${e.key}: ${e.value.join(', ')}").join('\n');
 }

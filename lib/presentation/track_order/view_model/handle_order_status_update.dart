@@ -8,7 +8,6 @@ import 'package:gauva_userapp/presentation/booking/provider/booking_providers.da
 import 'package:gauva_userapp/presentation/booking/provider/order_providers.dart';
 import 'package:gauva_userapp/presentation/track_order/provider/track_order_provider.dart';
 import '../../booking/provider/route_providers.dart';
-import '../../payment_method/provider/provider.dart';
 import '../../waypoint/provider/way_point_list_providers.dart';
 import '../../waypoint/provider/way_point_map_providers.dart';
 import '../../websocket/provider/websocket_provider.dart';
@@ -45,7 +44,7 @@ void handleOrderStatusUpdate({
   }
 
   void resetPaymentAndGoToConfirm() {
-    ref.read(selectedPayMethodProvider.notifier).reset();
+    // ref.read(selectedPayMethodProvider.notifier).reset();
     orderNotifier.goToConfirmPay();
   }
 
