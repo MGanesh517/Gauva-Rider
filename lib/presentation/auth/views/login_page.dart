@@ -75,6 +75,29 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                 },
               ),
             ),
+            Gap(12.h),
+            // Forgot Password Link
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  NavigationService.pushNamed(AppRoutes.forgotPassword);
+                },
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  'Forgot Password?',
+                  style: context.bodyMedium?.copyWith(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: ColorPalette.primary50,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

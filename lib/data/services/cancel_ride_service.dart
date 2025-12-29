@@ -12,7 +12,8 @@ class CancelRideService implements ICancelRideService {
 
   @override
   Future<Response> cancelRide({required int? orderId}) async {
-    // Spring Boot: POST /api/v1/ride/{rideId}/decline
+    // Spring Boot: POST /api/v1/ride/{rideId}/cancel (for riders)
+    // Note: /decline endpoint is for drivers only
     // Authorization: Bearer {token} (handled by DioInterceptors)
     final endpoint = ApiEndpoints.cancelRideEndpoint(orderId ?? 0);
 

@@ -142,7 +142,7 @@ Widget userDetails(BuildContext context) => Padding(
                                 width: 72.r,
                                 fit: BoxFit.cover,
                                 placeholder: (context, url) => Container(
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     gradient: LinearGradient(
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
@@ -164,8 +164,8 @@ Widget userDetails(BuildContext context) => Padding(
                                   ),
                                 ),
                                 errorWidget: (context, url, error) => Container(
-                                  decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
+                                  decoration: const BoxDecoration(
+                                    gradient: LinearGradient(
                                       begin: Alignment.topCenter,
                                       end: Alignment.bottomCenter,
                                       colors: [Color(0xFF397098), Color(0xFF942FAF)],
@@ -191,8 +191,8 @@ Widget userDetails(BuildContext context) => Padding(
                         : Container(
                             width: 72.r,
                             height: 72.r,
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
+                            decoration: const BoxDecoration(
+                              gradient: LinearGradient(
                                 begin: Alignment.topCenter,
                                 end: Alignment.bottomCenter,
                                 colors: [Color(0xFF397098), Color(0xFF942FAF)],

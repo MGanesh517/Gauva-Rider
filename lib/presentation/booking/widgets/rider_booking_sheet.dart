@@ -397,7 +397,9 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
         }
 
         final service = selectedService.selectedCarType;
-        final serviceId = service?.id ?? service?.serviceId;
+        // Prioritize serviceId (string like "BIKE") over id (numeric)
+        // The API expects string service types like "BIKE", "CAR", "AUTO", "PREMIUM"
+        final serviceId = service?.serviceId ?? service?.id;
 
         if (serviceId == null) {
           showNotification(message: 'Please select a valid service');

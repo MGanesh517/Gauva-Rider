@@ -4,6 +4,8 @@ import 'package:gauva_userapp/data/models/ride_history_response/ride_history_ite
 import 'package:gauva_userapp/presentation/auth/views/change_password.dart';
 import 'package:gauva_userapp/presentation/auth/views/login_page.dart';
 import 'package:gauva_userapp/presentation/auth/views/login_with_password_page.dart';
+import 'package:gauva_userapp/presentation/auth/views/forgot_password_page.dart';
+import 'package:gauva_userapp/presentation/auth/views/forgot_password_verify_otp_page.dart';
 import 'package:gauva_userapp/presentation/auth/views/onboarding_page.dart';
 import 'package:gauva_userapp/presentation/booking/views/booking_page.dart';
 import 'package:gauva_userapp/presentation/ride_history/views/ride_details_page.dart';
@@ -53,6 +55,11 @@ class AppRouter {
         return SlideRightRoute(page: const SetProfilePage());
       case '/change-password':
         return SlideRightRoute(page: const ChangePasswordPage());
+      case '/forgot-password':
+        return SlideRightRoute(page: const ForgotPasswordPage());
+      case '/forgot-password-verify-otp':
+        final email = settings.arguments as String;
+        return SlideRightRoute(page: ForgotPasswordVerifyOtpPage(email: email));
       case '/dashboard-page':
         return SlideRightRoute(page: const DashboardPage());
       case '/waypoint-page':
@@ -71,11 +78,10 @@ class AppRouter {
       case '/ride-history-detail':
         final ride = settings.arguments as RideHistoryItem;
         return SlideRightRoute(page: RideDetailsPage(ride: ride));
-   
+
       case '/report-issue':
         final orderId = settings.arguments as int?;
         return SlideRightRoute(page: ReportIssueView(orderId));
-   
 
       case '/no-internet':
         return SlideRightRoute(page: const NoInternetPage());

@@ -9,6 +9,7 @@ import 'package:gauva_userapp/data/models/intercity_trip_model.dart';
 import 'package:gauva_userapp/data/models/intercity_search_response.dart';
 
 import 'package:gauva_userapp/presentation/profile/provider/rider_details_provider.dart';
+import 'package:gauva_userapp/presentation/intercity/views/private_booking_success_page.dart';
 
 class IntercityBookingSummaryPage extends ConsumerStatefulWidget {
   final IntercityTripModel? trip;
@@ -131,14 +132,17 @@ class _IntercityBookingSummaryPageState extends ConsumerState<IntercityBookingSu
     if (mounted) {
       setState(() => isLoading = false);
 
-      // Check for success in state (or handle via listener usually, but here checking simple success flow)
-      // The notifier shows a notification on success/failure.
-      // If success, we should probably navigate away.
-      // Ideally we listen to the state change, but for simplicity:
+      // Check for success in state and navigate to success page
       final state = ref.read(intercityServiceNotifierProvider);
       state.bookingState.maybeWhen(
         success: (_) {
-          Navigator.of(context).popUntil((route) => route.isFirst);
+          // Navigate to success page
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) =>
+                  PrivateBookingSuccessPage(bookingType: widget.isPrivateBooking ? 'private' : 'share'),
+            ),
+          );
         },
         orElse: () {},
       );
@@ -384,33 +388,41 @@ class _IntercityBookingSummaryPageState extends ConsumerState<IntercityBookingSu
 
               Gap(40.h),
 
-              // Confirm Button
-              SizedBox(
+              // Confirm Button with Gradient
+              Container(
                 width: double.infinity,
                 height: 56.h,
-                child: ElevatedButton(
-                  onPressed: isLoading ? null : _confirmBooking,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF1469B5),
-                    elevation: 0,
-                    padding: EdgeInsets.all(0),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16.r)),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF397098), Color(0xFF942FAF)],
                   ),
-                  child: isLoading
-                      ? SizedBox(
-                          width: 24.h,
-                          height: 24.h,
-                          child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                        )
-                      : Text(
-                          'CONFIRM BOOKING',
-                          style: TextStyle(
-                            fontSize: 16.sp,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            // letterSpacing: 0.5,
-                          ),
-                        ),
+                  borderRadius: BorderRadius.circular(16.r),
+                ),
+                child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: isLoading ? null : _confirmBooking,
+                    borderRadius: BorderRadius.circular(16.r),
+                    child: Center(
+                      child: isLoading
+                          ? SizedBox(
+                              width: 24.h,
+                              height: 24.h,
+                              child: const CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                            )
+                          : Text(
+                              'CONFIRM BOOKING',
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                    ),
+                  ),
                 ),
               ),
               // Gap(20.h),

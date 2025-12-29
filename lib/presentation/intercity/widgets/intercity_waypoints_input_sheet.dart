@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:collection/collection.dart';
-import 'package:dotted_line/dotted_line.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,11 +11,8 @@ import 'package:gauva_userapp/core/widgets/is_ios.dart';
 import '../../../core/extensions/extensions.dart';
 import '../../../core/utils/color_palette.dart';
 import '../../../core/widgets/buttons/app_back_button.dart';
-import '../../../core/widgets/icon_destination.dart';
-import '../../../core/widgets/location_text_field.dart';
 import '../../../data/models/waypoint.dart';
 import '../../account_page/provider/theme_provider.dart';
-import '../../waypoint/provider/pick_route_providers.dart';
 import '../../waypoint/provider/search_place_providers.dart';
 import '../../waypoint/provider/selected_loc_text_field_providers.dart';
 import '../../waypoint/provider/way_point_list_providers.dart';
@@ -92,49 +88,6 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
     orElse: () => Waypoint(name: '', address: '', location: const LatLng(0, 0)),
   );
 
-  Widget _buildSeatSelector(bool isDark) => Container(
-    padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
-    decoration: BoxDecoration(
-      color: isDark ? Colors.grey[900] : Colors.grey[100],
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          'Seats Needed',
-          style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w500, color: isDark ? Colors.white : Colors.black),
-        ),
-        Row(
-          children: [
-            IconButton(
-              onPressed: seats > 1 ? () => setState(() => seats--) : null,
-              icon: Icon(
-                Icons.remove_circle_outline,
-                color: seats > 1 ? (isDark ? Colors.white : Colors.black) : Colors.grey,
-              ),
-            ),
-            Text(
-              '$seats',
-              style: TextStyle(
-                fontSize: 18.sp,
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black,
-              ),
-            ),
-            IconButton(
-              onPressed: seats < 6 ? () => setState(() => seats++) : null,
-              icon: Icon(
-                Icons.add_circle_outline,
-                color: seats < 6 ? (isDark ? Colors.white : Colors.black) : Colors.grey,
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-
   @override
   Widget build(BuildContext context) {
     final wayPointList = ref.watch(wayPointListNotifierProvider);
@@ -205,113 +158,211 @@ class _IntercityWaypointsInputSheetState extends ConsumerState<IntercityWaypoint
 
   Widget _buildDateTimeSelector(bool isDark) => Column(
     children: [
-      Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () async {
-                final date = await showDatePicker(
-                  context: context,
-                  initialDate: selectedDate ?? DateTime.now(),
-                  firstDate: DateTime.now(),
-                  lastDate: DateTime.now().add(const Duration(days: 30)),
-                );
-                if (date != null) setState(() => selectedDate = date);
-              },
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[900] : Colors.grey[100],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.calendar_today, color: Colors.blue, size: 20.sp),
-                    Gap(8.w),
-                    Text(
-                      selectedDate == null
-                          ? 'Select Date'
-                          : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
-                      style: TextStyle(color: isDark ? Colors.white : Colors.black, fontWeight: FontWeight.w500),
-                    ),
-                  ],
+      // Date Selector
+      GestureDetector(
+        onTap: () async {
+          final date = await showDatePicker(
+            context: context,
+            initialDate: selectedDate ?? DateTime.now(),
+            firstDate: DateTime.now(),
+            lastDate: DateTime.now().add(const Duration(days: 30)),
+          );
+          if (date != null) setState(() => selectedDate = date);
+        },
+        child: Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 12.w),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey[900] : Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.calendar_today, color: Colors.blue, size: 20.sp),
+              Gap(8.w),
+              Expanded(
+                child: Text(
+                  selectedDate == null ? 'Date' : '${selectedDate!.day}/${selectedDate!.month}/${selectedDate!.year}',
+                  style: TextStyle(
+                    color: isDark ? Colors.white : Colors.black,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 14.sp,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-            ),
+            ],
           ),
-        ],
+        ),
       ),
-      if (widget.bookingType == 'SHARE_POOL') ...[Gap(16.h), _buildSeatSelector(isDark)],
+      // Show seat selector only for share pooling
+      if (widget.bookingType == 'SHARE_POOL') ...[
+        Gap(12.h),
+        // Seat Selector
+        Container(
+          width: double.infinity,
+          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 4.h),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey[900] : Colors.grey[100],
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Seats',
+                style: TextStyle(
+                  fontSize: 14.sp,
+                  fontWeight: FontWeight.w500,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 32.w, minHeight: 32.h),
+                    onPressed: seats > 1 ? () => setState(() => seats--) : null,
+                    icon: Icon(
+                      Icons.remove_circle_outline,
+                      size: 20.sp,
+                      color: seats > 1 ? (isDark ? Colors.white : Colors.black) : Colors.grey,
+                    ),
+                  ),
+                  Text(
+                    '$seats',
+                    style: TextStyle(
+                      fontSize: 16.sp,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black,
+                    ),
+                  ),
+                  IconButton(
+                    padding: EdgeInsets.zero,
+                    constraints: BoxConstraints(minWidth: 32.w, minHeight: 32.h),
+                    onPressed: seats < 6 ? () => setState(() => seats++) : null,
+                    icon: Icon(
+                      Icons.add_circle_outline,
+                      size: 20.sp,
+                      color: seats < 6 ? (isDark ? Colors.white : Colors.black) : Colors.grey,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     ],
   );
 
   Widget _buildWaypointList(List<Waypoint> wayPointList, {required bool isDark}) {
     final selectedField = ref.watch(selectedLocTextFieldNotifierProvider);
     final fieldNotifier = ref.read(selectedLocTextFieldNotifierProvider.notifier);
-    final routePickNotifier = ref.read(pickRouteNotifierProvider.notifier);
     final wayPointNotifier = ref.read(wayPointListNotifierProvider.notifier);
 
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Column(
-          children: wayPointList
-              .mapIndexed(
-                (index, _) => Column(
-                  children: [
-                    IconDestination(isPickupPoint: index == 0, color: isDark ? Colors.white : null),
-                    if (index != wayPointList.length - 1)
-                      const DottedLine(
-                        direction: Axis.vertical,
-                        dashColor: ColorPalette.neutral90,
-                        lineThickness: 3,
-                        lineLength: 70,
-                      ),
-                  ],
-                ),
-              )
-              .toList(),
-        ),
-        Gap(6.w),
-        Expanded(
-          child: Column(
-            children: wayPointList
+    // Only show first 2 waypoints (pickup and destination)
+    final displayList = wayPointList.take(2).toList();
+
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+      decoration: BoxDecoration(
+        border: Border.all(color: isDark ? Colors.grey.shade800 : const Color(0xFFE0E0E0), width: 1),
+        borderRadius: BorderRadius.circular(8.r),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Icon column with dots and line
+          Column(
+            children: displayList
                 .mapIndexed(
-                  (index, e) => Padding(
-                    padding: const EdgeInsets.only(bottom: 16),
-                    child: LocationTextField(
-                      initialValue: e,
-                      isFocused: index == selectedField,
-                      borderColor: Colors.grey[300],
-                      textColor: Colors.black,
-                      onChanged: (value) {
-                        if (selectedField != index) {
-                          fieldNotifier.setSelectedLocation(index);
-                        }
-                        _onSearchChanged(value);
-                      },
-                      index: index,
-                      totalCount: wayPointList.length,
-                      onFocused: () => fieldNotifier.setSelectedLocation(index),
-                      onRemoveStop: () {},
-                      onMapPressed: (value, node) {
-                        node.unfocus();
-                        fieldNotifier.setSelectedLocation(index);
-                        routePickNotifier.setLocation(index: index);
-                        // NavigationService.pushNamed(AppRoutes.waypointPage);
-                      },
-                      onRemoved: (removed) {
-                        if (removed) {
-                          wayPointNotifier.removeWayPointByIndex(index: index);
-                        }
-                      },
-                    ),
+                  (index, _) => Column(
+                    children: [
+                      Container(
+                        width: 16.w,
+                        height: 16.h,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: index == 0
+                                ? const Color(0xFF34A853) // Green for pickup
+                                : const Color(0xFFEA4335), // Red for destination
+                            width: 2.5,
+                          ),
+                        ),
+                      ),
+                      if (index != displayList.length - 1)
+                        Container(
+                          width: 1,
+                          height: 40.h,
+                          margin: EdgeInsets.symmetric(vertical: 2.h),
+                          color: isDark ? Colors.grey.shade700 : const Color(0xFFBDBDBD),
+                        ),
+                    ],
                   ),
                 )
                 .toList(),
           ),
-        ),
-      ],
+          Gap(12.w),
+          // Text fields column
+          Expanded(
+            child: Column(
+              children: displayList
+                  .mapIndexed(
+                    (index, e) => Container(
+                      key: ValueKey('waypoint_${index}_${e.address}'),
+                      height: index == 0 ? 60.h : null, // Add height to first field for spacing
+                      alignment: Alignment.centerLeft,
+                      child: TextFormField(
+                        key: ValueKey('textfield_${index}_${e.address}'),
+                        initialValue: e.address,
+                        onChanged: (value) {
+                          if (selectedField != index) {
+                            fieldNotifier.setSelectedLocation(index);
+                          }
+                          _onSearchChanged(value);
+                        },
+                        onTap: () => fieldNotifier.setSelectedLocation(index),
+                        style: TextStyle(
+                          fontSize: 14.sp,
+                          fontWeight: FontWeight.w400,
+                          color: isDark ? Colors.white : const Color(0xFF212121),
+                        ),
+                        decoration: InputDecoration(
+                          hintText: index == 0 ? 'Pick-up Location' : 'Destination',
+                          hintStyle: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w400,
+                            color: isDark ? Colors.grey.shade600 : const Color(0xFF757575),
+                          ),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
+                          isDense: true,
+                          suffixIcon: e.address.isNotEmpty
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.cancel,
+                                    size: 20.sp,
+                                    color: isDark ? Colors.grey.shade600 : const Color(0xFF9E9E9E),
+                                  ),
+                                  onPressed: () {
+                                    wayPointNotifier.removeWayPointByIndex(index: index);
+                                  },
+                                )
+                              : null,
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

@@ -11,11 +11,12 @@ class ApiEndpoints {
   static const String updateProfilePhoto = '/api/v1/user/profile'; // Profile photo via profile update
   static const String riderDetails = '/api/v1/user/profile';
   static const String resendOTP = '/api/v1/auth/login/otp';
-  static const String forgotPassword = '/api/v1/auth/login'; // Forgot password flow
+  static const String forgotPassword = '/api/v1/auth/forgot-password'; // Send OTP to email
+  static const String verifyPasswordResetOtp = '/api/v1/auth/verify-password-reset-otp'; // Verify OTP
+  static const String resetPassword = '/api/v1/auth/reset-password'; // Reset password with OTP
   static const String logout = '/api/v1/auth/logout/user';
   static const String requestOTP = '/api/v1/auth/login/otp';
-  static const String forgetVerifyOtp = '/api/v1/auth/login/otp';
-  static const String resetPassword = '/api/v1/user/profile'; // Reset password via profile update
+  static const String forgetVerifyOtp = '/api/v1/auth/login/otp'; // Legacy endpoint
 
   // Ride endpoints - Spring Boot
   static const String rideServices = '/api/v1/services/fare-estimates'; // Fare estimation
@@ -28,8 +29,8 @@ class ApiEndpoints {
   static const String checkActiveTrip = '/api/v1/user'; // Use /api/v1/user/{userId}/rides/current
   static const String rideHistory = '/api/v1/user/rides/completed';
   static const String cancelledRideHistory = '/api/v1/user/rides/cancelled';
-  static const String cancelRide = '/api/v1/ride'; // Use /api/v1/ride/{rideId}/decline
-  static String cancelRideEndpoint(int rideId) => '/api/v1/ride/$rideId/decline';
+  static const String cancelRide = '/api/v1/ride'; // Use /api/v1/ride/{rideId}/cancel
+  static String cancelRideEndpoint(int rideId) => '/api/v1/ride/$rideId/cancel';
 
   // Chat endpoints - Spring Boot
   static const String sendMessage = '/api/chat/ride'; // Use /api/chat/ride/{rideId}/messages

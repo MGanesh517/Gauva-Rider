@@ -31,4 +31,6 @@ class AppRoutes {
   static const String privateBookingSuccess = '/private_booking_success';
   static const String intercitySelection = '/intercity_selection';
   static const String intercitySearchResults = '/intercity_search_results';
+  static const String forgotPassword = '/forgot-password';
+  static const String forgotPasswordVerifyOtp = '/forgot-password-verify-otp';
 }

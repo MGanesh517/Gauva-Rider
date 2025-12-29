@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,12 +19,6 @@ class _PrivateBookingSuccessPageState extends ConsumerState<PrivateBookingSucces
   @override
   void initState() {
     super.initState();
-    // Navigate to dashboard after 2 seconds
-    Timer(const Duration(seconds: 2), () {
-      if (mounted) {
-        NavigationService.pushNamedAndRemoveUntil(AppRoutes.dashboard);
-      }
-    });
   }
 
   @override
@@ -45,10 +38,10 @@ class _PrivateBookingSuccessPageState extends ConsumerState<PrivateBookingSucces
                 Container(
                   width: 120.w,
                   height: 120.h,
-                  decoration: BoxDecoration(
+                  decoration: const BoxDecoration(
                     shape: BoxShape.circle,
                     gradient: LinearGradient(
-                      colors: [const Color(0xFF1469B5), const Color(0xFF942FAF)],
+                      colors: [Color(0xFF1469B5), Color(0xFF942FAF)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -81,19 +74,40 @@ class _PrivateBookingSuccessPageState extends ConsumerState<PrivateBookingSucces
                   textAlign: TextAlign.center,
                 ),
                 Gap(48.h),
-                // Loading indicator
-                SizedBox(
-                  width: 24.w,
-                  height: 24.h,
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    valueColor: AlwaysStoppedAnimation<Color>(isDark ? Colors.white : Colors.black),
+                // Go to Home Button
+                Container(
+                  width: 200.w,
+                  height: 50.h,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF1469B5), Color(0xFF942FAF)],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                    borderRadius: BorderRadius.circular(12.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF1469B5).withOpacity(0.3),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                ),
-                Gap(8.h),
-                Text(
-                  'Redirecting to homepage...',
-                  style: TextStyle(fontSize: 12.sp, color: isDark ? Colors.grey[400] : Colors.grey[600]),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        NavigationService.pushNamedAndRemoveUntil(AppRoutes.dashboard);
+                      },
+                      borderRadius: BorderRadius.circular(12.r),
+                      child: Center(
+                        child: Text(
+                          'Go to Home',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16.sp),
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
               ],
             ),

@@ -9,6 +9,7 @@ import 'package:gauva_userapp/presentation/ride_history/views/ride_history_page.
 // import 'package:gauva_userapp/presentation/wallet/views/wallet_page.dart';
 import 'package:gauva_userapp/presentation/websocket/provider/websocket_provider.dart';
 import 'package:gauva_userapp/presentation/websocket/view_model/websocket_listener_notifier.dart';
+import 'package:gauva_userapp/core/services/in_app_update_service.dart';
 
 import '../../../core/utils/change_status_bar.dart';
 import '../../../core/utils/is_dark_mode.dart';
@@ -33,6 +34,8 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     Future.microtask(() => ref.read(selectedCountry.notifier));
     // Initialize WebSocket connection
     _initializeWebSocket();
+    // Check for app updates
+    _checkForUpdates();
   }
 
   Future<void> _initializeWebSocket() async {
@@ -40,10 +43,21 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
       await ref.read(websocketProvider.notifier).setupWebSocketListeners();
       // Start listening to WebSocket streams after connection
       Future.delayed(const Duration(seconds: 3), () {
-        ref.read(websocketListenerNotifierProvider.notifier).startListening();
+        // Check if widget is still mounted before accessing ref
+        if (mounted) {
+          ref.read(websocketListenerNotifierProvider.notifier).startListening();
+        }
       });
     } catch (e) {
       debugPrint('Failed to initialize WebSocket: $e');
+    }
+  }
+
+  Future<void> _checkForUpdates() async {
+    // Wait a bit before checking for updates to avoid blocking app startup
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) {
+      await InAppUpdateService.checkForUpdate(context);
     }
   }
 

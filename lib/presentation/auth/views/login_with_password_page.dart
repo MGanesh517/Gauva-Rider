@@ -6,11 +6,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:gauva_userapp/core/extensions/extensions.dart';
-import 'package:gauva_userapp/core/routes/app_routes.dart';
 import 'package:gauva_userapp/core/utils/exit_app_dialogue.dart';
 import 'package:gauva_userapp/core/utils/helpers.dart';
-import 'package:gauva_userapp/core/widgets/buttons/app_text_button.dart';
-import 'package:gauva_userapp/data/services/navigation_service.dart';
 import 'package:gauva_userapp/generated/l10n.dart';
 import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.dart';
 import 'package:gauva_userapp/presentation/auth/provider/auth_providers.dart';
@@ -92,31 +89,6 @@ class _LoginWithPasswordPageState extends ConsumerState<LoginWithPasswordPage> {
                 ),
               ),
             ),
-            // Gap(16.h),
-            // Consumer(
-            //   builder: (context, ref, _) {
-            //     final resentOTPNotifier = ref.read(resendOTPNotifierProvider.notifier);
-            //     final loginResponse = ref
-            //         .watch(loginNotifierProvider)
-            //         .maybeWhen(success: (data) => data, orElse: () => null);
-
-            //     return Center(
-            //       child: AppTextButton(
-            //         isDense: true,
-            //         text: AppLocalizations.of(context).use_otp_instead,
-            //         onPressed: () async {
-            //           await resentOTPNotifier.resendOtp(
-            //             mobile: loginResponse?.data?.mobile ?? '',
-            //             onSuccess: (d) {
-            //               NavigationService.pushNamed(AppRoutes.verifyOtp, arguments: d.data?.otp);
-            //             },
-            //           );
-            //         },
-            //         isDark: isDark(),
-            //       ),
-            //     );
-            //   },
-            // ),
           ],
         ),
       ),

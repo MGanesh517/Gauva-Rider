@@ -9,6 +9,34 @@ class OrderService implements IOrderService {
   final DioClient dioClient;
   OrderService({required this.dioClient});
 
+  /// Maps numeric service IDs to their string equivalents
+  /// 1 = BIKE, 2 = CAR, 3 = AUTO, 4 = PREMIUM
+  String _getServiceTypeString(dynamic serviceType) {
+    // If already a string, return as-is
+    if (serviceType is String) {
+      return serviceType;
+    }
+
+    // If numeric, map to string
+    if (serviceType is int || serviceType is num) {
+      switch (serviceType) {
+        case 1:
+          return 'BIKE';
+        case 2:
+          return 'CAR';
+        case 3:
+          return 'AUTO';
+        case 4:
+          return 'PREMIUM';
+        default:
+          return 'BIKE'; // Default fallback
+      }
+    }
+
+    // Fallback
+    return 'BIKE';
+  }
+
   @override
   Future<Response> createOrder({required Map<String, dynamic> data}) async {
     // Spring Boot: /api/v1/ride/request expects RideRequest
@@ -16,6 +44,10 @@ class OrderService implements IOrderService {
     final pickupLocation = data['pickup_location'] as List<dynamic>? ?? [];
     final dropLocation = data['drop_location'] as List<dynamic>? ?? [];
     final waitLocation = data['wait_location'] as List<dynamic>? ?? [];
+
+    // Get service type and ensure it's a string
+    final serviceTypeRaw = data['service_id'] ?? data['serviceId'];
+    final serviceTypeString = _getServiceTypeString(serviceTypeRaw);
 
     final rideRequest = {
       'pickupArea': data['pickup_area'] ?? data['pickupArea'] ?? data['pickup_address'] ?? '',
@@ -32,7 +64,7 @@ class OrderService implements IOrderService {
       'destinationLongitude': dropLocation.length > 1
           ? dropLocation[1]
           : (data['destination_longitude'] ?? data['destinationLongitude'] ?? 0),
-      'serviceType': data['service_id'] ?? data['serviceId'],
+      'serviceType': serviceTypeString,
       'couponCode': data['coupon_code'] ?? data['couponCode'] ?? '',
       'serviceOptionIds': data['service_option_ids'] ?? data['serviceOptionIds'] ?? [],
       if (waitLocation.isNotEmpty) ...{
