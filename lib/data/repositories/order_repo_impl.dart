@@ -4,6 +4,7 @@ import 'package:gauva_userapp/core/errors/failure.dart';
 import 'package:gauva_userapp/data/models/create_order_response/create_order_response.dart';
 import 'package:gauva_userapp/data/models/order_response/order_detail/order_detail_model.dart';
 import 'package:gauva_userapp/data/models/order_response/tip_model/trip_model.dart';
+import 'package:gauva_userapp/data/models/intercity_ride_history_model/intercity_ride_history_model.dart';
 import 'package:gauva_userapp/data/repositories/interfaces/order_repo_interface.dart';
 
 import '../../domain/interfaces/order_service_interface.dart';
@@ -120,34 +121,24 @@ class OrderRepoImpl extends BaseRepository implements IOrderRepo {
     final response = await orderService.orderDetails(orderId: orderId);
     debugPrint('📥 ORDER DETAILS Response: ${response.data}');
     debugPrint('📥 ORDER DETAILS Response Type: ${response.data.runtimeType}');
-    
+
     try {
       dynamic responseData = response.data;
-      
+
       // Handle case where response is the order object directly
       if (responseData is Map && responseData.containsKey('id') && !responseData.containsKey('data')) {
         debugPrint('📦 ORDER DETAILS - Response is order object directly, wrapping...');
         final orderMap = Map<String, dynamic>.from(responseData);
-        responseData = <String, dynamic>{
-          'success': true,
-          'message': 'Order details retrieved',
-          'data': orderMap,
-        };
+        responseData = <String, dynamic>{'success': true, 'message': 'Order details retrieved', 'data': orderMap};
       }
       // Handle case where response is an array (shouldn't happen, but handle it)
       else if (responseData is List && responseData.isNotEmpty) {
         debugPrint('📦 ORDER DETAILS - Response is array, extracting first element...');
         final firstElement = responseData[0];
-        final orderMap = firstElement is Map 
-            ? Map<String, dynamic>.from(firstElement)
-            : firstElement;
-        responseData = <String, dynamic>{
-          'success': true,
-          'message': 'Order details retrieved',
-          'data': orderMap,
-        };
+        final orderMap = firstElement is Map ? Map<String, dynamic>.from(firstElement) : firstElement;
+        responseData = <String, dynamic>{'success': true, 'message': 'Order details retrieved', 'data': orderMap};
       }
-      
+
       final result = OrderDetailModel.fromJson(responseData);
       debugPrint('✅ ORDER DETAILS - Parsed successfully');
       debugPrint('✅ Order ID: ${result.data?.id}');
@@ -207,4 +198,23 @@ class OrderRepoImpl extends BaseRepository implements IOrderRepo {
       return TripModel(message: 'No active trips', data: null);
     }
   });
+  @override
+  Future<Either<Failure, List<IntercityRideHistoryModel>>> getIntercityRideHistory() async =>
+      await safeApiCall(() async {
+        debugPrint('🔍 GET INTERCITY HISTORY');
+        final response = await orderService.getIntercityRideHistory();
+        debugPrint('📥 GET INTERCITY HISTORY Response: ${response.data}');
+
+        try {
+          if (response.data is List) {
+            final list = (response.data as List).map((e) => IntercityRideHistoryModel.fromJson(e)).toList();
+            return list;
+          } else {
+            return [];
+          }
+        } catch (e) {
+          debugPrint('🔴 GET INTERCITY HISTORY - Parsing error: $e');
+          rethrow;
+        }
+      });
 }

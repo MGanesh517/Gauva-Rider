@@ -40,7 +40,7 @@ abstract class IAuthRepo {
   Future<Either<Failure, CommonResponse>> changePassword({
     required String currentPassword,
     required String newPassword,
-    required newConfirmPassword,
+    required String newConfirmPassword,
   });
   Future<Either<Failure, RiderDetailsResponse>> riderDetails();
   Future<Either<Failure, RequestOtpResponse>> requestOTP({required String mobile});
@@ -60,4 +60,5 @@ abstract class IAuthRepo {
     String? phone,
     String? deviceToken,
   });
+  Future<Either<Failure, CommonResponse>> submitFcmToken({required String fcmToken});
 }

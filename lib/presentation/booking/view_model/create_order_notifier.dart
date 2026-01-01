@@ -54,13 +54,18 @@ class CreateOrderNotifier extends StateNotifier<AppState<Order>> {
     );
   }
 
-  Future<void> orderDetailsForCancelRide({required int orderId}) async {
+  Future<void> fetchOrderDetails({required int orderId}) async {
     state = const AppState.loading();
     final result = await orderRepo.orderDetails(orderId: orderId);
 
     result.fold((failure) => state = AppState.error(failure), (data) async {
       state = AppState.success(data.data!);
     });
+  }
+
+  // Deprecated: Use fetchOrderDetails instead
+  Future<void> orderDetailsForCancelRide({required int orderId}) async {
+    await fetchOrderDetails(orderId: orderId);
   }
 
   Future<void> setOrderData(Order order) async {

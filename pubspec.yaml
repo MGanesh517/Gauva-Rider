@@ -134,9 +134,7 @@ flutter:
     - assets/lottie/
     - assets/svg/
     - assets/
-    - assets/notification.mp3
-    - assets/notification2.mp3
-    - assets/gauva.mp4
+
 
   fonts:
     - family: GeneralSans

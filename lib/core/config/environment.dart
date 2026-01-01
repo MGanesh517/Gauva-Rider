@@ -18,7 +18,7 @@ class Environment {
   // Google OAuth Web Client ID (client_type: 3 - Web Application)
   static const String GOOGLE_WEB_CLIENT_ID = '798219755346-ocqss3oc88fhrjtk0j8rem397ihjeabd.apps.googleusercontent.com';
 
-  static const EnvironmentType currentEnvironment = EnvironmentType.prod;
+  static const EnvironmentType currentEnvironment = EnvironmentType.dev;
 
   static String? _overrideApiUrl;
 

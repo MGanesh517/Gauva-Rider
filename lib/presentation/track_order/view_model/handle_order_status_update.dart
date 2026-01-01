@@ -51,7 +51,7 @@ void handleOrderStatusUpdate({
   Future<void> setMarkerPolylines() async {
     final notifier = ref.read(createOrderNotifierProvider.notifier);
     final orderState = ref.read(createOrderNotifierProvider);
-    
+
     orderState.whenOrNull(
       success: (data) async {
         debugPrint('🗺️ Setting up map markers and polylines for order: ${data.id}');
@@ -60,7 +60,7 @@ void handleOrderStatusUpdate({
         debugPrint('🚗 Driver: ${data.driver?.name}');
         debugPrint('📏 Distance: ${data.distance}');
         debugPrint('⏱️ Duration: ${data.duration}');
-        
+
         // Check if we have valid points for waypoints
         if (data.points?.pickupLocation != null && data.points?.dropLocation != null) {
           final List<Waypoint> waypoints = notifier.constructWaypoints(data);
@@ -86,26 +86,28 @@ void handleOrderStatusUpdate({
     case 'accepted':
       debugPrint('✅ Status: ACCEPTED - Driver accepted ride');
 
-      if (fromPusher) {
-        // Fetch order details and then set up map
-        debugPrint('📥 Fetching order details for order ID: $orderId');
-        ref.read(createOrderNotifierProvider.notifier).orderDetailsForCancelRide(orderId: orderId ?? 0).then((_) {
-          debugPrint('✅ Order details fetched, setting up map...');
-          // Wait a bit for state to update, then set up map
-          Future.delayed(const Duration(milliseconds: 300), () {
-            setMarkerPolylines();
-            // Wait a bit more before updating map to ensure waypoints are set
-            Future.delayed(const Duration(milliseconds: 200), () {
-              mapStateNotifier.updateForAccepted();
+      // Always fetch fresh order details to get driver info
+      debugPrint('📥 Fetching order details for order ID: $orderId');
+      ref
+          .read(createOrderNotifierProvider.notifier)
+          .orderDetailsForCancelRide(orderId: orderId ?? 0)
+          .then((_) {
+            debugPrint('✅ Order details fetched, setting up map...');
+            // Wait a bit for state to update, then set up map
+            Future.delayed(const Duration(milliseconds: 300), () {
+              setMarkerPolylines();
+              // Wait a bit more before updating map to ensure waypoints are set
+              Future.delayed(const Duration(milliseconds: 200), () {
+                mapStateNotifier.updateForAccepted();
+              });
             });
+          })
+          .catchError((error) {
+            debugPrint('❌ Error fetching order details: $error');
           });
-        }).catchError((error) {
-          debugPrint('❌ Error fetching order details: $error');
-        });
+
+      if (fromPusher) {
         ref.read(trackOrderNotifierProvider.notifier).goToInProgress();
-      } else {
-        setMarkerPolylines();
-        mapStateNotifier.updateForAccepted();
       }
       orderNotifier.goToOrderAccept();
       break;

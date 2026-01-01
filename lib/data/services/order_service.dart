@@ -132,4 +132,10 @@ class OrderService implements IOrderService {
       );
     }
   }
+
+  @override
+  Future<Response> getIntercityRideHistory() async {
+    final response = await dioClient.dio.get(ApiEndpoints.intercityRideHistory);
+    return response;
+  }
 }

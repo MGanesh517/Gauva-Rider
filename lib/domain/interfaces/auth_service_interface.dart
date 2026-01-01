@@ -14,7 +14,7 @@ abstract class IAuthService {
   Future<Response> changePassword({
     required String currentPassword,
     required String newPassword,
-    required newConfirmPassword,
+    required String newConfirmPassword,
   });
   Future<Response> updateProfile({required Map<String, dynamic> data});
   Future<Response> resendOTP({required String mobile});
@@ -38,4 +38,5 @@ abstract class IAuthService {
     String? phone,
     String? deviceToken,
   });
+  Future<Response> submitFcmToken({required String fcmToken});
 }

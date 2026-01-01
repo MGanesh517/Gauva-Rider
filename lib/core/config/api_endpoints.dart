@@ -18,12 +18,19 @@ class ApiEndpoints {
   static const String requestOTP = '/api/v1/auth/login/otp';
   static const String forgetVerifyOtp = '/api/v1/auth/login/otp'; // Legacy endpoint
 
+  // Notification endpoints - Spring Boot
+  static const String submitFcmToken = '/api/notifications/token'; // Submit FCM token
+
   // Ride endpoints - Spring Boot
   static const String rideServices = '/api/v1/services/fare-estimates'; // Fare estimation
   static const String availableServicesForRoute = '/api/v1/services/available-for-route'; // Available services for route
   static const String servicesHome = '/api/v1/services'; // Services list
   static const String getDrivers = '/api/customer/drivers-near-me';
-  static const String applyCoupon = '/api/promotions/coupons/apply';
+  static const String getAvailableCoupons = '/api/v1/coupons/available';
+  static const String checkCoupon = '/api/v1/coupons/check'; // append /{code}
+  static const String validateCoupon = '/api/v1/coupons/validate';
+  static const String applyCoupon = '/api/v1/coupons/apply';
+  static const String myRedemptions = '/api/v1/coupons/my-redemptions';
   static const String createOrder = '/api/v1/ride/request';
   static const String orderDetails = '/api/v1/ride'; // Use /api/v1/ride/{rideId}
   static const String checkActiveTrip = '/api/v1/user'; // Use /api/v1/user/{userId}/rides/current
@@ -77,4 +84,5 @@ class ApiEndpoints {
   static const String intercitySearch = '/api/customer/intercity/search'; // Intercity search
   static const String intercityDrivers = '/api/customer/intercity/drivers'; // Fetch drivers for vehicle type
   static const String intercityBooking = '/api/customer/intercity/bookings'; // Intercity booking
+  static const String intercityRideHistory = '/api/driver/intercity/trips/history';
 }

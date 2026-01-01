@@ -117,7 +117,7 @@ class AuthService implements IAuthService {
   Future<Response> changePassword({
     required String currentPassword,
     required String newPassword,
-    required newConfirmPassword,
+    required String newConfirmPassword,
   }) async {
     // Spring Boot: Change password via profile update
     return await dioClient.dio.post(
@@ -337,5 +337,16 @@ class AuthService implements IAuthService {
     debugPrint('');
 
     return response;
+  }
+
+  @override
+  Future<Response> submitFcmToken({required String fcmToken}) async {
+    // Submit FCM token to backend for push notifications
+    final token = await LocalStorageService().getToken();
+    return await dioClient.dio.post(
+      ApiEndpoints.submitFcmToken,
+      data: {'token': fcmToken},
+      options: Options(headers: {'Authorization': 'Bearer $token'}),
+    );
   }
 }

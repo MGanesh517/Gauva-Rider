@@ -7,6 +7,9 @@ import '../../../data/repositories/ride_history_repo_impl.dart';
 import '../../../data/services/ride_history_service.dart';
 import '../../../domain/interfaces/ride_history_service_interface.dart';
 import '../../auth/provider/auth_providers.dart';
+import '../../booking/provider/order_providers.dart';
+import '../../../data/models/intercity_ride_history_model/intercity_ride_history_model.dart';
+import '../view_model/intercity_ride_history_notifier.dart';
 import '../view_model/ride_history_notifier.dart';
 
 // RideService Provider (depends on Dio)
@@ -22,3 +25,8 @@ final rideHistoryRepoProvider = Provider<IRideHistoryRepo>(
 final rideHistoryProvider = StateNotifierProvider<RideHistoryNotifier, AppState<List<RideHistoryItem>>>(
   (ref) => RideHistoryNotifier(ref, ref.read(rideHistoryRepoProvider)),
 );
+
+final intercityRideHistoryProvider =
+    StateNotifierProvider<IntercityRideHistoryNotifier, AppState<List<IntercityRideHistoryModel>>>(
+      (ref) => IntercityRideHistoryNotifier(ref.read(orderRepoProvider)),
+    );

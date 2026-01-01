@@ -216,7 +216,7 @@ class _VerifyOtpPageState extends ConsumerState<VerifyOtpPage> {
         title: '${AppLocalizations().confirm} OTP',
         onTap: () {
           final mobile = loginResponse?.data?.mobile ?? '';
-          // verifyNotifier.verifyOtp(mobile: mobile, otp: otpController.text.trim());
+          verifyNotifier.verifyOtp(mobile: mobile, otp: otpController.text.trim());
         },
       );
     },

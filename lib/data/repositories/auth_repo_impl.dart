@@ -113,7 +113,7 @@ class AuthRepoImpl extends BaseRepository implements IAuthRepo {
   Future<Either<Failure, CommonResponse>> changePassword({
     required String currentPassword,
     required String newPassword,
-    required newConfirmPassword,
+    required String newConfirmPassword,
   }) async => await safeApiCall(() async {
     final response = await _authService.changePassword(
       currentPassword: currentPassword,
@@ -320,5 +320,10 @@ class AuthRepoImpl extends BaseRepository implements IAuthRepo {
       debugPrint('');
       rethrow;
     }
+  });
+  @override
+  Future<Either<Failure, CommonResponse>> submitFcmToken({required String fcmToken}) async => safeApiCall(() async {
+    final response = await _authService.submitFcmToken(fcmToken: fcmToken);
+    return CommonResponse.fromMap(response.data);
   });
 }

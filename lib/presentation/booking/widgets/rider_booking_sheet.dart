@@ -10,6 +10,8 @@ import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.
 import 'package:gauva_userapp/presentation/booking/provider/order_providers.dart';
 import 'package:gauva_userapp/presentation/dashboard/viewmodel/car_type_notifier.dart';
 
+import 'package:gauva_userapp/data/models/coupon_model/coupon_model.dart';
+import 'package:gauva_userapp/presentation/booking/views/coupon_list_screen.dart';
 import '../../../core/utils/helpers.dart';
 import '../provider/ride_services_providers.dart';
 import '../provider/selection_providers.dart';
@@ -97,6 +99,57 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
                       children: [_buildServiceList(context, riderServiceState, ref, isDark)],
                     ),
                   ),
+                ),
+              ),
+              // Coupon Section
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16.w),
+                child: Consumer(
+                  builder: (context, ref, _) {
+                    final selectedCoupon = ref.watch(rideServiceFilterNotiferProvider).couponCode;
+
+                    return InkWell(
+                      onTap: () async {
+                        final result = await Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const CouponListScreen()),
+                        );
+
+                        if (result != null && result is CouponModel) {
+                          ref.read(rideServiceFilterNotiferProvider.notifier).updateCouponCode(result.code);
+                          // Optionally apply coupon logic here or in order creation
+                          showNotification(message: "Coupon ${result.code} selected!", isSuccess: true);
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(vertical: 12.h),
+                        decoration: BoxDecoration(
+                          border: Border(top: BorderSide(color: Colors.grey[200]!)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Ionicons.pricetag_outline, color: Color(0xFF1469B5)),
+                            Gap(12.w),
+                            Expanded(
+                              child: Text(
+                                selectedCoupon != null && selectedCoupon.isNotEmpty
+                                    ? "Coupon Applied: $selectedCoupon"
+                                    : "Apply Coupon",
+                                style: TextStyle(
+                                  fontSize: 14.sp,
+                                  fontWeight: FontWeight.w500,
+                                  color: selectedCoupon != null && selectedCoupon.isNotEmpty
+                                      ? const Color(0xFF1469B5)
+                                      : Colors.black,
+                                ),
+                              ),
+                            ),
+                            const Icon(Icons.chevron_right, color: Colors.grey),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
               // Fixed Bottom Button Bar - always at bottom

@@ -125,10 +125,25 @@ class LoginWithPassNotifier extends StateNotifier<AppState<LoginWithPasswordResp
         }
         await LocalStorageService().saveUser(user: data.data?.user?.toJson() ?? {});
         LocalStorageService().setRegistrationProgress(AppRoutes.dashboard);
+
+        // Submit FCM token silently (don't block navigation)
+        _submitFcmTokenSilently(deviceToken);
+
         ref.read(tripActivityNotifierProvider.notifier).checkTripActivity();
         state = AppState.success(data);
       },
     );
+  }
+
+  void _submitFcmTokenSilently(String? fcmToken) {
+    if (fcmToken != null && fcmToken.isNotEmpty) {
+      authRepo.submitFcmToken(fcmToken: fcmToken).then((result) {
+        result.fold(
+          (failure) => debugPrint('⚠️ FCM Token submission failed: ${failure.message}'),
+          (success) => debugPrint('✅ FCM Token submitted successfully'),
+        );
+      });
+    }
   }
 
   void resetStateAfterDelay() {
@@ -234,11 +249,16 @@ class OtpVerifyNotifier extends StateNotifier<AppState<OtpVerifyResponse>> {
             await LocalStorageService().saveRefreshToken(refreshToken);
           }
           await LocalStorageService().saveUser(user: verifyResponse.data?.user?.toJson() ?? {});
+
+          // Submit FCM token silently (don't block navigation)
+          _submitFcmTokenSilently(deviceToken);
+
           if (loginResponse?.data?.isNewRider == true) {
             LocalStorageService().setRegistrationProgress(AppRoutes.setPassword);
             NavigationService.pushNamed(AppRoutes.setPassword);
           } else {
             LocalStorageService().setRegistrationProgress(AppRoutes.dashboard);
+            NavigationService.pushNamedAndRemoveUntil(AppRoutes.dashboard);
             ref.read(tripActivityNotifierProvider.notifier).checkTripActivity();
           }
         }
@@ -247,6 +267,17 @@ class OtpVerifyNotifier extends StateNotifier<AppState<OtpVerifyResponse>> {
         resetStateAfterDelay();
       },
     ); //
+  }
+
+  void _submitFcmTokenSilently(String? fcmToken) {
+    if (fcmToken != null && fcmToken.isNotEmpty) {
+      authRepo.submitFcmToken(fcmToken: fcmToken).then((result) {
+        result.fold(
+          (failure) => debugPrint('⚠️ FCM Token submission failed: ${failure.message}'),
+          (success) => debugPrint('✅ FCM Token submitted successfully'),
+        );
+      });
+    }
   }
 
   void resetStateAfterDelay() {
@@ -488,6 +519,10 @@ class SignupNotifier extends StateNotifier<AppState<OtpVerifyResponse>> {
           await LocalStorageService().saveUser(user: signupResponse.data?.user?.toJson() ?? {});
           LocalStorageService().savePhoneCode(countryCode);
 
+          // Submit FCM token silently (don't block navigation)
+          final fcmToken = await deviceTokenFirebase();
+          _submitFcmTokenSilently(fcmToken);
+
           // Navigate to dashboard or appropriate screen after successful signup
           LocalStorageService().setRegistrationProgress(AppRoutes.dashboard);
           ref.read(tripActivityNotifierProvider.notifier).checkTripActivity();
@@ -519,6 +554,17 @@ class SignupNotifier extends StateNotifier<AppState<OtpVerifyResponse>> {
     Future.delayed(Duration.zero, () {
       state = const AppState.initial();
     });
+  }
+
+  void _submitFcmTokenSilently(String? fcmToken) {
+    if (fcmToken != null && fcmToken.isNotEmpty) {
+      authRepo.submitFcmToken(fcmToken: fcmToken).then((result) {
+        result.fold(
+          (failure) => debugPrint('⚠️ FCM Token submission failed: ${failure.message}'),
+          (success) => debugPrint('✅ FCM Token submitted successfully'),
+        );
+      });
+    }
   }
 }
 
@@ -634,6 +680,10 @@ class GoogleSignInNotifier extends StateNotifier<AppState<LoginWithPasswordRespo
         debugPrint('   👤 User Name: ${data.data?.user?.name}');
         debugPrint('   📧 User Email: ${data.data?.user?.email}');
 
+        // Submit FCM token silently (don't block navigation)
+        debugPrint('📱 Step 7.5: Submitting FCM token...');
+        _submitFcmTokenSilently(deviceToken);
+
         debugPrint('📱 Step 8: Setting registration progress...');
         LocalStorageService().setRegistrationProgress(AppRoutes.dashboard);
         debugPrint('   ✅ Registration progress set to dashboard');
@@ -668,5 +718,16 @@ class GoogleSignInNotifier extends StateNotifier<AppState<LoginWithPasswordRespo
     Future.delayed(Duration.zero, () {
       state = const AppState.initial();
     });
+  }
+
+  void _submitFcmTokenSilently(String? fcmToken) {
+    if (fcmToken != null && fcmToken.isNotEmpty) {
+      authRepo.submitFcmToken(fcmToken: fcmToken).then((result) {
+        result.fold(
+          (failure) => debugPrint('⚠️ FCM Token submission failed: ${failure.message}'),
+          (success) => debugPrint('✅ FCM Token submitted successfully'),
+        );
+      });
+    }
   }
 }
