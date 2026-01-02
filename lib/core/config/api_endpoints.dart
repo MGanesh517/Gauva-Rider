@@ -21,8 +21,17 @@ class ApiEndpoints {
   // Notification endpoints - Spring Boot
   static const String submitFcmToken = '/api/notifications/token'; // Submit FCM token
 
+  // User Wallet Endpoints
+  static const String userWalletBalance = '/api/v1/user/wallet/balance';
+  static const String userWalletTransactions = '/api/v1/user/wallet/transactions';
+
+  // Driver Wallet Endpoints
+  static const String driverWalletBalance = '/api/v1/driver/wallet/balance';
+  static const String driverWalletTransactions = '/api/v1/driver/wallet/transactions';
+
   // Ride endpoints - Spring Boot
-  static const String rideServices = '/api/v1/services/fare-estimates'; // Fare estimation
+  // static const String rideServices = '/api/v1/services/fare-estimates'; // Fare estimation
+  static const String rideServices = '/api/v1/services/available-for-route'; // Fare estimation
   static const String availableServicesForRoute = '/api/v1/services/available-for-route'; // Available services for route
   static const String servicesHome = '/api/v1/services'; // Services list
   static const String getDrivers = '/api/customer/drivers-near-me';
@@ -34,7 +43,7 @@ class ApiEndpoints {
   static const String createOrder = '/api/v1/ride/request';
   static const String orderDetails = '/api/v1/ride'; // Use /api/v1/ride/{rideId}
   static const String checkActiveTrip = '/api/v1/user'; // Use /api/v1/user/{userId}/rides/current
-  static const String rideHistory = '/api/v1/user/rides/completed';
+  static const String rideHistory = '/api/v1/ride/user/history';
   static const String cancelledRideHistory = '/api/v1/user/rides/cancelled';
   static const String cancelRide = '/api/v1/ride'; // Use /api/v1/ride/{rideId}/cancel
   static String cancelRideEndpoint(int rideId) => '/api/v1/ride/$rideId/cancel';

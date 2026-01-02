@@ -26,7 +26,7 @@ class RideHistoryRepoImpl extends BaseRepository implements IRideHistoryRepo {
             return <RideHistoryItem>[];
           }
 
-          // Handle array with data (Spring Boot returns array directly)
+          // Handle array with data (Spring Boot returns array directly or Page object)
           if (response.data is List) {
             debugPrint('📦 GET RIDE HISTORY - Array response with ${(response.data as List).length} items');
             final rides = (response.data as List)
@@ -34,6 +34,16 @@ class RideHistoryRepoImpl extends BaseRepository implements IRideHistoryRepo {
                 .toList();
             debugPrint('✅ GET RIDE HISTORY - Parsed ${rides.length} rides successfully');
             return rides;
+          } else if (response.data is Map<String, dynamic>) {
+            // Handle Page object
+            final data = response.data as Map<String, dynamic>;
+            if (data.containsKey('content') && data['content'] is List) {
+              debugPrint('📦 GET RIDE HISTORY - Page response with ${(data['content'] as List).length} items');
+              final rides = (data['content'] as List)
+                  .map((item) => RideHistoryItem.fromJson(item as Map<String, dynamic>))
+                  .toList();
+              return rides;
+            }
           }
 
           // Handle unexpected format

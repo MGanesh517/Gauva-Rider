@@ -334,6 +334,8 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
 
         await ref.read(rideServicesNotifierProvider.notifier).getRideServices(riderServiceFilter: riderService);
 
+        if (!mounted) return;
+
         ref.read(bookingNotifierProvider.notifier).resetState();
         ref.read(createOrderNotifierProvider.notifier).reset();
         ref.read(orderInProgressNotifier.notifier).resetState();
@@ -342,6 +344,8 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
         ref.read(bookingNotifierProvider.notifier).selectVehicle();
 
         await ref.read(routeNotifierProvider.notifier).fetchRoutes();
+
+        if (!mounted) return;
 
         ref
             .read(rideServicesNotifierProvider)

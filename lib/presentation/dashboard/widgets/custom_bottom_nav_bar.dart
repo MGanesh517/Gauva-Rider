@@ -27,9 +27,9 @@ class CustomBottomNavBar extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           _buildNavItem(0, AppLocalizations.of(context).home, Assets.icons.home, isDark),
-          // _buildNavItem(1, AppLocalizations.of(context).wallet, Assets.icons.wallet, isDark),
-          _buildNavItem(1, AppLocalizations.of(context).activity, Assets.icons.activity, isDark),
-          _buildNavItem(2, AppLocalizations.of(context).account, Assets.icons.account, isDark),
+          _buildNavItem(1, AppLocalizations.of(context).wallet, Assets.icons.wallet, isDark),
+          _buildNavItem(2, AppLocalizations.of(context).activity, Assets.icons.activity, isDark),
+          _buildNavItem(3, AppLocalizations.of(context).account, Assets.icons.account, isDark),
         ],
       ),
     );

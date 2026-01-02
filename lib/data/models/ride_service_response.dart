@@ -1,8 +1,5 @@
 class RideServiceResponse {
-  RideServiceResponse({
-    this.message,
-    this.data,
-    this.total,});
+  RideServiceResponse({this.message, this.data, this.total});
 
   RideServiceResponse.fromJson(dynamic json) {
     // Handle if json is a Map
@@ -10,7 +7,14 @@ class RideServiceResponse {
       message = json['message'];
       total = json['total'];
       // Handle new API format: {total: X, services: [...]}
-      if (json['services'] != null && json['data'] == null) {
+      // Handle new API format with servicesWithFares
+      if (json['servicesWithFares'] != null && json['data'] == null) {
+        data = Data.fromJson({
+          'services': json['servicesWithFares'],
+          'distance': json['routeDistanceKm']?.toString(),
+          'duration': json['eta'],
+        });
+      } else if (json['services'] != null && json['data'] == null) {
         // New format: services at root level
         data = Data.fromJson({'services': json['services']});
       } else {
@@ -27,13 +31,8 @@ class RideServiceResponse {
   String? message;
   Data? data;
   num? total;
-  RideServiceResponse copyWith({  String? message,
-    Data? data,
-    num? total,
-  }) => RideServiceResponse(  message: message ?? this.message,
-    data: data ?? this.data,
-    total: total ?? this.total,
-  );
+  RideServiceResponse copyWith({String? message, Data? data, num? total}) =>
+      RideServiceResponse(message: message ?? this.message, data: data ?? this.data, total: total ?? this.total);
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
     map['message'] = message;
@@ -43,14 +42,10 @@ class RideServiceResponse {
     }
     return map;
   }
-
 }
 
 class Data {
-  Data({
-    this.servicesList,
-    this.distance,
-    this.duration,});
+  Data({this.servicesList, this.distance, this.duration});
 
   Data.fromJson(dynamic json) {
     if (json['services'] != null) {
@@ -65,10 +60,8 @@ class Data {
   List<Services>? servicesList;
   String? distance;
   String? duration;
-  Data copyWith({  List<Services>? services,
-    String? distance,
-    String? duration,
-  }) => Data(  servicesList: services ?? servicesList,
+  Data copyWith({List<Services>? services, String? distance, String? duration}) => Data(
+    servicesList: services ?? servicesList,
     distance: distance ?? this.distance,
     duration: duration ?? this.duration,
   );
@@ -81,7 +74,6 @@ class Data {
     map['duration'] = duration;
     return map;
   }
-
 }
 
 class Services {
@@ -115,9 +107,21 @@ class Services {
     this.costAfterCoupon,
     this.isCouponApplicable,
     this.additionalFee,
-    this.totalFare,});
+    this.totalFare,
+  });
 
-  Services.fromJson(dynamic json) {
+  Services.fromJson(dynamic jsonInput) {
+    // Handle nested structure: { "service": {...}, "fareEstimate": {...} }
+    Map<String, dynamic> json;
+    Map<String, dynamic>? fareJson;
+
+    if (jsonInput['service'] != null && jsonInput['service'] is Map) {
+      json = jsonInput['service'];
+      fareJson = jsonInput['fareEstimate'];
+    } else {
+      json = jsonInput;
+    }
+
     // New API fields
     id = json['id'];
     serviceId = json['serviceId'];
@@ -131,7 +135,9 @@ class Services {
     isActive = json['isActive'];
     vehicleType = json['vehicleType'];
     estimatedArrival = json['estimatedArrival'];
-    baseFare = json['baseFare'];
+    baseFare = fareJson != null ? fareJson['baseFare'] : json['baseFare'];
+
+    // Some fields might be in service or fareEstimate
     perKmRate = json['perKmRate'];
     perMinRate = json['perMinRate'];
     minimumFare = json['minimumFare'];
@@ -140,17 +146,25 @@ class Services {
     maxWaitTime = json['maxWaitTime'];
     category = json['category'];
     isIntercity = json['isIntercity'];
+
     // Legacy fields (for backward compatibility)
     logo = json['logo'] ?? json['iconUrl'];
     personCapacity = json['person_capacity'] ?? json['capacity'];
     minimumFee = json['minimum_fee'] ?? json['minimumFare'];
     serviceFare = json['service_fare'] ?? json['total'];
-    // costAfterCoupon can come from multiple fields: finalTotal (new API), cost_after_coupon (old), or costAfterCoupon (transformed)
-    costAfterCoupon = json['costAfterCoupon'] ?? json['finalTotal'] ?? json['cost_after_coupon'];
+
+    // costAfterCoupon
+    costAfterCoupon = fareJson != null
+        ? (fareJson['finalTotal'] ?? fareJson['total'])
+        : (json['costAfterCoupon'] ?? json['finalTotal'] ?? json['cost_after_coupon']);
+
     isCouponApplicable = json['is_coupon_applicable'] ?? (json['appliedCoupon'] != null);
     additionalFee = json['additional_fee'];
-    // totalFare can come from multiple fields: finalTotal (new API), total_fare (old), or totalFare (transformed)
-    totalFare = json['totalFare'] ?? json['finalTotal'] ?? json['total'] ?? json['total_fare'];
+
+    // totalFare
+    totalFare = fareJson != null
+        ? (fareJson['finalTotal'] ?? fareJson['total'])
+        : (json['totalFare'] ?? json['finalTotal'] ?? json['total'] ?? json['total_fare']);
   }
   num? id;
   String? serviceId;
@@ -182,14 +196,15 @@ class Services {
   bool? isCouponApplicable;
   num? additionalFee;
   num? totalFare;
-  
+
   // Getter for display name (prefer displayName, fallback to name)
   String get displayNameOrName => displayName ?? name ?? '';
-  
+
   // Getter for icon (prefer icon emoji, fallback to iconUrl)
   String? get iconDisplay => icon ?? iconUrl;
-  
-  Services copyWith({  num? id,
+
+  Services copyWith({
+    num? id,
     String? serviceId,
     String? name,
     String? displayName,
@@ -218,7 +233,8 @@ class Services {
     bool? isCouponApplicable,
     num? additionalFee,
     num? totalFare,
-  }) => Services(  id: id ?? this.id,
+  }) => Services(
+    id: id ?? this.id,
     serviceId: serviceId ?? this.serviceId,
     name: name ?? this.name,
     displayName: displayName ?? this.displayName,
@@ -273,5 +289,4 @@ class Services {
     map['isIntercity'] = isIntercity;
     return map;
   }
-
 }

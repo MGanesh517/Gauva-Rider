@@ -111,6 +111,40 @@ Widget driverDetails(BuildContext context, Driver? driver, {required bool isDark
                   ),
                 ],
               ),
+              if (driver?.vehicleType != null || driver?.licensePlate != null) ...[
+                Gap(4.w),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                  decoration: BoxDecoration(
+                    color: isDark ? const Color(0xFF2C3036) : const Color(0xFFF1F7FE),
+                    borderRadius: BorderRadius.circular(4.r),
+                    border: Border.all(color: isDark ? Colors.grey[800]! : Colors.blue.withOpacity(0.1)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Ionicons.car_sport_outline,
+                        size: 12.sp,
+                        color: isDark ? Colors.white70 : const Color(0xFF1469B5),
+                      ),
+                      Gap(6.w),
+                      Flexible(
+                        child: Text(
+                          '${driver?.vehicleType ?? ''} ${driver?.licensePlate != null ? "• ${driver?.licensePlate}" : ""}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: context.bodyMedium?.copyWith(
+                            fontSize: 11.sp,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : const Color(0xFF1469B5),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ],
           ),
         ),

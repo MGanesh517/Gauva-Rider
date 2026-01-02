@@ -29,7 +29,7 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final filter = ref.read(rideServiceFilterNotiferProvider);
-      ref.read(rideServicesNotifierProvider.notifier).getAvailableServicesForRoute(riderServiceFilter: filter);
+      ref.read(rideServicesNotifierProvider.notifier).getRideServices(riderServiceFilter: filter);
     });
   }
 
@@ -117,7 +117,10 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
 
                         if (result != null && result is CouponModel) {
                           ref.read(rideServiceFilterNotiferProvider.notifier).updateCouponCode(result.code);
-                          // Optionally apply coupon logic here or in order creation
+                          // Update prices with coupon
+                          final filter = ref.read(rideServiceFilterNotiferProvider);
+                          ref.read(rideServicesNotifierProvider.notifier).getRideServices(riderServiceFilter: filter);
+
                           showNotification(message: "Coupon ${result.code} selected!", isSuccess: true);
                         }
                       },
@@ -128,7 +131,12 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Ionicons.pricetag_outline, color: Color(0xFF1469B5)),
+                            Icon(
+                              Ionicons.pricetag_outline,
+                              color: selectedCoupon != null && selectedCoupon.isNotEmpty
+                                  ? Colors.green
+                                  : const Color(0xFF1469B5),
+                            ),
                             Gap(12.w),
                             Expanded(
                               child: Text(
@@ -139,7 +147,7 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
                                   fontSize: 14.sp,
                                   fontWeight: FontWeight.w500,
                                   color: selectedCoupon != null && selectedCoupon.isNotEmpty
-                                      ? const Color(0xFF1469B5)
+                                      ? Colors.green
                                       : Colors.black,
                                 ),
                               ),

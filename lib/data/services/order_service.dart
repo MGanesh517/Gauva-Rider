@@ -39,6 +39,7 @@ class OrderService implements IOrderService {
 
   @override
   Future<Response> createOrder({required Map<String, dynamic> data}) async {
+    final userId = await LocalStorageService().getUserId();
     // Spring Boot: /api/v1/ride/request expects RideRequest
     // Map from booking sheet format to API format
     final pickupLocation = data['pickup_location'] as List<dynamic>? ?? [];
@@ -72,6 +73,7 @@ class OrderService implements IOrderService {
         'waitLongitude': waitLocation.length > 1 ? waitLocation[1] : 0,
         'waitAddress': data['wait_address'] ?? '',
       },
+      'userId': userId,
     };
     final response = await dioClient.dio.post(ApiEndpoints.createOrder, data: rideRequest);
     return response;

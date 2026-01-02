@@ -7,25 +7,21 @@ class DioClient {
   final Dio dio;
 
   DioClient({String? baseUrl})
-      : dio = Dio(
-    BaseOptions(
-      sendTimeout: const Duration(seconds: 20),
-      receiveTimeout: const Duration(seconds: 20),
-      connectTimeout: const Duration(seconds: 20),
-      baseUrl: baseUrl ?? Environment.apiUrl,
-      contentType: 'application/json',
-      headers: {
-        'Accept': '*/*', // Match curl command
-        'Content-Type': 'application/json',
-      },
-    ),
-  ) {
+    : dio = Dio(
+        BaseOptions(
+          sendTimeout: const Duration(seconds: 60),
+          receiveTimeout: const Duration(seconds: 60),
+          connectTimeout: const Duration(seconds: 60),
+          baseUrl: baseUrl ?? Environment.apiUrl,
+          contentType: 'application/json',
+          headers: {
+            'Accept': '*/*', // Match curl command
+            'Content-Type': 'application/json',
+          },
+        ),
+      ) {
     dio.interceptors.add(DioInterceptors());
     dio.interceptors.add(InterceptorsWrapper());
-    dio.interceptors.add(PrettyDioLogger(
-      requestHeader: true,
-      requestBody: true,
-      compact: false,
-    ));
+    dio.interceptors.add(PrettyDioLogger(requestHeader: true, requestBody: true, compact: false));
   }
 }

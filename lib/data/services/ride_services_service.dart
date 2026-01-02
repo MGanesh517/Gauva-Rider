@@ -20,23 +20,26 @@ class RideServicesService implements IRideServicesService {
       'durationMin': riderServiceState.durationMin ?? 0,
       'pickupLat': riderServiceState.pickupLocation.isNotEmpty ? riderServiceState.pickupLocation[0] : 0.0,
       'pickupLng': riderServiceState.pickupLocation.length > 1 ? riderServiceState.pickupLocation[1] : 0.0,
-      'dropLat': riderServiceState.dropLocation.isNotEmpty ? riderServiceState.dropLocation[0] : 0.0,
-      'dropLng': riderServiceState.dropLocation.length > 1 ? riderServiceState.dropLocation[1] : 0.0,
+      'destinationLat': riderServiceState.dropLocation.isNotEmpty ? riderServiceState.dropLocation[0] : 0.0,
+      'destinationLng': riderServiceState.dropLocation.length > 1 ? riderServiceState.dropLocation[1] : 0.0,
       'pickupZoneReadableId': riderServiceState.pickupZoneReadableId ?? '',
       'dropZoneReadableId': riderServiceState.dropZoneReadableId ?? '',
       'couponCode': riderServiceState.couponCode ?? '',
       'userId': userId,
     };
-    return dioClient.dio.post(ApiEndpoints.rideServices, data: fareRequest);
+    return dioClient.dio.get(ApiEndpoints.rideServices, queryParameters: fareRequest);
   }
 
   @override
   Future<Response> getAvailableServicesForRoute({required RiderServiceState riderServiceState}) async {
+    final userId = await LocalStorageService().getUserId();
     final queryParams = {
       'pickupLat': riderServiceState.pickupLocation.isNotEmpty ? riderServiceState.pickupLocation[0] : 0.0,
       'pickupLng': riderServiceState.pickupLocation.length > 1 ? riderServiceState.pickupLocation[1] : 0.0,
       'destinationLat': riderServiceState.dropLocation.isNotEmpty ? riderServiceState.dropLocation[0] : 0.0,
       'destinationLng': riderServiceState.dropLocation.length > 1 ? riderServiceState.dropLocation[1] : 0.0,
+      'couponCode': riderServiceState.couponCode ?? '',
+      'userId': userId,
     };
     return dioClient.dio.get(ApiEndpoints.availableServicesForRoute, queryParameters: queryParams);
   }

@@ -13,6 +13,8 @@ class Driver {
     this.direction,
     this.currentLocation,
     this.totalTrip,
+    this.licensePlate,
+    this.vehicleType,
   });
 
   Driver.fromJson(dynamic json) {
@@ -25,12 +27,11 @@ class Driver {
     direction = json['direction'];
     final loc = json['current_location'] is String ? jsonDecode(json['current_location']) : json['current_location'];
     if (loc != null) {
-      currentLocation = LatLng(
-        (loc['lat'] as num).toDouble(),
-        (loc['lng'] as num).toDouble(),
-      );
+      currentLocation = LatLng((loc['lat'] as num).toDouble(), (loc['lng'] as num).toDouble());
     }
     totalTrip = json['total_trip'];
+    licensePlate = json['license_plate'];
+    vehicleType = json['vehicle_type'];
   }
 
   num? id;
@@ -42,7 +43,10 @@ class Driver {
   num? direction;
   LatLng? currentLocation;
   num? totalTrip;
-  Driver copyWith({  num? id,
+  String? licensePlate;
+  String? vehicleType;
+  Driver copyWith({
+    num? id,
     String? name,
     String? email,
     String? mobile,
@@ -50,9 +54,11 @@ class Driver {
     num? rating,
     num? direction,
     LatLng? currentLocation,
-    num? totalTrip
-
-  }) => Driver(  id: id ?? this.id,
+    num? totalTrip,
+    String? licensePlate,
+    String? vehicleType,
+  }) => Driver(
+    id: id ?? this.id,
     name: name ?? this.name,
     email: email ?? this.email,
     mobile: mobile ?? this.mobile,
@@ -60,7 +66,7 @@ class Driver {
     rating: rating ?? this.rating,
     direction: direction ?? this.direction,
     currentLocation: currentLocation ?? this.currentLocation,
-    totalTrip: totalTrip
+    totalTrip: totalTrip,
   );
   Map<String, dynamic> toJson() {
     final map = <String, dynamic>{};
@@ -72,13 +78,11 @@ class Driver {
     map['rating'] = rating;
     map['direction'] = direction;
     if (currentLocation != null) {
-      map['current_location'] = {
-        'lat': currentLocation!.latitude,
-        'lng': currentLocation!.longitude,
-      };
+      map['current_location'] = {'lat': currentLocation!.latitude, 'lng': currentLocation!.longitude};
     }
     map['total_trip'] = totalTrip;
+    map['license_plate'] = licensePlate;
+    map['vehicle_type'] = vehicleType;
     return map;
   }
-
 }
