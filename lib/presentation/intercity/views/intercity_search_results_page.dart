@@ -311,6 +311,16 @@ class _IntercitySearchResultsPageState extends ConsumerState<IntercitySearchResu
     final isThisCardLoading = isGlobalLoading && option.vehicleType == _loadingVehicleType;
     final isSelected = isThisCardLoading;
 
+    String? imagePath;
+    if (option.vehicleType == 'TATA_MAGIC_LITE')
+      imagePath = 'assets/images/tataMagic.png';
+    else if (option.vehicleType == 'CAR_NORMAL')
+      imagePath = 'assets/images/carnormal.png';
+    else if (option.vehicleType == 'CAR_PREMIUM_EXPRESS')
+      imagePath = 'assets/images/carPremium.png';
+    else if (option.vehicleType == 'AUTO_NORMAL')
+      imagePath = 'assets/images/Auto5.png';
+
     return Container(
       margin: EdgeInsets.only(bottom: 16.h),
       decoration: BoxDecoration(
@@ -339,7 +349,12 @@ class _IntercitySearchResultsPageState extends ConsumerState<IntercitySearchResu
                   height: 60.w,
                   decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(12)),
                   child: Center(
-                    child: Icon(Ionicons.car_sport, size: 32.sp, color: Colors.grey.shade700),
+                    child: imagePath != null
+                        ? Padding(
+                            padding: EdgeInsets.all(8.w),
+                            child: Image.asset(imagePath, fit: BoxFit.contain),
+                          )
+                        : Icon(Ionicons.car_sport, size: 32.sp, color: Colors.grey.shade700),
                   ),
                 ),
                 Gap(12.w),
@@ -392,30 +407,8 @@ class _IntercitySearchResultsPageState extends ConsumerState<IntercitySearchResu
             Gap(12.h),
 
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Price per seat',
-                      style: TextStyle(fontSize: 10.sp, color: Colors.grey[500]),
-                    ),
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '₹${option.currentPerHeadPrice?.toStringAsFixed(0) ?? 0}',
-                          style: TextStyle(
-                            fontSize: 18.sp,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : const Color(0xFF24262D),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
                 Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
@@ -469,28 +462,6 @@ class _IntercitySearchResultsPageState extends ConsumerState<IntercitySearchResu
                 ),
               ],
             ),
-            if (option.description != null && option.description!.isNotEmpty) ...[
-              Gap(12.h),
-              Container(
-                padding: EdgeInsets.all(8.w),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey[800] : Colors.grey[50],
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.info_outline, size: 14.sp, color: Colors.grey),
-                    Gap(8.w),
-                    Expanded(
-                      child: Text(
-                        option.description!,
-                        style: TextStyle(fontSize: 11.sp, color: Colors.grey[600]),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
           ],
         ),
       ),

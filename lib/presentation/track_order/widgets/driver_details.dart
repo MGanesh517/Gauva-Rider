@@ -11,6 +11,22 @@ import 'package:gauva_userapp/generated/l10n.dart';
 
 import '../../../data/services/url_launch_serivices.dart';
 
+String _getFirstLetter(String? name) {
+  if (name == null) return 'D';
+  final trimmed = name.trim();
+  if (trimmed.isEmpty) return 'D';
+  return trimmed[0].toUpperCase();
+}
+
+String _buildVehicleInfo(Driver? driver) {
+  final licensePlate = driver?.licensePlate;
+
+  if (licensePlate != null && licensePlate.isNotEmpty) {
+    return licensePlate;
+  }
+  return '';
+}
+
 Widget driverDetails(BuildContext context, Driver? driver, {required bool isDark, int? otp}) {
   const double height = 60;
   const double width = 60;
@@ -23,39 +39,55 @@ Widget driverDetails(BuildContext context, Driver? driver, {required bool isDark
     child: Row(
       children: [
         CircleAvatar(
-          backgroundColor: ColorPalette.primary50,
-          child: Padding(
-            padding: const EdgeInsets.all(1.0),
-            child: ClipOval(
-              child: CachedNetworkImage(
-                imageUrl: driver?.profilePicture ?? '',
-                height: height.h,
-                width: width.w,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  height: height.h,
-                  width: width.w,
-                  color: Colors.grey[300],
-                  child: Center(
-                    child: ShaderMask(
-                      shaderCallback: (bounds) => const LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [Color(0xFF397098), Color(0xFF942FAF)],
-                      ).createShader(bounds),
-                      child: const CircularProgressIndicator(strokeWidth: 2),
+          backgroundColor: ColorPalette.primary94,
+          radius: (height / 2).r,
+          child: (driver?.profilePicture != null && driver!.profilePicture!.isNotEmpty)
+              ? Padding(
+                  padding: const EdgeInsets.all(1.0),
+                  child: ClipOval(
+                    child: CachedNetworkImage(
+                      imageUrl: driver.profilePicture!,
+                      height: height.h,
+                      width: width.w,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        height: height.h,
+                        width: width.w,
+                        color: Colors.grey[300],
+                        child: Center(
+                          child: ShaderMask(
+                            shaderCallback: (bounds) => const LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Color(0xFF397098), Color(0xFF942FAF)],
+                            ).createShader(bounds),
+                            child: const CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Center(
+                        child: Text(
+                          _getFirstLetter(driver.name),
+                          style: context.bodyMedium?.copyWith(
+                            fontSize: 24.sp,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF1469B5),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+              : Center(
+                  child: Text(
+                    _getFirstLetter(driver?.name),
+                    style: context.bodyMedium?.copyWith(
+                      fontSize: 24.sp,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1469B5),
                     ),
                   ),
                 ),
-                errorWidget: (context, url, error) => Container(
-                  height: height.h,
-                  width: width.w,
-                  color: Colors.grey,
-                  child: const Icon(Icons.error, color: Colors.white),
-                ),
-              ),
-            ),
-          ),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -72,46 +104,46 @@ Widget driverDetails(BuildContext context, Driver? driver, {required bool isDark
                   color: isDark ? const Color(0xFF687387) : const Color(0xFF24262D),
                 ),
               ),
-              Row(
-                children: [
-                  Icon(Icons.directions_car_outlined, size: 13.r, color: const Color(0xFF687387)),
-                  Gap(4.w),
-                  Text(
-                    (driver?.totalTrip ?? 0).formattedCount,
-                    style: context.bodyMedium?.copyWith(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF687387),
-                    ),
-                  ),
-                  Gap(4.w),
-                  Text(
-                    AppLocalizations.of(context).trips,
-                    style: context.bodyMedium?.copyWith(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF687387),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5),
-                    height: 8.h,
-                    width: 1.w,
-                    color: const Color(0xFFD7DAE0),
-                  ),
-                  Icon(Icons.star, color: Colors.amber, size: 16.r),
-                  Gap(2.w),
-                  Text(
-                    (driver?.rating ?? 0).formattedCount,
-                    style: context.bodyMedium?.copyWith(
-                      fontSize: 10.sp,
-                      fontWeight: FontWeight.w600,
-                      color: const Color(0xFF687387),
-                    ),
-                  ),
-                ],
-              ),
-              if (driver?.vehicleType != null || driver?.licensePlate != null) ...[
+              // Row(
+              //   children: [
+              //     Icon(Icons.directions_car_outlined, size: 13.r, color: const Color(0xFF687387)),
+              //     Gap(4.w),
+              //     Text(
+              //       (driver?.totalTrip ?? 0).formattedCount,
+              //       style: context.bodyMedium?.copyWith(
+              //         fontSize: 10.sp,
+              //         fontWeight: FontWeight.w500,
+              //         color: const Color(0xFF687387),
+              //       ),
+              //     ),
+              //     Gap(4.w),
+              //     Text(
+              //       AppLocalizations.of(context).trips,
+              //       style: context.bodyMedium?.copyWith(
+              //         fontSize: 10.sp,
+              //         fontWeight: FontWeight.w600,
+              //         color: const Color(0xFF687387),
+              //       ),
+              //     ),
+              //     Container(
+              //       margin: EdgeInsets.symmetric(horizontal: 8.w, vertical: 5),
+              //       height: 8.h,
+              //       width: 1.w,
+              //       color: const Color(0xFFD7DAE0),
+              //     ),
+              //     Icon(Icons.star, color: Colors.amber, size: 16.r),
+              //     Gap(2.w),
+              //     Text(
+              //       (driver?.rating ?? 0).formattedCount,
+              //       style: context.bodyMedium?.copyWith(
+              //         fontSize: 10.sp,
+              //         fontWeight: FontWeight.w600,
+              //         color: const Color(0xFF687387),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+              if (driver?.licensePlate != null) ...[
                 Gap(4.w),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
@@ -123,15 +155,9 @@ Widget driverDetails(BuildContext context, Driver? driver, {required bool isDark
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(
-                        Ionicons.car_sport_outline,
-                        size: 12.sp,
-                        color: isDark ? Colors.white70 : const Color(0xFF1469B5),
-                      ),
-                      Gap(6.w),
                       Flexible(
                         child: Text(
-                          '${driver?.vehicleType ?? ''} ${driver?.licensePlate != null ? "• ${driver?.licensePlate}" : ""}',
+                          _buildVehicleInfo(driver),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: context.bodyMedium?.copyWith(

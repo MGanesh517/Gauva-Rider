@@ -30,8 +30,16 @@ class Driver {
       currentLocation = LatLng((loc['lat'] as num).toDouble(), (loc['lng'] as num).toDouble());
     }
     totalTrip = json['total_trip'];
-    licensePlate = json['license_plate'];
-    vehicleType = json['vehicle_type'];
+
+    // Parse vehicle details from nested object or fallback to direct fields
+    if (json['vehicle'] != null) {
+      final vehicle = json['vehicle'];
+      licensePlate = vehicle['licensePlate'];
+      vehicleType = vehicle['vehicleType'];
+    } else {
+      licensePlate = json['license_plate'];
+      vehicleType = json['vehicle_type'];
+    }
   }
 
   num? id;
