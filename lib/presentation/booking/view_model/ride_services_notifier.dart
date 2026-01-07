@@ -29,16 +29,34 @@ class RideServicesNotifier extends StateNotifier<AppState<RideServiceResponse>> 
     );
   }
 
-  Future<void> getAvailableServicesForRoute({required RiderServiceState riderServiceFilter}) async {
+  RiderServiceState? _lastRequest;
+
+  Future<void> getAvailableServicesForRoute({
+    required RiderServiceState riderServiceFilter,
+    bool isSilent = false,
+  }) async {
     if (riderServiceFilter.pickupLocation.isEmpty || riderServiceFilter.dropLocation.isEmpty) {
       return;
     }
-    state = const AppState.loading();
+
+    // Smart Caching: If request is identical to last successful one, skip re-fetch
+    if (_lastRequest != null && _lastRequest == riderServiceFilter) {
+      // If we already have data or are loading, strictly return
+      if (state.maybeWhen(error: (_) => false, orElse: () => true)) {
+        return;
+      }
+    }
+
+    _lastRequest = riderServiceFilter;
+    if (!isSilent) {
+      state = const AppState.loading();
+    }
+
     final result = await rideServicesRepo.getAvailableServicesForRoute(riderServiceFilter: riderServiceFilter);
     result.fold(
       (failure) {
         state = AppState.error(failure);
-        showNotification(message: failure.message);
+        if (!isSilent) showNotification(message: failure.message);
       },
       (data) {
         state = AppState.success(data);

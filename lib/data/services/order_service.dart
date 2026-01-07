@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:gauva_userapp/domain/interfaces/order_service_interface.dart';
 
+import 'package:flutter/foundation.dart';
 import '../../core/config/api_endpoints.dart';
+
 import 'api/dio_client.dart';
 import 'local_storage_service.dart';
 
@@ -68,6 +70,9 @@ class OrderService implements IOrderService {
       'serviceType': serviceTypeString,
       'couponCode': data['coupon_code'] ?? data['couponCode'] ?? '',
       'serviceOptionIds': data['service_option_ids'] ?? data['serviceOptionIds'] ?? [],
+      'estimatedFare': data['estimatedFare'] ?? 0,
+      'distanceKm': data['distanceKm'] ?? 0,
+      'durationMin': data['durationMin'] ?? 0,
       if (waitLocation.isNotEmpty) ...{
         'waitLatitude': waitLocation[0],
         'waitLongitude': waitLocation.length > 1 ? waitLocation[1] : 0,
@@ -85,54 +90,53 @@ class OrderService implements IOrderService {
 
   @override
   Future<Response> checkActiveTrip() async {
-    // Spring Boot: Check for active trip
-    // Since /api/v1/user/{userId}/rides/current doesn't exist, try alternative endpoints
-    // Return empty response if no active trip to prevent crashes
-    try {
-      final token = await LocalStorageService().getToken();
-      if (token == null) {
-        // No token means not logged in, return empty
-        return Response(
-          requestOptions: RequestOptions(path: ''),
-          statusCode: 200,
-          data: [],
-        );
-      }
+    int userId = await LocalStorageService().getUserId();
+    final token = await LocalStorageService().getToken();
 
-      // Try to get requested rides which may include active trips
-      // Spring Boot may use Authorization header instead of userId in path
+    debugPrint('🔍 checkActiveTrip: Initial userId: $userId, token exists: ${token != null}');
+
+    // Self-healing: If userId is 0 but we have a token, try to fetch the profile
+    if (userId == 0 && token != null && token.isNotEmpty) {
+      debugPrint('⚠️ checkActiveTrip: User ID is 0, attempting to fetch profile for self-healing...');
       try {
-        final userId = await LocalStorageService().getUserId();
-        final response = await dioClient.dio.get(
-          '/api/v1/user/$userId/rides/requested',
+        final profileResponse = await dioClient.dio.get(
+          ApiEndpoints.riderDetails,
           options: Options(headers: {'Authorization': 'Bearer $token'}),
         );
-        return response;
-      } catch (e) {
-        // If that fails, try with Authorization header only (no userId in path)
-        try {
-          final response = await dioClient.dio.get(
-            '/api/v1/user/rides/completed',
-            options: Options(headers: {'Authorization': 'Bearer $token'}),
-          );
-          return response;
-        } catch (e2) {
-          // If both fail, return empty response to prevent crash
-          return Response(
-            requestOptions: RequestOptions(path: ''),
-            statusCode: 200,
-            data: [],
-          );
+
+        if (profileResponse.statusCode == 200 && profileResponse.data != null) {
+          debugPrint('✅ checkActiveTrip: Profile fetched successfully for self-healing');
+          final responseData = profileResponse.data;
+
+          // Handle response wrapper if present
+          final userData = (responseData is Map<String, dynamic> && responseData.containsKey('data'))
+              ? responseData['data']
+              : responseData;
+
+          if (userData is Map<String, dynamic>) {
+            debugPrint('💾 checkActiveTrip: Saving user data to local storage...');
+            await LocalStorageService().saveUser(user: userData);
+
+            // Re-fetch id
+            userId = await LocalStorageService().getUserId();
+            debugPrint('✅ checkActiveTrip: Self-healing complete. New userId: $userId');
+          } else {
+            debugPrint('❌ checkActiveTrip: Unexpected user data format: ${userData.runtimeType}');
+          }
+        } else {
+          debugPrint('❌ checkActiveTrip: Failed to fetch profile. Status: ${profileResponse.statusCode}');
         }
+      } catch (e) {
+        debugPrint('❌ checkActiveTrip: Error fetching profile for self-healing: $e');
       }
-    } catch (e) {
-      // Final fallback: return empty response
-      return Response(
-        requestOptions: RequestOptions(path: ''),
-        statusCode: 200,
-        data: [],
-      );
     }
+
+    // Spring Boot: /api/v1/user/{userId}/rides/current
+    final url = '/api/v1/user/$userId/rides/current';
+    debugPrint('🚀 checkActiveTrip: Requesting active trip from: $url');
+
+    final response = await dioClient.dio.get(url, options: Options(headers: {'Authorization': 'Bearer $token'}));
+    return response;
   }
 
   @override

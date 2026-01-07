@@ -165,37 +165,55 @@ class OrderRepoImpl extends BaseRepository implements IOrderRepo {
     debugPrint('📥 Response Type: ${response.data.runtimeType}');
 
     try {
-      // Handle empty array response (no active trips)
+      // 1. Handle Empty List (No Active Trips)
       if (response.data is List && (response.data as List).isEmpty) {
         debugPrint('✅ CHECK ACTIVE TRIP - No active trips (empty array)');
         return TripModel(message: 'No active trips', data: null);
       }
 
-      // Handle array with data
+      // 2. Handle List with Data (First element is the active order)
       if (response.data is List && (response.data as List).isNotEmpty) {
         debugPrint('📦 CHECK ACTIVE TRIP - Array response with data');
-        // Wrap array response in expected format
+        final firstOrder = (response.data as List).first;
+
+        // Wrap in TripModel structure
         final wrappedData = {
           'message': 'Active trips found',
-          'data': {'order': (response.data as List).first},
+          'data': {'order': firstOrder},
         };
+
         final result = TripModel.fromJson(wrappedData);
         debugPrint('✅ CHECK ACTIVE TRIP - Parsed from array successfully');
         debugPrint('✅ Active order: ${result.data?.order?.id}');
         return result;
       }
 
-      // Handle normal object response
+      // 3. Handle Direct Order Object (Missing 'data' wrapper)
+      // If the response is the order object itself (e.g. has 'id' and 'status' but no 'data' key)
+      if (response.data is Map &&
+          (response.data as Map).containsKey('id') &&
+          !(response.data as Map).containsKey('data')) {
+        debugPrint('📦 CHECK ACTIVE TRIP - Direct order object detected');
+        final wrappedData = {
+          'message': 'Active trips found',
+          'data': {'order': response.data},
+        };
+        final result = TripModel.fromJson(wrappedData);
+        debugPrint('✅ CHECK ACTIVE TRIP - Parsed from direct object successfully');
+        return result;
+      }
+
+      // 4. Handle Standard TripModel Response
       final result = TripModel.fromJson(response.data);
-      debugPrint('✅ CHECK ACTIVE TRIP - Parsed successfully');
+      debugPrint('✅ CHECK ACTIVE TRIP - Parsed successfully (Standard Format)');
       debugPrint('✅ Active order: ${result.data?.order?.id ?? "None"}');
       return result;
     } catch (e, stackTrace) {
       debugPrint('🔴 CHECK ACTIVE TRIP - Parsing error: $e');
       debugPrint('🔴 Stack trace: $stackTrace');
       debugPrint('🔴 Raw response data: ${response.data}');
-      // Return empty trip model on error
-      return TripModel(message: 'No active trips', data: null);
+      // Return empty trip model on error to prevent app crash
+      return TripModel(message: 'No active trips (Parsing Failed)', data: null);
     }
   });
   @override

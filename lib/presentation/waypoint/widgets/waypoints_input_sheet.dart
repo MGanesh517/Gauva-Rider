@@ -28,7 +28,7 @@ import '../../booking/provider/selection_providers.dart';
 import '../../booking/provider/route_providers.dart';
 import '../../dashboard/provider/home_map_providers.dart';
 import '../../track_order/provider/order_in_progress_provider.dart';
-import '../provider/google_api_providers.dart';
+
 import '../provider/search_place_providers.dart';
 import '../provider/selected_loc_text_field_providers.dart';
 import '../provider/way_point_list_providers.dart';
@@ -92,7 +92,7 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
   void _onSearchChanged(String? value) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
 
-    _debounce = Timer(const Duration(milliseconds: 800), () {
+    _debounce = Timer(const Duration(milliseconds: 300), () {
       if (value == null || value.trim().isEmpty) {
         ref.read(searchPlaceNotifierProvider.notifier).reset();
       } else if (value.length > 3) {
@@ -289,28 +289,7 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
         final dropLatLng = LatLng(dropOff.location.latitude, dropOff.location.longitude);
 
         // Show loading
-        showNotification(message: 'Getting zone information...');
-
-        // Get zones for pickup and dropoff
-        final googleAPIRepo = ref.read(googleAPIRepoProvider);
-        String? pickupZone = '';
-        String? dropZone = '';
-
-        try {
-          final pickupZoneResult = await googleAPIRepo.getZoneId(pickupLatLng);
-          pickupZoneResult.fold(
-            (error) => debugPrint('Error getting pickup zone: ${error.message}'),
-            (zone) => pickupZone = zone,
-          );
-
-          final dropZoneResult = await googleAPIRepo.getZoneId(dropLatLng);
-          dropZoneResult.fold(
-            (error) => debugPrint('Error getting drop zone: ${error.message}'),
-            (zone) => dropZone = zone,
-          );
-        } catch (e) {
-          debugPrint('Error getting zones: $e');
-        }
+        showNotification(message: 'Getting available services...');
 
         // Calculate distance and duration
         final distanceKm = _calculateDistance(pickupLatLng, dropLatLng) / 1000; // Convert to km
@@ -324,15 +303,17 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
           waitLocation: stop.name.isNotEmpty ? [stop.location.latitude, stop.location.longitude] : [],
           waitAddress: stop.address,
           serviceOptionIds: [],
-          pickupZoneReadableId: pickupZone,
-          dropZoneReadableId: dropZone,
+          pickupZoneReadableId: '',
+          dropZoneReadableId: '',
           distanceKm: distanceKm,
           durationMin: durationMin,
         );
 
         ref.read(rideServiceFilterNotiferProvider.notifier).addRideServiceFilter(riderService);
 
-        await ref.read(rideServicesNotifierProvider.notifier).getRideServices(riderServiceFilter: riderService);
+        await ref
+            .read(rideServicesNotifierProvider.notifier)
+            .getAvailableServicesForRoute(riderServiceFilter: riderService);
 
         if (!mounted) return;
 

@@ -198,8 +198,10 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
             child: Center(child: Text(AppLocalizations.of(context).no_service_available)),
           );
         }
+        final distance = data.data?.distance;
         return Column(
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: list.map<Widget>((service) {
             final selectedService = ref.watch(carTypeNotifierProvider).selectedCarType;
             // More robust selection check - compare both id and serviceId
@@ -209,14 +211,21 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
                     (selectedService.serviceId != null &&
                         selectedService.serviceId == service.serviceId &&
                         selectedService.serviceId.toString().isNotEmpty));
-            return _buildServiceCard(context, service, isSelected, ref, isDark);
+            return _buildServiceCard(context, service, isSelected, ref, isDark, distance);
           }).toList(),
         );
       },
     ),
   );
 
-  Widget _buildServiceCard(BuildContext context, dynamic service, bool isSelected, WidgetRef ref, bool isDark) {
+  Widget _buildServiceCard(
+    BuildContext context,
+    dynamic service,
+    bool isSelected,
+    WidgetRef ref,
+    bool isDark,
+    String? distance,
+  ) {
     final notifier = ref.read(carTypeNotifierProvider.notifier);
     final serviceName = (service.displayName ?? service.name ?? 'SERVICE').toUpperCase();
 
@@ -319,6 +328,11 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
                                 service.estimatedArrival ?? '3 mins away',
                                 style: TextStyle(fontSize: 10.sp, color: Colors.grey[600]),
                               ),
+                              if (distance != null)
+                                Text(
+                                  ' • $distance km',
+                                  style: TextStyle(fontSize: 10.sp, color: Colors.grey[600]),
+                                ),
                               Text(
                                 ' • Drop ${_getEstimatedDropTime(service)}',
                                 style: TextStyle(fontSize: 10.sp, color: Colors.grey[600]),
@@ -467,6 +481,27 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
           return;
         }
 
+        final rideServicesState = ref.read(rideServicesNotifierProvider);
+        double distanceKm = 0;
+        int durationMin = 0;
+
+        rideServicesState.whenOrNull(
+          success: (data) {
+            if (data.data?.distance != null) {
+              distanceKm = double.tryParse(data.data!.distance.toString()) ?? 0;
+            }
+            // Duration comes as "5 mins", need to parse
+            if (data.data?.duration != null) {
+              final durationStr = data.data!.duration.toString();
+              durationMin = int.tryParse(durationStr.replaceAll(RegExp(r'[^0-9]'), '')) ?? 0;
+            }
+          },
+        );
+
+        // Get estimated fare from selected service
+        final estimatedFare =
+            service?.costAfterCoupon ?? service?.totalFare ?? service?.serviceFare ?? service?.minimumFare ?? 0.0;
+
         final data = {
           'pickup_location': [bookingData.pickupLocation.first, bookingData.pickupLocation.last],
           'drop_location': [bookingData.dropLocation.first, bookingData.dropLocation.last],
@@ -479,6 +514,9 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
           'drop_address': bookingData.dropAddress,
           'wait_address': bookingData.waitAddress,
           'service_id': serviceId,
+          'estimatedFare': estimatedFare,
+          'distanceKm': distanceKm,
+          'durationMin': durationMin,
         };
 
         await notifier.createOrder(orderData: data);

@@ -12,14 +12,21 @@ class SearchPlaceNotifier extends StateNotifier<AsyncValue<List<PlaceModel>>> {
 
   final _cache = <String, List<PlaceModel>>{};
 
+  LatLng? _cachedLocation;
+
   Future<void> searchPlace(String place) async {
     if (_cache.containsKey(place)) {
       state = AsyncData(_cache[place]!);
       return;
     }
     state = const AsyncValue.loading();
-    final currentLocation = await ref.read(homeMapRepoProvider).getUserLocation();
-    final result = await googleAPIRepo.searchPlace(place, currentLocation ?? const LatLng(0, 0));
+
+    // Use cached location or fetch if null
+    if (_cachedLocation == null) {
+      _cachedLocation = await ref.read(homeMapRepoProvider).getUserLocation();
+    }
+
+    final result = await googleAPIRepo.searchPlace(place, _cachedLocation ?? const LatLng(0, 0));
     result.fold((error) => state = AsyncValue.error(error.message, StackTrace.current), (places) {
       _cache[place] = places;
       state = AsyncValue.data(places);

@@ -22,6 +22,6 @@ class DioClient {
       ) {
     dio.interceptors.add(DioInterceptors());
     dio.interceptors.add(InterceptorsWrapper());
-    dio.interceptors.add(PrettyDioLogger(requestHeader: true, requestBody: true, compact: false));
+    dio.interceptors.add(PrettyDioLogger(requestHeader: true, requestBody: false, compact: false));
   }
 }

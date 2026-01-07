@@ -6,8 +6,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:gauva_userapp/core/extensions/extensions.dart';
+import 'package:gauva_userapp/core/routes/app_routes.dart';
 import 'package:gauva_userapp/core/utils/exit_app_dialogue.dart';
 import 'package:gauva_userapp/core/utils/helpers.dart';
+import 'package:gauva_userapp/data/services/navigation_service.dart';
 import 'package:gauva_userapp/generated/l10n.dart';
 import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.dart';
 import 'package:gauva_userapp/presentation/auth/provider/auth_providers.dart';
@@ -85,6 +87,28 @@ class _LoginWithPasswordPageState extends ConsumerState<LoginWithPasswordPage> {
                   child: Icon(
                     showPassword ? Ionicons.eye : Ionicons.eye_off,
                     color: context.theme.inputDecorationTheme.suffixIconColor,
+                  ),
+                ),
+              ),
+            ),
+            Gap(12.h),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  NavigationService.pushNamed(AppRoutes.forgotPassword);
+                },
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: Text(
+                  'Forgot Password?',
+                  style: context.bodyMedium?.copyWith(
+                    fontSize: 14.sp,
+                    fontWeight: FontWeight.w600,
+                    color: ColorPalette.primary50,
                   ),
                 ),
               ),

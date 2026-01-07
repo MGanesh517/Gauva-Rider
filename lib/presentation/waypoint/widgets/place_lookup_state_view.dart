@@ -1,8 +1,14 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gauva_userapp/common/loading_view.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:gauva_userapp/presentation/booking/view_model/ride_services_notifier.dart';
+import 'package:gauva_userapp/presentation/booking/provider/ride_services_providers.dart';
+import 'package:gauva_userapp/data/models/waypoint.dart';
 
+import '../../../core/state/rider_service_state.dart';
 import '../../../gen/assets.gen.dart';
 import '../../booking/widgets/place_result_item.dart';
 import '../provider/place_lat_lng_fetcher_providers.dart';
@@ -73,6 +79,52 @@ class PlaceLookupStateView extends ConsumerWidget {
                         address: place.subtitle,
                         location: location,
                       );
+
+                      // Prefetch services if both pickup and drop are set
+                      // This ensures data is ready when user clicks "Confirm"
+                      if (wayPointsState.isNotEmpty && wayPointsState.length > 1) {
+                        // We need the updated list, but wayPointsState is from previous render.
+                        // However, we just updated one index. Let's construct a temporary check.
+                        final pickup = targetIndex == 0
+                            ? Waypoint(name: 'Pick-up', address: place.subtitle, location: location)
+                            : wayPointsState[0];
+                        final drop = targetIndex == 1
+                            ? Waypoint(name: 'Destination', address: place.subtitle, location: location)
+                            : wayPointsState[1];
+
+                        if (pickup.address.isNotEmpty &&
+                            drop.address.isNotEmpty &&
+                            pickup.location.latitude != 0 &&
+                            drop.location.latitude != 0) {
+                          final pickupLatLng = LatLng(pickup.location.latitude, pickup.location.longitude);
+                          final dropLatLng = LatLng(drop.location.latitude, drop.location.longitude);
+
+                          // Calculate distance (Simple Euclidean for prefetch estimation or use Haversine if needed)
+                          // For prefetch, we just need valid coordinates to wake up the backend or get initial cache
+                          final distanceKm = 5.0; // Placeholder
+                          final durationMin = 15;
+
+                          final riderService = RiderServiceState(
+                            pickupLocation: [pickupLatLng.latitude, pickupLatLng.longitude],
+                            pickupAddress: pickup.address,
+                            dropLocation: [dropLatLng.latitude, dropLatLng.longitude],
+                            dropAddress: drop.address,
+                            waitLocation: [],
+                            waitAddress: '',
+                            serviceOptionIds: [],
+                            pickupZoneReadableId: '',
+                            dropZoneReadableId: '',
+                            distanceKm: distanceKm,
+                            durationMin: durationMin,
+                          );
+
+                          // Fire and forget - silent prefetch
+                          ref
+                              .read(rideServicesNotifierProvider.notifier)
+                              .getAvailableServicesForRoute(riderServiceFilter: riderService, isSilent: true);
+                        }
+                      }
+
                       ref.read(searchPlaceNotifierProvider.notifier).reset();
                     }
                   } catch (e) {

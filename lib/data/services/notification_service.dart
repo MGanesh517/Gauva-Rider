@@ -9,19 +9,21 @@ class NotificationService {
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
-
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
-      'high_importance_channel',
+      'high_importance_channel_custom_sound', // New ID to force update
       'High Importance Notifications',
       importance: Importance.max,
+      playSound: true,
+      sound: RawResourceAndroidNotificationSound('noti_sound'),
     );
 
     await flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-    const AndroidInitializationSettings initializationSettingsAndroid =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+    const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
     const DarwinInitializationSettings initializationSettingsIOS = DarwinInitializationSettings();
 
@@ -32,9 +34,7 @@ class NotificationService {
 
     await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
-    await FirebaseMessaging.instance.requestPermission(
-      
-    );
+    await FirebaseMessaging.instance.requestPermission();
 
     FirebaseMessaging.onMessage.listen((message) {
       if (message.notification != null) {
@@ -46,16 +46,17 @@ class NotificationService {
   }
 
   Future<void> showNotification(RemoteMessage message) async {
-
     if (message.notification != null) {
       const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-        'high_importance_channel',
+        'high_importance_channel_custom_sound',
         'High Importance Notifications',
         importance: Importance.max,
         priority: Priority.high,
+        playSound: true,
+        sound: RawResourceAndroidNotificationSound('noti_sound'),
       );
 
-      const DarwinNotificationDetails iosPlatformChannelSpecifics = DarwinNotificationDetails();
+      const DarwinNotificationDetails iosPlatformChannelSpecifics = DarwinNotificationDetails(sound: 'noti_sound.mpeg');
 
       const NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
@@ -75,18 +76,17 @@ class NotificationService {
     showNotification(message);
   }
 
-  Future<void> showCustomNotification({
-    required String title,
-    required String body,
-  }) async {
+  Future<void> showCustomNotification({required String title, required String body}) async {
     const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
-      'high_importance_channel',
+      'high_importance_channel_custom_sound',
       'High Importance Notifications',
       importance: Importance.max,
       priority: Priority.high,
+      playSound: true,
+      sound: RawResourceAndroidNotificationSound('noti_sound'),
     );
 
-    const DarwinNotificationDetails iosPlatformChannelSpecifics = DarwinNotificationDetails();
+    const DarwinNotificationDetails iosPlatformChannelSpecifics = DarwinNotificationDetails(sound: 'noti_sound.mpeg');
 
     const NotificationDetails platformChannelSpecifics = NotificationDetails(
       android: androidPlatformChannelSpecifics,
@@ -100,5 +100,4 @@ class NotificationService {
       platformChannelSpecifics,
     );
   }
-
 }
