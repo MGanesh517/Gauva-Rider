@@ -23,10 +23,21 @@ class _HomeMapState extends ConsumerState<HomeMap> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() {
+    Future.microtask(() async {
+      // Initialize notifier first (no API call)
       ref.read(homeMapNotifierProvider.notifier);
+      
+      // PERFORMANCE OPTIMIZATION: Stagger API calls for better perceived performance
+      // Critical: Load services first (needed for booking functionality)
       ref.read(carTypeNotifierProvider.notifier).getServicesHome();
-      ref.read(bannerProvider.notifier).getBanners();
+      
+      // Non-critical: Load banners after a delay (not blocking main functionality)
+      // This prevents network congestion and improves perceived load time
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) {
+          ref.read(bannerProvider.notifier).getBanners();
+        }
+      });
     });
   }
 
