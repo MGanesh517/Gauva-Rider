@@ -49,10 +49,9 @@ class _BookingMapState extends ConsumerState<BookingMap> {
       controller.animateCamera(CameraUpdate.newLatLngZoom(adjustedPosition, 14));
     }
 
-    // Fetch route when map is created
-    Future.microtask(() {
-      ref.read(routeNotifierProvider.notifier).fetchRoutes();
-    });
+    // PERFORMANCE OPTIMIZATION: Don't fetch route immediately on map creation
+    // Routes will be fetched when booking state changes to selectVehicle
+    // This prevents duplicate API calls
   }
 
   bool isDark() => ref.watch(themeModeProvider.notifier).isDarkMode();
@@ -62,10 +61,13 @@ class _BookingMapState extends ConsumerState<BookingMap> {
     final state = ref.watch(wayPointMapNotifierProvider);
     final bookingState = ref.watch(bookingNotifierProvider);
 
-    // Fetch route when booking state changes to selectVehicle
+    // PERFORMANCE OPTIMIZATION: Fetch route only once when booking state changes to selectVehicle
+    // Check if polyline is empty to avoid duplicate calls
     bookingState.whenOrNull(
       selectVehicle: (vehicles, b) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
+          // Only fetch if polyline is empty (route not loaded yet)
+          // RouteNotifier will handle deduplication and caching
           if (state.polyline.isEmpty) {
             ref.read(routeNotifierProvider.notifier).fetchRoutes();
           }

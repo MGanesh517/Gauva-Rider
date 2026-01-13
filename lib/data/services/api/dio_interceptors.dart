@@ -14,14 +14,17 @@ class DioInterceptors extends Interceptor {
 
   @override
   Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    // Cache token for 5 minutes to avoid repeated storage reads
+    // PERFORMANCE OPTIMIZATION: Fast token cache check (synchronous when cached)
+    // Only fetch from storage if cache is expired or missing
     if (_cachedToken == null ||
         _tokenCacheTime == null ||
         DateTime.now().difference(_tokenCacheTime!) > _tokenCacheDuration) {
+      // Only async operation when cache is expired
       _cachedToken = await LocalStorageService().getToken();
       _tokenCacheTime = DateTime.now();
     }
 
+    // Set header synchronously (no await needed)
     if (_cachedToken != null && _cachedToken!.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $_cachedToken';
     }

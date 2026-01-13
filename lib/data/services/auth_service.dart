@@ -342,11 +342,17 @@ class AuthService implements IAuthService {
   @override
   Future<Response> submitFcmToken({required String fcmToken}) async {
     // Submit FCM token to backend for push notifications
+    debugPrint('📤 AUTH SERVICE - Submitting FCM Token');
+    debugPrint('📤 FCM Token: $fcmToken');
+    debugPrint('📤 Endpoint: ${ApiEndpoints.submitFcmToken}');
     final token = await LocalStorageService().getToken();
-    return await dioClient.dio.post(
+    final response = await dioClient.dio.post(
       ApiEndpoints.submitFcmToken,
       data: {'token': fcmToken},
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
+    debugPrint('📥 AUTH SERVICE - FCM Token Response Status: ${response.statusCode}');
+    debugPrint('📥 AUTH SERVICE - FCM Token Response Data: ${response.data}');
+    return response;
   }
 }

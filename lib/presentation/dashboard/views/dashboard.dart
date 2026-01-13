@@ -5,6 +5,7 @@ import 'package:gauva_userapp/core/widgets/location_permission_wrapper.dart';
 import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.dart';
 import 'package:gauva_userapp/presentation/account_page/view/account_page.dart';
 import 'package:gauva_userapp/presentation/dashboard/widgets/home_map.dart';
+import 'package:gauva_userapp/presentation/notifications/provider/notification_providers.dart';
 import 'package:gauva_userapp/presentation/ride_history/views/ride_history_page.dart';
 import '../../../screens/user/wallet_screen.dart';
 import 'package:gauva_userapp/presentation/websocket/provider/websocket_provider.dart';
@@ -36,6 +37,17 @@ class _DashboardPageState extends ConsumerState<DashboardPage> {
     _initializeWebSocket();
     // Check for app updates
     _checkForUpdates();
+    // Load unread notification count
+    _loadUnreadCount();
+  }
+
+  void _loadUnreadCount() {
+    // Load unread count after a short delay to avoid blocking app startup
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      if (mounted) {
+        ref.read(unreadCountNotifierProvider.notifier).getUnreadCount();
+      }
+    });
   }
 
   Future<void> _initializeWebSocket() async {

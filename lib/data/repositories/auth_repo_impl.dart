@@ -323,7 +323,10 @@ class AuthRepoImpl extends BaseRepository implements IAuthRepo {
   });
   @override
   Future<Either<Failure, CommonResponse>> submitFcmToken({required String fcmToken}) async => safeApiCall(() async {
+    debugPrint('📬 AUTH REPOSITORY - Submitting FCM Token');
+    debugPrint('📬 FCM Token: $fcmToken');
     final response = await _authService.submitFcmToken(fcmToken: fcmToken);
+    debugPrint('📬 AUTH REPOSITORY - FCM Token submission completed');
     return CommonResponse.fromMap(response.data);
   });
 }

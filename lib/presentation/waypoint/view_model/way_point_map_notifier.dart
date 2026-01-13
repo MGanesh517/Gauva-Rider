@@ -15,6 +15,7 @@ import '../../../core/widgets/markers/app_marker_drop_off.dart';
 import '../../../core/widgets/markers/app_marker_pickup.dart';
 import '../../../gen/assets.gen.dart';
 import '../../dashboard/provider/home_map_providers.dart';
+import '../../dashboard/provider/driver_providers.dart';
 import '../provider/location_provider.dart';
 import '../provider/way_point_list_providers.dart';
 
@@ -171,7 +172,15 @@ class WayPointMapNotifier extends StateNotifier<WayPointMapState> {
         state = state.copyWith(markers: updatedMarkers);
       });
     }
-    await ref.read(routeNotifierProvider.notifier).fetchRoutes();
+    
+    // PERFORMANCE OPTIMIZATION: Only fetch routes if both pickup and dropoff are set
+    // This prevents unnecessary API calls when only one waypoint is updated
+    if (waypoints.length >= 2 && 
+        waypoints.first.location != const LatLng(0, 0) &&
+        waypoints.last.location != const LatLng(0, 0)) {
+      // Fetch routes in background (non-blocking)
+      ref.read(routeNotifierProvider.notifier).fetchRoutes();
+    }
   }
 
   Future<void> _updateDriverMarker(LatLng location) async {
@@ -261,5 +270,87 @@ class WayPointMapNotifier extends StateNotifier<WayPointMapState> {
     Future.delayed(const Duration(milliseconds: 300), () {
       state.mapController?.animateCamera(CameraUpdate.newLatLngBounds(bounds, 80));
     });
+  }
+
+  /// Add nearby driver markers to the map based on selected service type
+  Future<void> addNearbyDrivers({
+    required LatLng location,
+    String? serviceType,
+    int radiusMeters = 5000,
+    int limit = 20,
+  }) async {
+    try {
+      // Remove existing driver markers (keep pickup/dropoff markers)
+      final updatedMarkers = {...state.markers}
+        ..removeWhere((m) => m.markerId.value.startsWith('driver_'));
+
+      // Fetch nearby drivers
+      final driverRepo = ref.read(driverRepoProvider);
+      final result = await driverRepo.getDrivers(
+        location: location,
+        radiusMeters: radiusMeters,
+        limit: limit,
+        serviceType: serviceType,
+      );
+
+      result.fold(
+        (failure) {
+          debugPrint('❌ Failed to fetch nearby drivers: ${failure.message}');
+        },
+        (driverResponse) {
+          final drivers = driverResponse.data ?? [];
+          debugPrint('✅ Found ${drivers.length} nearby drivers for serviceType: $serviceType');
+
+          // Add driver markers
+          for (final driver in drivers) {
+            if (driver.latitude != null && driver.longitude != null) {
+              final driverPosition = LatLng(driver.latitude!, driver.longitude!);
+              final serviceType = driver.vehicle?.serviceType ?? 'CAR';
+              
+              // Get marker color based on service type
+              final markerColor = _getServiceTypeColor(serviceType);
+              final markerIcon = BitmapDescriptor.defaultMarkerWithHue(markerColor);
+
+              final driverMarker = Marker(
+                markerId: MarkerId('driver_${driver.id ?? driver.name ?? DateTime.now().millisecondsSinceEpoch}'),
+                position: driverPosition,
+                icon: markerIcon,
+                infoWindow: InfoWindow(
+                  title: driver.name ?? 'Driver',
+                  snippet: driver.vehicle?.model ?? serviceType,
+                ),
+              );
+
+              updatedMarkers.add(driverMarker);
+            }
+          }
+        },
+      );
+
+      state = state.copyWith(markers: updatedMarkers);
+    } catch (e) {
+      debugPrint('❌ Error adding nearby drivers: $e');
+    }
+  }
+
+  /// Clear all driver markers from the map
+  void clearDriverMarkers() {
+    final updatedMarkers = {...state.markers}
+      ..removeWhere((m) => m.markerId.value.startsWith('driver_'));
+    state = state.copyWith(markers: updatedMarkers);
+  }
+
+  /// Get marker color hue based on service type
+  double _getServiceTypeColor(String serviceType) {
+    switch (serviceType.toUpperCase()) {
+      case 'BIKE':
+        return BitmapDescriptor.hueBlue;
+      case 'MEGA':
+        return BitmapDescriptor.hueOrange;
+      case 'CAR':
+        return BitmapDescriptor.hueGreen;
+      default:
+        return BitmapDescriptor.hueGreen;
+    }
   }
 }

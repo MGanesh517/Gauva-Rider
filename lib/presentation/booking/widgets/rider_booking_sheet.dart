@@ -11,10 +11,12 @@ import 'package:gauva_userapp/presentation/booking/provider/order_providers.dart
 import 'package:gauva_userapp/presentation/dashboard/viewmodel/car_type_notifier.dart';
 
 import 'package:gauva_userapp/data/models/coupon_model/coupon_model.dart';
+import 'package:gauva_userapp/data/models/ride_service_response.dart';
 import 'package:gauva_userapp/presentation/booking/views/coupon_list_screen.dart';
 import '../../../core/utils/helpers.dart';
 import '../provider/ride_services_providers.dart';
 import '../provider/selection_providers.dart';
+import '../../waypoint/provider/way_point_map_providers.dart';
 
 class RideBookingSheet extends ConsumerStatefulWidget {
   const RideBookingSheet({super.key});
@@ -24,6 +26,8 @@ class RideBookingSheet extends ConsumerStatefulWidget {
 }
 
 class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
+  String? _lastFetchedServiceType; // Track last fetched service type
+
   @override
   void initState() {
     super.initState();
@@ -33,39 +37,67 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
     });
   }
 
+  /// Fetch nearby drivers for the selected service
+  void _fetchDriversForService(dynamic service) {
+    final wayPointState = ref.read(wayPointMapNotifierProvider);
+    final pickupLocation = wayPointState.currentLocation;
+
+    if (pickupLocation == null) return;
+
+    // Get service type (BIKE, MEGA, CAR, etc.)
+    final serviceType = service.serviceId ?? service.serviceType ?? service.id?.toString();
+
+    // Normalize service type to match API expectations
+    String? normalizedServiceType;
+    if (serviceType != null && serviceType.toString().isNotEmpty) {
+      final upperType = serviceType.toString().toUpperCase();
+      if (upperType.contains('BIKE') || upperType == 'BIKE') {
+        normalizedServiceType = 'BIKE';
+      } else if (upperType.contains('MEGA') || upperType == 'MEGA' || upperType.contains('AUTO')) {
+        normalizedServiceType = 'MEGA';
+      } else if (upperType.contains('CAR') || upperType == 'CAR') {
+        normalizedServiceType = 'CAR';
+      } else {
+        normalizedServiceType = upperType; // Use as-is if not recognized
+      }
+    }
+
+    // Only fetch if service type changed (prevents unnecessary API calls)
+    if (_lastFetchedServiceType != normalizedServiceType) {
+      _lastFetchedServiceType = normalizedServiceType;
+
+      // Clear old drivers first, then fetch new ones
+      ref.read(wayPointMapNotifierProvider.notifier).clearDriverMarkers();
+
+      // Fetch drivers for the new service type
+      ref
+          .read(wayPointMapNotifierProvider.notifier)
+          .addNearbyDrivers(location: pickupLocation, serviceType: normalizedServiceType, radiusMeters: 5000, limit: 20);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final riderServiceState = ref.watch(rideServicesNotifierProvider);
     final isDark = ref.watch(themeModeProvider.notifier).isDarkMode();
     final selectedService = ref.watch(carTypeNotifierProvider).selectedCarType;
 
-    // Calculate dynamic height based on number of services
-    final serviceCount = riderServiceState.whenOrNull(success: (data) => data.data?.servicesList?.length ?? 0) ?? 0;
-
-    // Calculate approximate height needed
-    // Drag handle: ~20h, Each service card: ~70h, Button: ~74h, Padding: ~16h
-    final screenHeight = MediaQuery.of(context).size.height;
-    final dragHandleHeight = 20.h;
-    final buttonHeight = 74.h; // 50h button + 24h padding
-    final serviceCardHeight = 70.h; // Approximate height per card
-    final spacing = 8.h; // Spacing between cards
-    final contentPadding = 16.h;
-
-    final totalContentHeight =
-        dragHandleHeight +
-        (serviceCount * serviceCardHeight) +
-        ((serviceCount > 0 ? serviceCount - 1 : 0) * spacing) +
-        buttonHeight +
-        contentPadding;
-
-    // Calculate initial size as percentage of screen height
-    final calculatedSize = (totalContentHeight / screenHeight).clamp(0.25, 0.9);
-    final minSize = calculatedSize.clamp(0.25, 0.9);
+    // Watch for service type changes and fetch nearby drivers
+    ref.listen<Services?>(carTypeNotifierProvider.select((state) => state.selectedCarType), (previous, next) {
+      // Only fetch if service actually changed
+      if (next != null && (previous == null || previous.id != next.id)) {
+        _fetchDriversForService(next);
+      } else if (next == null && previous != null) {
+        // Clear drivers when service is deselected
+        _lastFetchedServiceType = null;
+        ref.read(wayPointMapNotifierProvider.notifier).clearDriverMarkers();
+      }
+    });
 
     return DraggableScrollableSheet(
-      initialChildSize: calculatedSize,
-      minChildSize: minSize,
-      maxChildSize: 0.9, // Maximum 90%
+      initialChildSize: 0.4,
+      minChildSize: 0.3,
+      maxChildSize: 0.9,
       builder: (context, scrollController) => Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -76,7 +108,6 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
           top: false,
           bottom: true,
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             children: [
               // Drag handle
               Center(
@@ -87,7 +118,7 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
                   decoration: BoxDecoration(color: const Color(0xFFD7DAE0), borderRadius: BorderRadius.circular(10)),
                 ),
               ),
-              // Scrollable Content - use Expanded to fill available space, button stays at bottom
+              // Scrollable Content - only this scrolls, button stays fixed
               Expanded(
                 child: SingleChildScrollView(
                   controller: scrollController,
@@ -96,73 +127,74 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [_buildServiceList(context, riderServiceState, ref, isDark)],
+                      children: [
+                        _buildServiceList(context, riderServiceState, ref, isDark),
+                        // Coupon Section
+                        Consumer(
+                          builder: (context, ref, _) {
+                            final selectedCoupon = ref.watch(rideServiceFilterNotiferProvider).couponCode;
+
+                            return InkWell(
+                              onTap: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const CouponListScreen()),
+                                );
+
+                                if (result != null && result is CouponModel) {
+                                  ref.read(rideServiceFilterNotiferProvider.notifier).updateCouponCode(result.code);
+                                  // Update prices with coupon
+                                  final filter = ref.read(rideServiceFilterNotiferProvider);
+                                  ref
+                                      .read(rideServicesNotifierProvider.notifier)
+                                      .getRideServices(riderServiceFilter: filter);
+
+                                  showNotification(message: "Coupon ${result.code} selected!", isSuccess: true);
+                                }
+                              },
+                              child: Container(
+                                padding: EdgeInsets.only(top: 12.h, bottom: 0),
+                                decoration: BoxDecoration(
+                                  border: Border(top: BorderSide(color: Colors.grey[200]!)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Ionicons.pricetag_outline,
+                                      color: selectedCoupon != null && selectedCoupon.isNotEmpty
+                                          ? Colors.green
+                                          : const Color(0xFF1469B5),
+                                    ),
+                                    Gap(12.w),
+                                    Expanded(
+                                      child: Text(
+                                        selectedCoupon != null && selectedCoupon.isNotEmpty
+                                            ? "Coupon Applied: $selectedCoupon"
+                                            : "Apply Coupon",
+                                        style: TextStyle(
+                                          fontSize: 14.sp,
+                                          fontWeight: FontWeight.w500,
+                                          color: selectedCoupon != null && selectedCoupon.isNotEmpty
+                                              ? Colors.green
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ),
+                                    const Icon(Icons.chevron_right, color: Colors.grey),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     ),
                   ),
                 ),
               ),
-              // Coupon Section
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.w),
-                child: Consumer(
-                  builder: (context, ref, _) {
-                    final selectedCoupon = ref.watch(rideServiceFilterNotiferProvider).couponCode;
-
-                    return InkWell(
-                      onTap: () async {
-                        final result = await Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const CouponListScreen()),
-                        );
-
-                        if (result != null && result is CouponModel) {
-                          ref.read(rideServiceFilterNotiferProvider.notifier).updateCouponCode(result.code);
-                          // Update prices with coupon
-                          final filter = ref.read(rideServiceFilterNotiferProvider);
-                          ref.read(rideServicesNotifierProvider.notifier).getRideServices(riderServiceFilter: filter);
-
-                          showNotification(message: "Coupon ${result.code} selected!", isSuccess: true);
-                        }
-                      },
-                      child: Container(
-                        padding: EdgeInsets.symmetric(vertical: 12.h),
-                        decoration: BoxDecoration(
-                          border: Border(top: BorderSide(color: Colors.grey[200]!)),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Ionicons.pricetag_outline,
-                              color: selectedCoupon != null && selectedCoupon.isNotEmpty
-                                  ? Colors.green
-                                  : const Color(0xFF1469B5),
-                            ),
-                            Gap(12.w),
-                            Expanded(
-                              child: Text(
-                                selectedCoupon != null && selectedCoupon.isNotEmpty
-                                    ? "Coupon Applied: $selectedCoupon"
-                                    : "Apply Coupon",
-                                style: TextStyle(
-                                  fontSize: 14.sp,
-                                  fontWeight: FontWeight.w500,
-                                  color: selectedCoupon != null && selectedCoupon.isNotEmpty
-                                      ? Colors.green
-                                      : Colors.black,
-                                ),
-                              ),
-                            ),
-                            const Icon(Icons.chevron_right, color: Colors.grey),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              // Fixed Bottom Button Bar - always at bottom
+              // Fixed Bottom Button Bar - NEVER scrolls, always at bottom
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 12.h),
+                padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 0, bottom: 12.h),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 4, offset: Offset(0, -2))],
@@ -245,7 +277,7 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
       onTap: () => notifier.selectCar(service),
       child: isSelected
           ? Container(
-              margin: EdgeInsets.only(bottom: 8.h),
+              margin: EdgeInsets.only(bottom: 6.h),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 gradient: const LinearGradient(
@@ -352,7 +384,7 @@ class _RideBookingSheetState extends ConsumerState<RideBookingSheet> {
               ),
             )
           : Container(
-              margin: EdgeInsets.only(bottom: 8.h),
+              margin: EdgeInsets.only(bottom: 6.h),
               padding: EdgeInsets.all(10.w),
               decoration: BoxDecoration(
                 color: Colors.white,

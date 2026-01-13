@@ -33,6 +33,9 @@ Widget carGridView({required List<Services> list, required CarTypeNotifier notif
             childAspectRatio: 1.0, // Adjust based on card width/height ratio
           ),
           itemCount: list.length,
+          // PERFORMANCE OPTIMIZATION: Add repaint boundaries for each grid item
+          addRepaintBoundaries: true,
+          cacheExtent: 0, // No cache needed for non-scrollable grid
           itemBuilder: (context, index) {
             final type = list[index];
             final isSelected = state.selectedCarType == type;

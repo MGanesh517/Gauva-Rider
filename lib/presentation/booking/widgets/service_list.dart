@@ -12,23 +12,31 @@ class ServiceList extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final carTypeState = ref.watch(carTypeNotifierProvider);
-    final carTypeStateNotifier = ref.watch(carTypeNotifierProvider.notifier);
+    // PERFORMANCE OPTIMIZATION: Watch only specific values to reduce rebuilds
+    final viewType = ref.watch(carTypeNotifierProvider.select((state) => state.viewType));
+    final selectedCarId = ref.watch(carTypeNotifierProvider.select((state) => state.selectedCarType?.id));
+    final carTypeStateNotifier = ref.read(carTypeNotifierProvider.notifier);
+
+    final servicesList = data.data?.servicesList ?? [];
+    final itemCount = servicesList.length;
 
     return ListView.builder(
       padding: EdgeInsets.zero,
-      scrollDirection: carTypeState.viewType == CarViewType.grid ? Axis.vertical : Axis.horizontal,
-      itemCount: data.data?.servicesList?.length,
-
+      scrollDirection: viewType == CarViewType.grid ? Axis.vertical : Axis.horizontal,
+      itemCount: itemCount,
+      // PERFORMANCE OPTIMIZATION: Add cacheExtent for better scroll performance
+      cacheExtent: 500, // Cache 500 pixels worth of items off-screen
+      // PERFORMANCE OPTIMIZATION: Add itemExtent for fixed-height items (if applicable)
+      // itemExtent: 120, // Uncomment if all items have same height
       itemBuilder: (context, index) {
-        final service = data.data?.servicesList ?? [];
+        final service = servicesList[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: 8),
           child: ServiceItem(
-            entity: service[index],
-            isSelected: carTypeState.selectedCarType?.id == service[index].id,
+            entity: service,
+            isSelected: selectedCarId == service.id,
             onPressed: () {
-              carTypeStateNotifier.selectCar(service[index]);
+              carTypeStateNotifier.selectCar(service);
             },
           ),
         );

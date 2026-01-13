@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:gauva_userapp/core/config/environment.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gauva_userapp/core/utils/app_colors.dart';
 import 'package:gauva_userapp/core/widgets/is_ios.dart';
 import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.dart';
@@ -13,94 +13,46 @@ class GoogleSignInButton extends ConsumerWidget {
   const GoogleSignInButton({super.key});
 
   Future<void> _handleGoogleSignIn(BuildContext context, WidgetRef ref, GoogleSignInNotifier stateNotifier) async {
-    print('');
-    print('🔵 ═══════════════════════════════════════════════════════');
-    print('🔵 GOOGLE SIGN-IN BUTTON - Starting');
-    print('🔵 ═══════════════════════════════════════════════════════');
-
     try {
-      print('📱 Step 1: Initializing Google Sign In...');
-      // Initialize Google Sign In - do this on a separate isolate if possible
-      // Use web client ID from google-services.json (client_type: 3)
-      // This is the OAuth 2.0 client ID for web applications
-      final GoogleSignIn googleSignIn = GoogleSignIn(
-        scopes: ['email', 'profile'],
-        // Removed serverClientId to use Android OAuth client from google-services.json
-        // This will automatically use the Android client with matching SHA-1
-      );
-      print('✅ Step 1: Google Sign In initialized');
-      print('   🔑 Using Web Client ID: ${Environment.GOOGLE_WEB_CLIENT_ID}');
+      // Step 1: Initialize Google Sign In (simple, no serverClientId needed for mobile)
+      final GoogleSignIn googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
 
-      print('📱 Step 2: Opening Google Sign In dialog...');
-      // Sign in with Google - this opens native activity
-      // The frame skipping is expected during this transition
+      // Step 2: Sign in with Google
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      print('📱 Step 2: Google Sign In dialog closed');
-
       if (googleUser == null) {
-        print('⚠️ Step 2: User cancelled Google Sign In');
-        // User cancelled the sign-in - no error needed
+        // User cancelled
         return;
       }
 
-      print('✅ Step 2: User selected Google account');
-      print('   👤 Name: ${googleUser.displayName}');
-      print('   📧 Email: ${googleUser.email}');
-      print('   🆔 ID: ${googleUser.id}');
-
-      print('📱 Step 3: Getting authentication details...');
-      // Get authentication details
+      // Step 3: Get Google authentication
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      print('✅ Step 3: Authentication details received');
 
-      // Get the ID token
-      final String? idToken = googleAuth.idToken;
-      print('📱 Step 4: Checking ID token...');
-      print('   🔑 ID Token: ${idToken != null ? "${idToken.substring(0, 30)}..." : "NULL"}');
-      print(
-        '   🔑 Access Token: ${googleAuth.accessToken != null ? "${googleAuth.accessToken!.substring(0, 30)}..." : "NULL"}',
-      );
+      // Step 4: Create Firebase credential and sign in to Firebase
+      // This gives us a Firebase ID token with correct audience for backend
+      final credential = GoogleAuthProvider.credential(accessToken: googleAuth.accessToken, idToken: googleAuth.idToken);
 
-      if (idToken == null) {
-        print('❌ Step 4: ID token is NULL - Cannot proceed');
-        // Handle error - ID token is null
+      // Step 5: Sign in to Firebase Auth to get Firebase ID token
+      final UserCredential firebaseUser = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // Step 6: Get Firebase ID token (this has the correct audience "gauva-15d9a")
+      final String? firebaseIdToken = await firebaseUser.user?.getIdToken();
+
+      if (firebaseIdToken == null) {
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Failed to get Google authentication token'), duration: Duration(seconds: 3)),
+            const SnackBar(content: Text('Failed to get authentication token'), duration: Duration(seconds: 3)),
           );
         }
         return;
       }
 
-      print('✅ Step 4: ID token received (length: ${idToken.length})');
+      // Step 7: Extract user info and send to backend
+      final String? name = firebaseUser.user?.displayName;
+      final String? email = firebaseUser.user?.email;
 
-      // Extract user information from Google account
-      final String? name = googleUser.displayName;
-      final String? email = googleUser.email;
-      // Phone number is not available from Google Sign-In, so it will be null
-      final String? phone = null;
-
-      print('📱 Step 5: Preparing data for API call...');
-      print('   👤 Name: $name');
-      print('   📧 Email: $email');
-      print('   📱 Phone: $phone (not available from Google)');
-
-      print('📱 Step 6: Calling sign-in notifier...');
-      // Call the sign-in notifier with the ID token and user info
-      // This will handle the API call and state management
-      await stateNotifier.signInWithGoogle(idToken: idToken, name: name, email: email, phone: phone);
-      print('✅ Step 6: Sign-in notifier completed');
-      print('🔵 ═══════════════════════════════════════════════════════');
-      print('');
-    } catch (e, stackTrace) {
-      print('');
-      print('🔴 ═══════════════════════════════════════════════════════');
-      print('🔴 GOOGLE SIGN-IN BUTTON - ERROR');
-      print('🔴 Error: $e');
-      print('🔴 Stack Trace: $stackTrace');
-      print('🔴 ═══════════════════════════════════════════════════════');
-      print('');
-      // Handle error gracefully
+      // Step 8: Call backend with Firebase ID token
+      await stateNotifier.signInWithGoogle(idToken: firebaseIdToken, name: name, email: email, phone: null);
+    } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Google sign-in failed: ${e.toString()}'), duration: const Duration(seconds: 4)),
@@ -167,12 +119,8 @@ class GoogleSignInButton extends ConsumerWidget {
               : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Google icon - proper multi-colored G logo
-                    SizedBox(
-                      width: 20.w,
-                      height: 20.h,
-                      child: CustomPaint(painter: GoogleLogoPainter()),
-                    ),
+                    // Google icon - using image asset
+                    Image.asset('assets/googleImage.png', width: 20.w, height: 20.h, fit: BoxFit.contain),
                     SizedBox(width: 12.w),
                     Text(
                       'Sign in with Google',
@@ -189,68 +137,4 @@ class GoogleSignInButton extends ConsumerWidget {
       ),
     );
   }
-}
-
-// Custom painter for Google logo
-class GoogleLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()..style = PaintingStyle.fill;
-
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-
-    // Draw the Google 'G' logo with proper colors
-    // Blue arc (top right)
-    paint.color = const Color(0xFF4285F4);
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -0.5 * 3.14159, // -90 degrees
-      1.5 * 3.14159, // 270 degrees
-      true,
-      paint,
-    );
-
-    // Red arc (top left)
-    paint.color = const Color(0xFFEA4335);
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      -0.5 * 3.14159, // -90 degrees
-      0.5 * 3.14159, // 90 degrees
-      true,
-      paint,
-    );
-
-    // Yellow arc (bottom left)
-    paint.color = const Color(0xFFFBBC05);
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      0.0, // 0 degrees
-      0.5 * 3.14159, // 90 degrees
-      true,
-      paint,
-    );
-
-    // Green arc (bottom right)
-    paint.color = const Color(0xFF34A853);
-    canvas.drawArc(
-      Rect.fromCircle(center: center, radius: radius),
-      0.5 * 3.14159, // 90 degrees
-      0.5 * 3.14159, // 90 degrees
-      true,
-      paint,
-    );
-
-    // Draw white center circle to create the 'G' shape
-    paint.color = Colors.white;
-    canvas.drawCircle(center, radius * 0.5, paint);
-
-    // Draw the horizontal bar of the 'G'
-    paint.color = const Color(0xFF4285F4);
-    final barRect = Rect.fromLTWH(center.dx, center.dy - radius * 0.15, radius, radius * 0.3);
-    canvas.drawRect(barRect, paint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

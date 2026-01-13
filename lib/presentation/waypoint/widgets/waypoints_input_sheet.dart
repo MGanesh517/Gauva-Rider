@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:math' as math;
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
@@ -44,8 +43,6 @@ class SearchDestinationPage extends ConsumerStatefulWidget {
 }
 
 class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
-  Timer? _debounce;
-
   late bool isDark;
   @override
   void didChangeDependencies() {
@@ -90,20 +87,20 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
   }
 
   void _onSearchChanged(String? value) {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-
-    _debounce = Timer(const Duration(milliseconds: 300), () {
-      if (value == null || value.trim().isEmpty) {
-        ref.read(searchPlaceNotifierProvider.notifier).reset();
-      } else if (value.length > 3) {
-        ref.read(searchPlaceNotifierProvider.notifier).searchPlace(value);
-      }
-    });
+    // PERFORMANCE OPTIMIZATION: Remove double debounce
+    // The SearchPlaceNotifier already has debounce, so we call it directly
+    // This matches the HTML tool behavior (starts searching at 2 characters)
+    if (value == null || value.trim().isEmpty) {
+      ref.read(searchPlaceNotifierProvider.notifier).reset();
+    } else if (value.trim().length >= 2) {
+      // Start searching at 2 characters (matches HTML tool)
+      // The notifier will handle debouncing internally
+      ref.read(searchPlaceNotifierProvider.notifier).searchPlace(value);
+    }
   }
 
   @override
   void dispose() {
-    _debounce?.cancel();
     setStatusBar(isHome: true, isDark: isDark);
     super.dispose();
   }
@@ -288,11 +285,8 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
         final pickupLatLng = LatLng(pickup.location.latitude, pickup.location.longitude);
         final dropLatLng = LatLng(dropOff.location.latitude, dropOff.location.longitude);
 
-        // Show loading
-        showNotification(message: 'Getting available services...');
-
-        // Calculate distance and duration
-        final distanceKm = _calculateDistance(pickupLatLng, dropLatLng) / 1000; // Convert to km
+        // PERFORMANCE OPTIMIZATION: Calculate distance/duration synchronously (fast)
+        final distanceKm = _calculateDistance(pickupLatLng, dropLatLng) / 1000;
         final durationMin = _estimateDuration(distanceKm);
 
         final riderService = RiderServiceState(
@@ -309,33 +303,49 @@ class _SearchDestinationPageState extends ConsumerState<SearchDestinationPage> {
           durationMin: durationMin,
         );
 
+        // PERFORMANCE OPTIMIZATION: Set filter first (synchronous, fast)
         ref.read(rideServiceFilterNotiferProvider.notifier).addRideServiceFilter(riderService);
 
+        // PERFORMANCE OPTIMIZATION: Reset providers in parallel (non-blocking)
+        // These are synchronous operations, so we do them before API call
+        ref.read(bookingNotifierProvider.notifier).resetState();
+        ref.read(createOrderNotifierProvider.notifier).reset();
+        ref.read(orderInProgressNotifier.notifier).resetState();
+        ref.read(selectedRideNotifierProvider.notifier).reset();
+        ref.read(bookingNotifierProvider.notifier).selectVehicle();
+
+        // PERFORMANCE OPTIMIZATION: Fetch services (required before navigation)
         await ref
             .read(rideServicesNotifierProvider.notifier)
             .getAvailableServicesForRoute(riderServiceFilter: riderService);
 
-        if (!mounted) return;
-
-        ref.read(bookingNotifierProvider.notifier).resetState();
-        ref.read(createOrderNotifierProvider.notifier).reset();
-        ref.read(orderInProgressNotifier.notifier).resetState();
-        // ref.read(selectedPayMethodProvider.notifier).reset();
-        ref.read(selectedRideNotifierProvider.notifier).reset();
-        ref.read(bookingNotifierProvider.notifier).selectVehicle();
-
-        await ref.read(routeNotifierProvider.notifier).fetchRoutes();
+        // PERFORMANCE OPTIMIZATION: Start route fetching in parallel (non-blocking)
+        // Routes will load on the booking page, preventing blank screen delay
+        // Don't await - let it load in background while navigating
+        ref.read(routeNotifierProvider.notifier).fetchRoutes();
 
         if (!mounted) return;
 
+        // PERFORMANCE OPTIMIZATION: Navigate immediately after services load
+        // Don't wait for routes - they'll load in background on booking page
         ref
             .read(rideServicesNotifierProvider)
             .maybeWhen(
               success: (_) {
+                // Navigate immediately - routes will continue loading in background
                 NavigationService.pushReplacementNamed(AppRoutes.bookingPage);
                 ref.read(wayPointMapNotifierProvider.notifier).updateForAccepted();
+
+                // Routes will complete loading on booking page (non-blocking)
+                // This prevents blank white screen delay
               },
-              orElse: () {},
+              error: (error) {
+                // Show error if services failed
+                showNotification(message: error.message);
+              },
+              orElse: () {
+                // Handle other states if needed
+              },
             );
       },
       child: Text(

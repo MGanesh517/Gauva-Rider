@@ -67,26 +67,45 @@ class GoogleAPIRepoImpl extends BaseRepository implements IGoogleAPIRepo {
 
   @override
   Future<Either<Failure, List<PlaceModel>>> searchPlace(String place, LatLng origin) async => safeApiCall(() async {
-      debugPrint('🔍 SEARCH PLACE - Query: $place, Origin: ${origin.latitude}, ${origin.longitude}');
+      // PERFORMANCE OPTIMIZATION: Removed debug prints for faster execution
+      // Only log in debug mode if needed
+      if (kDebugMode) {
+        debugPrint('🔍 SEARCH PLACE - Query: $place');
+      }
+      
       final response = await _googleApiService.searchPlace(place);
-      debugPrint('📥 Place Autocomplete Response Status: ${response.data['status']}');
       final data = response.data;
-      if (data['status'] == 'OK') {
-        final List<dynamic> unformattedData = data['predictions'];
-        debugPrint('📍 Found ${unformattedData.length} predictions');
-        final List<PlaceModel> places = unformattedData
-            .map<PlaceModel>((prediction) => PlaceModel(
+      
+      // PERFORMANCE OPTIMIZATION: Handle both response formats efficiently
+      List<dynamic> predictions = [];
+      if (data['status'] == 'OK' && data['predictions'] != null) {
+        predictions = data['predictions'] as List<dynamic>;
+      } else if (data['predictions'] != null) {
+        // Handle case where predictions exist but status might be different
+        predictions = data['predictions'] as List<dynamic>;
+      }
+      
+      if (predictions.isNotEmpty) {
+        // PERFORMANCE OPTIMIZATION: Efficient mapping without unnecessary operations
+        final List<PlaceModel> places = predictions
+            .map<PlaceModel>((prediction) {
+              final structured = prediction['structured_formatting'] as Map<String, dynamic>?;
+              return PlaceModel(
                   placeId: prediction['place_id'] as String? ?? '',
-                  title: prediction['structured_formatting']?['secondary_text'] as String? ?? '',
+                title: structured?['main_text'] as String? ?? structured?['secondary_text'] as String? ?? '',
                   subtitle: prediction['description'] as String? ?? '',
                   distance: 'N/A',
                   latLng: const LatLng(0.0, 0.0),
-                ))
+              );
+            })
             .toList();
-        debugPrint('✅ SEARCH PLACE - Returning ${places.length} places');
+        
+        if (kDebugMode) {
+          debugPrint('✅ SEARCH PLACE - Found ${places.length} places');
+        }
         return places;
       }
-      debugPrint('⚠️ SEARCH PLACE - No results found');
+      
       return [];
     });
 

@@ -12,6 +12,7 @@ class AppRoutes {
   static const String waypointPage = '/waypoint-page';
   static const String bookingPage = '/booking-page';
   static const String chatPage = '/chat-page';
+  static const String notificationsPage = '/notifications-page';
   static const String profileInfoPage = '/profile-info-page';
   static const String searchDestinationPage = '/search-destination-page';
   static const String rideHistory = '/ride-history';

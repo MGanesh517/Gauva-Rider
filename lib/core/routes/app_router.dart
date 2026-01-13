@@ -11,6 +11,7 @@ import 'package:gauva_userapp/presentation/booking/views/booking_page.dart';
 import 'package:gauva_userapp/presentation/ride_history/views/ride_details_page.dart';
 import 'package:gauva_userapp/presentation/splash/views/splash_page.dart';
 import 'package:gauva_userapp/presentation/track_order/views/chat_sheet.dart';
+import 'package:gauva_userapp/presentation/notifications/views/notifications_page.dart';
 import 'package:gauva_userapp/presentation/waypoint/views/way_point_page.dart';
 import 'package:gauva_userapp/presentation/waypoint/widgets/waypoints_input_sheet.dart';
 import 'package:gauva_userapp/presentation/intercity/views/intercity_search_results_page.dart';
@@ -70,6 +71,8 @@ class AppRouter {
         return SlideRightRoute(page: BookingPage());
       case '/chat-page':
         return SlideRightRoute(page: const ChatSheet());
+      case '/notifications-page':
+        return SlideRightRoute(page: const NotificationsPage());
       case '/profile-info-page':
         return SlideRightRoute(page: const ProfileInfoPage());
 

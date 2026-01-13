@@ -8,10 +8,11 @@ Future<String?> deviceTokenFirebase() async => Platform.isIOS
     : await FirebaseMessaging.instance.getToken();
 
 Future<String?> iosDeviceToken()async{
+  // Request notification permissions with sound enabled
   await FirebaseMessaging.instance.requestPermission(
-    // alert: true,
-    // badge: true,
-    // sound: true,
+    alert: true,
+    badge: true,
+    sound: true,
   );
   final token = await FirebaseMessaging.instance.getAPNSToken();
   // print("🔥 FCM Token: $token");

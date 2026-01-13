@@ -10,13 +10,27 @@ class DriverService implements IDriverService {
 
   DriverService({required this.dioClient});
   @override
-  Future<Response> getDrivers({required LatLng? location}) async => dioClient.dio.get(
+  Future<Response> getDrivers({
+    required LatLng? location,
+    int radiusMeters = 5000,
+    int limit = 20,
+    String? serviceType,
+  }) async {
+    final queryParams = <String, dynamic>{
+      'lat': location!.latitude,
+      'lng': location.longitude,
+      'radius_m': radiusMeters,
+      'limit': limit,
+    };
+    
+    // Add serviceType filter if provided
+    if (serviceType != null && serviceType.isNotEmpty) {
+      queryParams['serviceType'] = serviceType;
+    }
+    
+    return dioClient.dio.get(
       ApiEndpoints.getDrivers,
-      queryParameters: {
-        'lat': location!.latitude, // Spring Boot uses 'lat' and 'lng'
-        'lng': location.longitude,
-        'radius_m': 5000, // Optional: radius in meters
-        'limit': 10, // Optional: limit results
-      },
+      queryParameters: queryParams,
     );
+  }
 }

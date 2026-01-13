@@ -20,9 +20,23 @@ class CarTypeNotifier extends StateNotifier<CarTypeState> {
   final Ref ref;
   final IRideServicesRepo rideServicesRepo;
 
+  // PERFORMANCE OPTIMIZATION: Cache services response for 5 minutes
+  // Services are relatively static and don't change frequently
+  List<Services>? _cachedServices;
+  DateTime? _servicesCacheTime;
+  static const _servicesCacheDuration = Duration(minutes: 5);
+
   CarTypeNotifier(this.ref, this.rideServicesRepo) : super(CarTypeState.initial());
 
   Future<void> getServicesHome() async {
+    // Return cached data if available and not expired
+    if (_cachedServices != null && 
+        _servicesCacheTime != null &&
+        DateTime.now().difference(_servicesCacheTime!) < _servicesCacheDuration) {
+      state = state.copyWith(serviceListState: AppState.success(_cachedServices!));
+      return;
+    }
+
     state = state.copyWith(serviceListState: const AppState.loading());
 
     final result = await rideServicesRepo.getServicesHome();
@@ -33,9 +47,18 @@ class CarTypeNotifier extends StateNotifier<CarTypeState> {
       },
           (data) {
         final list = data.data?.servicesList ?? [];
+        // Cache the services list
+        _cachedServices = list;
+        _servicesCacheTime = DateTime.now();
         state = state.copyWith(serviceListState: AppState.success(list));
       },
     );
+  }
+  
+  /// Clear services cache (useful when services might have changed)
+  void clearServicesCache() {
+    _cachedServices = null;
+    _servicesCacheTime = null;
   }
 
   void selectCar(Services carType, {bool resetSelectedLocationState = false}) {

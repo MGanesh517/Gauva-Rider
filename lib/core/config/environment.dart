@@ -5,7 +5,7 @@ enum EnvironmentType { dev, prod }
 class Environment {
   static const String dev = 'development';
   static const String prod = 'production';
-  static const String _prodUrl = 'https://gauva-f6f6d9ddagfqc9fw.southindia-01.azurewebsites.net';
+  static const String _prodUrl = 'https://gauva-f6f6d9ddagfqc9fw.canadacentral-01.azurewebsites.net';
   static const String _devUrl = 'https://gauva-f6f6d9ddagfqc9fw.canadacentral-01.azurewebsites.net';
 
   // Firebase Configuration (from google-services.json)

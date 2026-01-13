@@ -1,15 +1,11 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gauva_userapp/common/loading_view.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:gauva_userapp/presentation/booking/view_model/ride_services_notifier.dart';
 import 'package:gauva_userapp/presentation/booking/provider/ride_services_providers.dart';
 import 'package:gauva_userapp/data/models/waypoint.dart';
 
 import '../../../core/state/rider_service_state.dart';
-import '../../../gen/assets.gen.dart';
 import '../../booking/widgets/place_result_item.dart';
 import '../provider/place_lat_lng_fetcher_providers.dart';
 import '../provider/search_place_providers.dart';
@@ -39,6 +35,10 @@ class PlaceLookupStateView extends ConsumerWidget {
           child: ListView.separated(
             padding: EdgeInsets.zero,
             itemCount: places.length,
+            // PERFORMANCE OPTIMIZATION: Optimize place search list
+            cacheExtent: 300, // Cache off-screen items
+            addAutomaticKeepAlives: false,
+            addRepaintBoundaries: true, // Each place item is a repaint boundary
             separatorBuilder: (context, index) => const Divider(thickness: 0.3, indent: 48, height: 16),
             itemBuilder: (context, index) {
               final place = places[index];

@@ -12,20 +12,42 @@ class DriverRepoImpl extends BaseRepository implements IDriverRepo {
 
   DriverRepoImpl({required this.driverService});
   @override
-  Future<Either<Failure, DriverResponse>> getDrivers(
-      {required LatLng? location}) async => await safeApiCall(() async {
-      debugPrint('🚗 GET DRIVERS - Location: ${location?.latitude}, ${location?.longitude}');
-      final response = await driverService.getDrivers(location: location);
-      debugPrint('📥 GET DRIVERS Response: ${response.data}');
-      try {
-        final result = DriverResponse.fromMap(response.data);
-        debugPrint('✅ GET DRIVERS - Parsed successfully');
-        debugPrint('✅ Drivers count: ${result.data?.length ?? 0}');
-        return result;
-      } catch (e, stackTrace) {
-        debugPrint('🔴 GET DRIVERS - Parsing error: $e');
-        debugPrint('🔴 Stack trace: $stackTrace');
-        rethrow;
+  Future<Either<Failure, DriverResponse>> getDrivers({
+    required LatLng? location,
+    int radiusMeters = 5000,
+    int limit = 20,
+    String? serviceType,
+  }) async => await safeApiCall(() async {
+    debugPrint('🚗 GET DRIVERS - Location: ${location?.latitude}, ${location?.longitude}, ServiceType: $serviceType');
+    final response = await driverService.getDrivers(
+      location: location,
+      radiusMeters: radiusMeters,
+      limit: limit,
+      serviceType: serviceType,
+    );
+    debugPrint('📥 GET DRIVERS Response: ${response.data}');
+    try {
+      // Handle both array response and object response
+      dynamic responseData = response.data;
+      DriverResponse result;
+
+      if (responseData is List) {
+        // API returns array directly
+        result = DriverResponse.fromMap({'data': responseData} as Map<String, dynamic>);
+      } else if (responseData is Map) {
+        // API returns object with data field
+        result = DriverResponse.fromMap(responseData as Map<String, dynamic>);
+      } else {
+        throw Exception('Unexpected response format');
       }
-    });
+
+      debugPrint('✅ GET DRIVERS - Parsed successfully');
+      debugPrint('✅ Drivers count: ${result.data?.length ?? 0}');
+      return result;
+    } catch (e, stackTrace) {
+      debugPrint('🔴 GET DRIVERS - Parsing error: $e');
+      debugPrint('🔴 Stack trace: $stackTrace');
+      rethrow;
+    }
+  });
 }

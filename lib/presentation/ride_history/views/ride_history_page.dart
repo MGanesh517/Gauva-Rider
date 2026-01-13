@@ -148,6 +148,11 @@ class _RideHistoryPageState extends ConsumerState<RideHistoryPage> {
                         }
                         return ListView.builder(
                           itemCount: orders.length,
+                          // PERFORMANCE OPTIMIZATION: Add cacheExtent for better scroll performance
+                          cacheExtent: 500, // Cache 500 pixels worth of items off-screen
+                          // PERFORMANCE OPTIMIZATION: Add addAutomaticKeepAlives for better item preservation
+                          addAutomaticKeepAlives: false, // Don't keep items alive when scrolled away
+                          addRepaintBoundaries: true, // Add repaint boundaries for each item
                           itemBuilder: (context, index) {
                             final ride = orders[index];
                             return rideHistoryCard(
@@ -187,6 +192,10 @@ class _RideHistoryPageState extends ConsumerState<RideHistoryPage> {
                         }
                         return ListView.builder(
                           itemCount: orders.length,
+                          // PERFORMANCE OPTIMIZATION: Add cacheExtent for better scroll performance
+                          cacheExtent: 500,
+                          addAutomaticKeepAlives: false,
+                          addRepaintBoundaries: true,
                           itemBuilder: (context, index) {
                             final ride = orders[index];
                             return intercityRideHistoryCard(

@@ -20,6 +20,11 @@ class ApiEndpoints {
 
   // Notification endpoints - Spring Boot
   static const String submitFcmToken = '/api/notifications/token'; // Submit FCM token
+  static const String notificationsInbox = '/api/notifications/inbox'; // List notifications
+  static const String unreadCount = '/api/notifications/inbox/unread/count'; // Unread count
+  static String markAsRead(int id) => '/api/notifications/inbox/$id/read'; // Mark one as read
+  static const String markAllAsRead = '/api/notifications/inbox/read-all'; // Mark all as read
+  static const String clearNotifications = '/api/notifications/inbox'; // Clear all notifications
 
   // User Wallet Endpoints
   static const String userWalletBalance = '/api/v1/user/wallet/balance';

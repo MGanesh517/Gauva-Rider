@@ -38,6 +38,9 @@ class HomeMapState {
 
 class HomeMapNotifier extends StateNotifier<HomeMapState> {
   final Ref ref;
+  
+  // PERFORMANCE OPTIMIZATION: Cache addresses to avoid repeated API calls
+  static final Map<String, String> _addressCache = {};
 
   HomeMapNotifier(this.ref,) : super(HomeMapState.empty()) {
     _initialize();
@@ -46,44 +49,63 @@ class HomeMapNotifier extends StateNotifier<HomeMapState> {
   Future<void> _initialize() async {
     final userLocation = await showLocationPermissionPrompt(ref);
     if(userLocation != null){
+      // PERFORMANCE OPTIMIZATION: Update location immediately, fetch address in background
       updateCurrentLocationMarkerAddress(userLocation);
     }
-    // // final clusterManager = await _initClusterManager(userLocation: userLocation);
-    //
-    // state = state.copyWith(
-    //   currentLocation: userLocation,
-    //   // manager: clusterManager,
-    // );
-    // await showLocationPermissionPrompt(ref);
-    // if(userLocation != null){
-    //   await _getAddressFromLatLng(userLocation);
-    //   await _setCurrentLocationMarker();
-    // }
   }
 
   Future<void> updateCurrentLocationMarkerAddress(LatLng location) async {
-    state = state.copyWith(currentLocation: location,);
-    await _getAddressFromLatLng(location);
-    await _setCurrentLocationMarker();
+    // PERFORMANCE OPTIMIZATION: Update location immediately (non-blocking)
+    // This allows map to show instantly
+    state = state.copyWith(currentLocation: location);
+    
+    // Set marker immediately without waiting for address
+    _setCurrentLocationMarker();
+    
+    // PERFORMANCE OPTIMIZATION: Fetch address in background (non-blocking)
+    // Don't await - let it update address when ready
+    _getAddressFromLatLng(location).then((address) {
+      if (address != null) {
+        state = state.copyWith(address: address);
+      }
+    }).catchError((e) {
+      // Silently handle errors - address is not critical for map display
+      debugPrint('⚠️ Failed to fetch address: $e');
+    });
   }
 
-  Future<void> _getAddressFromLatLng(LatLng location) async {
+  Future<String?> _getAddressFromLatLng(LatLng location) async {
     try {
+      // PERFORMANCE OPTIMIZATION: Check cache first (instant response)
+      final cacheKey = '${location.latitude.toStringAsFixed(6)}_${location.longitude.toStringAsFixed(6)}';
+      if (_addressCache.containsKey(cacheKey)) {
+        return _addressCache[cacheKey];
+      }
+
+      // Fetch from API if not cached
       final String? address = await getAddressFromLocationUsingApi(location);
+      
+      // Cache the address for future use
+      if (address != null && address.isNotEmpty) {
+        _addressCache[cacheKey] = address;
+        // Limit cache size to prevent memory issues
+        if (_addressCache.length > 50) {
+          _addressCache.remove(_addressCache.keys.first);
+        }
+      }
 
-        state = state.copyWith(address: address);
-
+      return address;
     } catch (e) {
-      if(true){}
+      debugPrint('⚠️ Error fetching address: $e');
+      return null;
     }
   }
 
-  Future<String?> getAddressFromLocationUsingApi(LatLng latLng)async{
+  Future<String?> getAddressFromLocationUsingApi(LatLng latLng) async {
     final response = await ref.read(googleAPIRepoProvider).getAddressFromLatLng(latLng);
-
-   final String? address = response.fold(
-          (failure) => null,
-          (data)=> data,
+    final String? address = response.fold(
+      (failure) => null,
+      (data) => data,
     );
     return address;
   }
@@ -115,16 +137,24 @@ class HomeMapNotifier extends StateNotifier<HomeMapState> {
   //   return clusterManager;
   // }
 
-  Future<void> _setCurrentLocationMarker()async{
-    final currentLocationMarkerIcon = await _getCurrentLocationMarker();
-    state = state.copyWith(
-      markers: {Marker(
-        markerId: const MarkerId('currentLocation'),
-        position: state.currentLocation!,
-        icon: currentLocationMarkerIcon,
-        anchor: const Offset(0.5, 1.0), // Anchor at bottom center of the marker
-      )}
-    );
+  Future<void> _setCurrentLocationMarker() async {
+    if (state.currentLocation == null) return;
+    
+    // PERFORMANCE OPTIMIZATION: Load marker icon asynchronously without blocking
+    _getCurrentLocationMarker().then((icon) {
+      if (state.currentLocation != null) {
+        state = state.copyWith(
+          markers: {
+            Marker(
+              markerId: const MarkerId('currentLocation'),
+              position: state.currentLocation!,
+              icon: icon,
+              anchor: const Offset(0.5, 1.0), // Anchor at bottom center of the marker
+            )
+          },
+        );
+      }
+    });
   }
 
   // void _updateMarkers(Set<Marker> markers) async {

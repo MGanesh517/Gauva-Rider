@@ -118,6 +118,11 @@ class _ChatSheetState extends ConsumerState<ChatSheet> {
       controller: scrollController,
       padding: EdgeInsets.all(8.r),
       itemCount: messages.length,
+      // PERFORMANCE OPTIMIZATION: Optimize chat list scrolling
+      cacheExtent: 1000, // Chat messages benefit from larger cache
+      reverse: true, // Chat typically scrolls from bottom
+      addAutomaticKeepAlives: false,
+      addRepaintBoundaries: true, // Each message is a repaint boundary
       itemBuilder: (context, index) {
         final message = messages[index];
         final isLastItem = index == messages.length - 1;

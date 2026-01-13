@@ -11,6 +11,7 @@ import 'package:gauva_userapp/presentation/account_page/provider/theme_provider.
 import 'package:gauva_userapp/presentation/auth/widgets/auth_app_bar.dart';
 import 'package:gauva_userapp/presentation/auth/widgets/auth_bottom_buttons.dart';
 import 'package:gauva_userapp/presentation/auth/widgets/auth_message.dart';
+import 'package:gauva_userapp/presentation/auth/widgets/google_sign_in_button.dart';
 import '../../../core/extensions/extensions.dart';
 import '../../../core/theme/color_palette.dart';
 import '../../../core/utils/app_colors.dart';
@@ -122,7 +123,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     },
                   ),
                   // Gap(8.h),
-                  // const GoogleSignInButton(),
+                  GoogleSignInButton(),
                   // Sign Up Link
                   Padding(
                     padding: EdgeInsets.only(bottom: 16.h, top: 8.h),

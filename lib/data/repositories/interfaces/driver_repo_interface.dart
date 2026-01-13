@@ -5,6 +5,10 @@ import 'package:gauva_userapp/data/models/driver_response/driver_response.dart';
 import '../../../core/errors/failure.dart';
 
 abstract class IDriverRepo {
-  Future<Either<Failure, DriverResponse>> getDrivers(
-      {required LatLng? location});
+  Future<Either<Failure, DriverResponse>> getDrivers({
+    required LatLng? location,
+    int radiusMeters = 5000,
+    int limit = 20,
+    String? serviceType,
+  });
 }

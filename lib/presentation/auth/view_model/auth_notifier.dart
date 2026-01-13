@@ -154,14 +154,29 @@ class LoginWithPassNotifier extends StateNotifier<AppState<LoginWithPasswordResp
   Future<void> _submitFcmTokenSilently(String? fcmToken) async {
     if (fcmToken != null && fcmToken.isNotEmpty) {
       try {
+        debugPrint('📱 ═══════════════════════════════════════════════════════');
+        debugPrint('📱 SUBMITTING FCM TOKEN');
+        debugPrint('📱 ═══════════════════════════════════════════════════════');
+        debugPrint('📱 FCM Token: $fcmToken');
+        debugPrint('📱 Token Length: ${fcmToken.length}');
+        debugPrint('📱 ═══════════════════════════════════════════════════════');
         final result = await authRepo.submitFcmToken(fcmToken: fcmToken);
         result.fold(
-          (failure) => debugPrint('⚠️ FCM Token submission failed: ${failure.message}'),
-          (success) => debugPrint('✅ FCM Token submitted successfully'),
+          (failure) {
+            debugPrint('⚠️ FCM Token submission failed: ${failure.message}');
+            debugPrint('📱 Failed Token: $fcmToken');
+          },
+          (success) {
+            debugPrint('✅ FCM Token submitted successfully');
+            debugPrint('📱 Submitted Token: $fcmToken');
+          },
         );
       } catch (e) {
         debugPrint('⚠️ FCM Token submission error: $e');
+        debugPrint('📱 Error Token: $fcmToken');
       }
+    } else {
+      debugPrint('⚠️ FCM Token is null or empty, skipping submission');
     }
   }
 
@@ -315,14 +330,29 @@ class OtpVerifyNotifier extends StateNotifier<AppState<OtpVerifyResponse>> {
   Future<void> _submitFcmTokenSilently(String? fcmToken) async {
     if (fcmToken != null && fcmToken.isNotEmpty) {
       try {
+        debugPrint('📱 ═══════════════════════════════════════════════════════');
+        debugPrint('📱 SUBMITTING FCM TOKEN (OTP Verification)');
+        debugPrint('📱 ═══════════════════════════════════════════════════════');
+        debugPrint('📱 FCM Token: $fcmToken');
+        debugPrint('📱 Token Length: ${fcmToken.length}');
+        debugPrint('📱 ═══════════════════════════════════════════════════════');
         final result = await authRepo.submitFcmToken(fcmToken: fcmToken);
         result.fold(
-          (failure) => debugPrint('⚠️ FCM Token submission failed: ${failure.message}'),
-          (success) => debugPrint('✅ FCM Token submitted successfully'),
+          (failure) {
+            debugPrint('⚠️ FCM Token submission failed: ${failure.message}');
+            debugPrint('📱 Failed Token: $fcmToken');
+          },
+          (success) {
+            debugPrint('✅ FCM Token submitted successfully');
+            debugPrint('📱 Submitted Token: $fcmToken');
+          },
         );
       } catch (e) {
         debugPrint('⚠️ FCM Token submission error: $e');
+        debugPrint('📱 Error Token: $fcmToken');
       }
+    } else {
+      debugPrint('⚠️ FCM Token is null or empty, skipping submission');
     }
   }
 
@@ -614,12 +644,26 @@ class SignupNotifier extends StateNotifier<AppState<OtpVerifyResponse>> {
 
   void _submitFcmTokenSilently(String? fcmToken) {
     if (fcmToken != null && fcmToken.isNotEmpty) {
+      debugPrint('📱 ═══════════════════════════════════════════════════════');
+      debugPrint('📱 SUBMITTING FCM TOKEN (Signup)');
+      debugPrint('📱 ═══════════════════════════════════════════════════════');
+      debugPrint('📱 FCM Token: $fcmToken');
+      debugPrint('📱 Token Length: ${fcmToken.length}');
+      debugPrint('📱 ═══════════════════════════════════════════════════════');
       authRepo.submitFcmToken(fcmToken: fcmToken).then((result) {
         result.fold(
-          (failure) => debugPrint('⚠️ FCM Token submission failed: ${failure.message}'),
-          (success) => debugPrint('✅ FCM Token submitted successfully'),
+          (failure) {
+            debugPrint('⚠️ FCM Token submission failed: ${failure.message}');
+            debugPrint('📱 Failed Token: $fcmToken');
+          },
+          (success) {
+            debugPrint('✅ FCM Token submitted successfully');
+            debugPrint('📱 Submitted Token: $fcmToken');
+          },
         );
       });
+    } else {
+      debugPrint('⚠️ FCM Token is null or empty, skipping submission');
     }
   }
 }
@@ -778,12 +822,26 @@ class GoogleSignInNotifier extends StateNotifier<AppState<LoginWithPasswordRespo
 
   void _submitFcmTokenSilently(String? fcmToken) {
     if (fcmToken != null && fcmToken.isNotEmpty) {
+      debugPrint('📱 ═══════════════════════════════════════════════════════');
+      debugPrint('📱 SUBMITTING FCM TOKEN (Google Sign-In)');
+      debugPrint('📱 ═══════════════════════════════════════════════════════');
+      debugPrint('📱 FCM Token: $fcmToken');
+      debugPrint('📱 Token Length: ${fcmToken.length}');
+      debugPrint('📱 ═══════════════════════════════════════════════════════');
       authRepo.submitFcmToken(fcmToken: fcmToken).then((result) {
         result.fold(
-          (failure) => debugPrint('⚠️ FCM Token submission failed: ${failure.message}'),
-          (success) => debugPrint('✅ FCM Token submitted successfully'),
+          (failure) {
+            debugPrint('⚠️ FCM Token submission failed: ${failure.message}');
+            debugPrint('📱 Failed Token: $fcmToken');
+          },
+          (success) {
+            debugPrint('✅ FCM Token submitted successfully');
+            debugPrint('📱 Submitted Token: $fcmToken');
+          },
         );
       });
+    } else {
+      debugPrint('⚠️ FCM Token is null or empty, skipping submission');
     }
   }
 }

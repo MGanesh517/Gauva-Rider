@@ -4,16 +4,71 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:gauva_userapp/core/extensions/extensions.dart';
 import 'package:gauva_userapp/core/routes/app_routes.dart';
-import 'package:gauva_userapp/core/utils/network_image.dart';
-import 'package:gauva_userapp/core/widgets/is_ios.dart';
 import 'package:gauva_userapp/data/services/navigation_service.dart';
 import 'package:gauva_userapp/gen/assets.gen.dart';
 import 'package:gauva_userapp/generated/l10n.dart';
 import '../../../core/theme/color_palette.dart';
-import '../../../core/widgets/country_code_bottom_sheet.dart';
-import '../../account_page/provider/select_country_provider.dart';
 import '../../waypoint/provider/selected_loc_text_field_providers.dart';
+import '../../notifications/provider/notification_providers.dart';
 import '../provider/home_map_providers.dart';
+
+// Separate widget to prevent repeated API calls
+class _NotificationIcon extends ConsumerStatefulWidget {
+  const _NotificationIcon();
+
+  @override
+  ConsumerState<_NotificationIcon> createState() => _NotificationIconState();
+}
+
+class _NotificationIconState extends ConsumerState<_NotificationIcon> {
+  bool _hasLoadedInitialCount = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Load unread count only once when widget is first created
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_hasLoadedInitialCount) {
+        _hasLoadedInitialCount = true;
+        ref.read(unreadCountNotifierProvider.notifier).getUnreadCount();
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Watch unread count (this doesn't trigger API calls, just watches state)
+    final unreadState = ref.watch(unreadCountNotifierProvider);
+    final unreadCount = unreadState.maybeWhen(success: (count) => count, orElse: () => 0);
+
+    return InkWell(
+      onTap: () {
+        // Navigate to notifications page
+        NavigationService.pushNamed(AppRoutes.notificationsPage);
+        // Refresh unread count when returning (only after navigation)
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) {
+            ref.read(unreadCountNotifierProvider.notifier).refresh();
+          }
+        });
+      },
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(20)),
+        child: Badge(
+          isLabelVisible: unreadCount > 0,
+          label: Text(
+            unreadCount > 99 ? '99+' : unreadCount.toString(),
+            style: const TextStyle(fontSize: 10, color: Colors.white),
+          ),
+          backgroundColor: Colors.red,
+          child: const Icon(Icons.notifications_outlined, color: Colors.white, size: 22),
+        ),
+      ),
+    );
+  }
+}
 
 class HomeMapAppbar extends StatelessWidget {
   final bool isDark;
@@ -52,7 +107,6 @@ class HomeMapAppbar extends StatelessWidget {
   Widget locationAndCountrySelection(BuildContext context) => Consumer(
     builder: (context, ref, _) {
       final homeMapState = ref.watch(homeMapNotifierProvider);
-      final state = ref.watch(selectedCountry);
       return Row(
         children: [
           Assets.images.locationPin.image(height: 24, width: 24, fit: BoxFit.fill),
@@ -65,7 +119,9 @@ class HomeMapAppbar extends StatelessWidget {
               style: context.bodyMedium?.copyWith(fontSize: 12, fontWeight: FontWeight.w400, color: Colors.white),
             ),
           ),
-          const Gap(16),
+          const Gap(8),
+          // Notification icon button - Navigate to notifications page
+          _NotificationIcon(),
         ],
       );
     },

@@ -77,33 +77,18 @@ class GoogleApiService implements IGoogleApiService {
 
   @override
   Future<Response> searchPlace(String place) async {
-    final currentLocation = await _getCurrentLocation();
-    
+    // PERFORMANCE OPTIMIZATION: Don't fetch location on every search
+    // Backend autocomplete works fast without location parameters
+    // Location is optional and only helps with ranking, not required for search
+    // This matches the HTML tool behavior for faster search (1 second response)
     return dioClient.dio.get(
       ApiEndpoints.searchPlace,
       queryParameters: {
         'search_text': place,
-        if (currentLocation != null) 'lat': currentLocation.latitude,
-        if (currentLocation != null) 'lng': currentLocation.longitude,
-        'radius': 5000, // 5km radius
+        // Removed location parameters for faster search (matches HTML tool)
+        // Backend will handle search without location, making it faster
       },
     );
-  }
-  
-  Future<LatLng?> _getCurrentLocation() async {
-    try {
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-      if (permission == LocationPermission.deniedForever || permission == LocationPermission.denied) {
-        return null;
-      }
-      final position = await Geolocator.getCurrentPosition();
-      return LatLng(position.latitude, position.longitude);
-    } catch (e) {
-      return null;
-    }
   }
   
   /// Get zone ID for a location

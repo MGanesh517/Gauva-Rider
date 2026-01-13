@@ -14,19 +14,24 @@ class CarSelectionView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final state = ref.watch(carTypeNotifierProvider);
+    // PERFORMANCE OPTIMIZATION: Watch only serviceListState instead of entire state
+    final serviceState = ref.watch(
+      carTypeNotifierProvider.select((state) => state.serviceListState),
+    );
     final notifier = ref.read(carTypeNotifierProvider.notifier);
-    final serviceState = state.serviceListState;
-    bool isDark() => ref.read(themeModeProvider.notifier).isDarkMode();
+    // PERFORMANCE OPTIMIZATION: Cache theme check
+    final isDarkMode = ref.read(themeModeProvider.notifier).isDarkMode();
 
     final bool showNothing = serviceState.whenOrNull(error: (e) => true, success: (data) => data.isEmpty) ?? false;
     if (showNothing) {
       return const SizedBox.shrink();
     }
-    return Container(
+    return RepaintBoundary(
+      // PERFORMANCE OPTIMIZATION: RepaintBoundary prevents unnecessary repaints
+      child: Container(
       width: double.infinity,
       padding: EdgeInsets.only(left: 16.w, right: 16.w, top: 0, bottom: 12.h),
-      decoration: BoxDecoration(color: isDark() ? Colors.black : Colors.white),
+        decoration: BoxDecoration(color: isDarkMode ? Colors.black : Colors.white),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -44,7 +49,11 @@ class CarSelectionView extends ConsumerWidget {
               style: context.bodyMedium?.copyWith(fontSize: 15.sp, fontWeight: FontWeight.w500, color: Colors.black),
             ),
             loading: () => const SizedBox(height: 80, child: Center(child: LoadingView())),
-            success: (data) => carGridView(list: data, notifier: notifier, state: state),
+              success: (data) {
+                // Read state only when needed (for carGridView)
+                final state = ref.read(carTypeNotifierProvider);
+                return carGridView(list: data, notifier: notifier, state: state);
+              },
             error: (e) => Text(
               e.message,
               maxLines: 2,
@@ -53,6 +62,7 @@ class CarSelectionView extends ConsumerWidget {
             ),
           ),
         ],
+        ),
       ),
     );
   }

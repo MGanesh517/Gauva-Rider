@@ -2,7 +2,7 @@ name: gauva_userapp
 description: A Flutter project for Gauva Rider App.
 publish_to: "none"
 
-version: 1.0.8+108
+version: 1.0.11+111
 
 environment:
   sdk: ^3.8.1

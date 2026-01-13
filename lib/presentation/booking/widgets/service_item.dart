@@ -28,8 +28,10 @@ class ServiceItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Consumer(
       builder: (context, ref, _){
-        final carTypeState = ref.watch(carTypeNotifierProvider);
-        final bool isGridView = carTypeState.viewType == CarViewType.grid;
+        // PERFORMANCE OPTIMIZATION: Watch only viewType instead of entire state
+        final bool isGridView = ref.watch(
+          carTypeNotifierProvider.select((state) => state.viewType == CarViewType.grid),
+        );
 
         return Padding(
           padding: isGridView ? EdgeInsets.zero : const EdgeInsets.only(right: 8.0),
